@@ -38,30 +38,47 @@ function send_command {
 function check_is_running {
 	if [[ ! -e $PID_FILE ]]; then
 		echo "Server not running!" >&2
-		exit 1
+		exit 1 # TODO: set up some real exit codes that are unique
 	fi
 	
 	PID=`cat $PID_FILE`
 	
+	# check to see if we have a wrapper currently running
 	kill -0 $PID 2>&- 1>&-
-	
 	if [[ $? != 0 ]]; then
 		echo "Server not running!" >&2
-		exit 1
+		exit 1 # TODO: set up some real exit codes that are unique
 	fi
 }
 
 function set_up_pipe {
+	# TODO: Error checking for if this action fails.
 	if [[ ! -p "$COMMAND_PIPE" ]]; then
 		echo "Pipe doesn't exist, creating it..."
 		mkfifo $COMMAND_PIPE
 	fi
 }
 
+function print_usage {
+	echo "USAGE:"
+	echo "    $0 <action>"
+	echo "Action can be one of:"
+	echo "    start  -- start the server if it's not already running"
+	echo "    status -- whether the server is running or not"
+	echo "Any other action is interpretted as a server command and is directed to the minecraft server"
+	echo ""
+}
+
+if [[ $# -eq 0 ]]; then
+	print_usage
+	exit 0
+fi
+
 ACTION=$@
 
 case $ACTION in
 	start )
+		# write the PID file and start'er up!
 		echo $$ > $PID_FILE
 		read_command | $MINECRAFT_SERVER_CMD	
 		;;
