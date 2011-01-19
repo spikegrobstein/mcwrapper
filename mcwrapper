@@ -7,6 +7,7 @@ MS_SIZE="1024M"
 MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar $MINECRAFT_SERVER_PATH nogui"
 
 COMMAND_PIPE="command_input"
+PID_FILE="mcwrapper.pid"
 
 # END CONFIGURATION SETTINGS ############
 #########################################
@@ -27,6 +28,29 @@ function read_command {
 	read_command
 }
 
+function send_command {
+	check_is_running
+	
+	COMMAND=$1
+	echo $COMMAND > $COMMAND_PIPE
+}
+
+function check_is_running {
+	if [[ ! -e $PID_FILE ]]; then
+		echo "Server not running!" >&2
+		exit 1
+	fi
+	
+	PID=`cat $PID_FILE`
+	
+	kill -0 $PID 2>&- 1>&-
+	
+	if [[ $? != 0 ]]; then
+		echo "Server not running!" >&2
+		exit 1
+	fi
+}
+
 function set_up_pipe {
 	if [[ ! -p "$COMMAND_PIPE" ]]; then
 		echo "Pipe doesn't exist, creating it..."
@@ -34,4 +58,23 @@ function set_up_pipe {
 	fi
 }
 
-read_command | $MINECRAFT_SERVER_CMD	
+ACTION=$@
+
+case $ACTION in
+	start )
+		echo $$ > $PID_FILE
+		read_command | $MINECRAFT_SERVER_CMD	
+		;;
+	status )
+		check_is_running
+		echo "Server is running." >&2
+		;;
+	* )
+		echo "sending: $ACTION"
+		send_command "$ACTION"
+		;;
+esac
+
+exit 0
+
+
