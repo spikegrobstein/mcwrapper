@@ -1,9 +1,17 @@
 #! /bin/bash
 
-# get the settings
-. mcwrapper.conf
+MINECRAFT_SERVER_PATH="/Users/spike/minecraft/minecraft_server.jar"
+MX_SIZE="1024M"
+MS_SIZE="1024M"
 
-function read_pipe {
+MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar $MINECRAFT_SERVER_PATH nogui"
+
+COMMAND_PIPE="command_input"
+
+# END CONFIGURATION SETTINGS ############
+#########################################
+
+function read_command {
 	# read from the command pipe
 	exec < $COMMAND_PIPE
 	
@@ -16,7 +24,7 @@ function read_pipe {
 	fi
 	
 	# recurse
-	read_pipe
+	read_command
 }
 
 function set_up_pipe {
@@ -26,4 +34,4 @@ function set_up_pipe {
 	fi
 }
 
-read_pipe | $MINECRAFT_SERVER_CMD	
+read_command | $MINECRAFT_SERVER_CMD	
