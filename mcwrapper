@@ -107,7 +107,10 @@ case $ACTION in
 		
 		echo $$ > $PID_FILE
 		set_up_pipe
-		read_command | $MINECRAFT_SERVER_CMD	
+		read_command | $MINECRAFT_SERVER_CMD
+		
+		# clean up PID file when done.
+		rm $PID_FILE
 		;;
 	status )
 		check_is_running
