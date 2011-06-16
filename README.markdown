@@ -6,9 +6,11 @@ A Minecraft Server wrapper. This enables a Minecraft server admin to easily star
 
 ## Quickstart
 
-To use `mcwrapper`, first open `mcwrapper` in your text editor of choice. At the top of the file are configuration parameters. You should set them to their necessary values. The important one is `MINECRAFT_SERVER_PATH` which is the path to the minecraft_server.jar on your filesystem.
+To use `mcwrapper`, first open `mcwrapper` in your text editor of choice (eg TextMate, `vim`). At the top of the file are configuration parameters. You should set them to their necessary values. The important one is `MINECRAFT_SERVER_PATH` which is the path to the minecraft_server.jar on your filesystem.
 
-Once that is configured, you can start the server by running the following:
+When running, `mcwrapper` will use the directory that contains your minecraft_server.jar file to store it's necessary files along with the server's world data.
+
+Once you have the script properly configured, you can start the server by running the following:
 
     ./mcwrapper start
     
