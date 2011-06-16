@@ -86,7 +86,15 @@ ACTION=$@
 case $ACTION in
 	start )
 		# write the PID file and start'er up!
-		# TODO: don't start again if it's already running!
+		# don't start if we're already running.
+		
+		check_is_running
+		
+		if [[ $? = 0 ]]; then
+			echo "Server is already running. Exiting..." >&2
+			exit 1
+		fi
+		
 		echo $$ > $PID_FILE
 		set_up_pipe
 		read_command | $MINECRAFT_SERVER_CMD	
