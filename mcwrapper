@@ -81,12 +81,17 @@ function print_usage {
 	echo ""
 }
 
+## begin meat of program:
+
 if [[ $# -eq 0 ]]; then
 	print_usage
 	exit 0
 fi
 
 ACTION=$@
+
+# must cd to minecraft server directory to make sure support files are created in the correct place.
+cd `dirname $MINECRAFT_SERVER_PATH`
 
 case $ACTION in
 	start )
