@@ -61,7 +61,7 @@ function check_is_running {
 function set_up_pipe {
 	# TODO: Error checking for if this action fails.
 	if [[ ! -p "$COMMAND_PIPE" ]]; then
-		echo "Pipe doesn't exist, creating it..."
+		echo "Pipe doesn't exist, creating it..." >&2
 		mkfifo $COMMAND_PIPE
 	fi
 }
@@ -92,7 +92,11 @@ case $ACTION in
 		;;
 	status )
 		check_is_running
-		echo "Server is running." >&2
+		if [[ $? = 0 ]]; then
+			echo "Server is running." >&2
+		else
+			echo "Server is NOT running." >&2
+		fi
 		;;
 	* )
 		echo "sending: $ACTION"
