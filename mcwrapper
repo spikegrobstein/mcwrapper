@@ -42,8 +42,8 @@ function send_command {
 
 function check_is_running {
 	if [[ ! -e $PID_FILE ]]; then
-		echo "Server not running!" >&2
-		exit 1 # TODO: set up some real exit codes that are unique
+		#echo "Server not running!" >&2
+		return 1 # TODO: set up some real exit codes that are unique
 	fi
 	
 	PID=`cat $PID_FILE`
@@ -51,9 +51,11 @@ function check_is_running {
 	# check to see if we have a wrapper currently running
 	kill -0 $PID 2>&- 1>&-
 	if [[ $? != 0 ]]; then
-		echo "Server not running!" >&2
-		exit 1 # TODO: set up some real exit codes that are unique
+		#echo "Server not running!" >&2
+		return 1 # TODO: set up some real exit codes that are unique
 	fi
+	
+	return 0
 }
 
 function set_up_pipe {
