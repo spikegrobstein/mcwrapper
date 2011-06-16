@@ -1,16 +1,21 @@
 #! /bin/bash
 
+# path to the minecraft_server.jar
 MINECRAFT_SERVER_PATH="/Users/spike/minecraft/minecraft_server.jar"
+
+# Java VM settings
 MX_SIZE="1024M"
 MS_SIZE="1024M"
 
+# command for starting minecraft_server.jar
 MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar $MINECRAFT_SERVER_PATH nogui"
 
-COMMAND_PIPE="command_input"
 PID_FILE="mcwrapper.pid"
 
 # END CONFIGURATION SETTINGS ############
 #########################################
+
+COMMAND_PIPE="command_input"
 
 function read_command {
 	# read from the command pipe
