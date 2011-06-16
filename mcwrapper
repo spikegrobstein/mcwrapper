@@ -88,6 +88,7 @@ case $ACTION in
 		# write the PID file and start'er up!
 		# TODO: don't start again if it's already running!
 		echo $$ > $PID_FILE
+		set_up_pipe
 		read_command | $MINECRAFT_SERVER_CMD	
 		;;
 	status )
