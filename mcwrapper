@@ -117,14 +117,16 @@ case $ACTION in
 		if [[ $? = 0 ]]; then
 			echo "Server is running." >&2
 			exit 0
-		else
-			echo "Server is NOT running." >&2
-			exit 1
 		fi
+		
+		echo "Server is NOT running." >&2
+		exit 1
+		
 		;;
 	* )
 		echo "sending: $ACTION"
 		send_command "$ACTION"
+		exit 0
 		;;
 esac
 
