@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # path to the minecraft_server.jar
-MINECRAFT_SERVER_PATH="/Users/spike/minecraft/minecraft_server.jar"
+MINECRAFT_SERVER_PATH="/usr/local/minecraft/minecraft_server.jar"
 
 # Java VM settings
 MX_SIZE="1024M"
