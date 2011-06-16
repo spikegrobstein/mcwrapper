@@ -26,6 +26,8 @@ If you'd like to stop the server, issue the following:
 You can also find out whether the server is running:
 
     ./mcwrapper status
+    
+The status action will return 0 if the server is running or 1 if it's stopped.
 
 ## Details
 
