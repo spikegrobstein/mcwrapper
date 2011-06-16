@@ -59,10 +59,15 @@ function check_is_running {
 }
 
 function set_up_pipe {
-	# TODO: Error checking for if this action fails.
 	if [[ ! -p "$COMMAND_PIPE" ]]; then
 		echo "Pipe doesn't exist, creating it..." >&2
 		mkfifo $COMMAND_PIPE
+		
+		if [[ $? != 0 ]]; then
+			# if mkfifo failed, print error message, exit non-zero.
+			echo "Error creating the pipe ($?)." >&2
+			exit 1
+		fi
 	fi
 }
 
