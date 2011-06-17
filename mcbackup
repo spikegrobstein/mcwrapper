@@ -70,7 +70,20 @@ function start_writing_world () {
 # copy the world data and configuration
 function do_backup () {
 	cp -R "$WORLD_DIR" "$CURRENT_BACKUP_PATH/"
+	
+	if [[ $? != 0 ]]; then
+		#an error occurred
+		echo "An error occurred when copying the world data."
+		exit 1
+	fi
+	
 	cp -R "${MINECRAFT_SERVERDIR}/"*.{txt,properties} "$CURRENT_BACKUP_PATH/"
+	
+	if [[ $? != 0 ]]; then
+		#an error occurred
+		echo "An error occurred when copying the configuration information"
+		exit 1
+	fi
 }
 
 function create_symlink () {
