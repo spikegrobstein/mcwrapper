@@ -91,8 +91,20 @@ function create_symlink () {
 	if [[ -e "$LATEST_BACKUP_PATH" ]]; then
 		# if the symlink already exists, delete it before creating it.
 		rm "$LATEST_BACKUP_PATH"
+		
+		if [[ $? != 0 ]]; then
+			#an error occurred
+			echo "An error occurred when deleting the old symlink."
+			exit 1
+		fi
 	fi
 	ln -s "$CURRENT_BACKUP_PATH" "$LATEST_BACKUP_PATH"
+	
+	if [[ $? != 0 ]]; then
+		#an error occurred
+		echo "An error occurred when creating the symlink."
+		exit 1
+	fi
 }
 
 # delete old backups
