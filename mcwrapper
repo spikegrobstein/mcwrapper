@@ -97,6 +97,11 @@ if [[ $# -eq 0 ]]; then
 	exit 0
 fi
 
+# initialize some vars
+MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
+PID_FILE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$PID_FILE"
+COMMAND_PIPE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$COMMAND_PIPE"
+
 ACTION=$1;shift
 
 # check to make sure that we're in a sane configuration
@@ -145,11 +150,11 @@ case $ACTION in
 				exit 0
 				;;
 			pidfile )
-				echo $PID_FILE
+				echo $PID_FILE_PATH
 				exit 0
 				;;
 			pipe )
-				echo $COMMAND_PIPE
+				echo $COMMAND_PIPE_PATH
 				exit 0
 				;;
 			*)
