@@ -99,6 +99,8 @@ fi
 
 ACTION=$@
 
+# check to make sure that we're in a sane configuration
+# function exits on error.
 sanity_check
 
 # must cd to minecraft server directory to make sure support files are created in the correct place.
