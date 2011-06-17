@@ -7,9 +7,6 @@ MINECRAFT_SERVER_PATH="/usr/local/minecraft/minecraft_server.jar"
 MX_SIZE="1024M"
 MS_SIZE="1024M"
 
-# command for starting minecraft_server.jar
-MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar $MINECRAFT_SERVER_PATH nogui"
-
 PID_FILE="mcwrapper.pid"
 COMMAND_PIPE="command_input"
 
@@ -20,6 +17,9 @@ COMMAND_PIPE="command_input"
 MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
 PID_FILE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$PID_FILE"
 COMMAND_PIPE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$COMMAND_PIPE"
+
+# command for starting minecraft_server.jar
+MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar $MINECRAFT_SERVER_PATH nogui"
 
 function read_command {
 	# read from the command pipe
