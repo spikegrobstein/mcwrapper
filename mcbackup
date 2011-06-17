@@ -43,12 +43,16 @@ function stop_writing_world () {
 	sh "$MCWRAPPER" save-off
 }
 
+# begin writing the world data again
+function start_writing_world () {
+	sh "$MCWRAPPER" save-on
+}
+
+# copy the world data and configuration
 function do_backup () {
 	cp -R "$WORLD_DIR" "$CURRENT_BACKUP_PATH/"
 	cp -R "${MINECRAFT_SERVERDIR}/"*.{txt,properties} "$CURRENT_BACKUP_PATH/"
 }
-
-
 
 
 # path to mcwrapper
@@ -77,8 +81,7 @@ CURRENT_BACKUP_PATH="${BACKUP_DIR}/$CURRENT_BACKUP_NAME"
 create_backup_directory
 stop_writing_world
 do_backup
-
-sh "$MCWRAPPER" save-on
+start_writing_world
 
 # then we symlink the current backup to "latest" in backups directory
 if [[ -e "$BACKUP_DIR/latest" ]]; then
