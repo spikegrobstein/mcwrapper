@@ -48,6 +48,12 @@ function sanity_check () {
 # create the backup directory
 function create_backup_directory () {
 	mkdir -p "$CURRENT_BACKUP_PATH"
+	
+	if [[ $? != 0 ]]; then
+		#an error occurred
+		echo "An error occurred when creating the backup directory."
+		exit 1
+	fi
 }
 
 # stop writing to the world file(s) after flushing the buffer
