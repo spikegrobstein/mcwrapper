@@ -63,12 +63,24 @@ You can run that all through the Minecraft server with the following command:
 
 Since it's not safe to back up the world data while the server is running, you need to force a save, then disable writing world data to disk during a backup.
 
-This is done by issuing the following commands:
+I've built a helper script for this called `mcbackup`.
 
-    ./mcwrapper save-all
-    ./mcwrapper save-off
-    # at this point, do the backup
-    ./mcwrapper save-on
+`mcbackup` is passed a path to `mcwrapper` as its only commandline argument. From there, it reads configuration settings, then issues commands to the server to stop writing world data after flushing anything in memory, creates a timestamped directory in the minecraft server directory and creates a symlink to the latest backup called `latest`.
+
+Example usage follows.
+
+Assuming your `mcwrapper` lives in `/usr/local/minecraft/mcwrapper`, run `mcbackup` like this:
+
+    ./mcbackup /usr/local/minecraft/mcwrapper
+    
+mcbackup will then do the following:
+
+ 1. create `/usr/local/minecraft/backups/YYYYMMDDHHMMSS` where YYYYMMDDHHMMSS is the current timestamp
+ 2. copy `/usr/local/minecraft/world` and any other configuration data in `/usr/local/minecraft` into the above directory
+ 3. create a symlink to the latest backup at `/usr/local/minecraft/backups/latest`
+ 4. delete old backups. Defaults to keeping the latest 5.
+ 
+The name of the `latest` backup can be configured by editing that setting in `mcbackup`. You can also configure how many previous backups are kept.
     
 ## The Future (Todo List)
 
