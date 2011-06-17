@@ -71,6 +71,15 @@ function set_up_pipe {
 	fi
 }
 
+function sanity_check {
+	# check to make sure that things that need to exist exist.
+	if [[ ! -d "$MINECRAFT_SERVER_PATH" ]]; then
+		# the minecraft server path does not exist.
+		echo "Minecraft server not found! ($MINECRAFT_SERVER_PATH)"
+		exit 1
+	fi
+}
+
 function print_usage {
 	echo "USAGE:"
 	echo "    $0 <action>"
@@ -89,6 +98,8 @@ if [[ $# -eq 0 ]]; then
 fi
 
 ACTION=$@
+
+sanity_check
 
 # must cd to minecraft server directory to make sure support files are created in the correct place.
 cd `dirname $MINECRAFT_SERVER_PATH`
