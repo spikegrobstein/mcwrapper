@@ -32,6 +32,11 @@ function sanity_check () {
 	fi
 }
 
+function create_backup_directory () {
+	mkdir -p "$CURRENT_BACKUP_PATH"
+}
+
+
 
 # path to mcwrapper
 MCWRAPPER="$1"
@@ -56,8 +61,7 @@ WORLD_DIR="${MINECRAFT_SERVERDIR}/world"
 CURRENT_BACKUP_NAME=`date +%Y%m%d%H%M%S`
 CURRENT_BACKUP_PATH="${BACKUP_DIR}/$CURRENT_BACKUP_NAME"
 
-# create backup directory
-mkdir -p $CURRENT_BACKUP_PATH
+create_backup_directory
 
 # write the world, stop writing world data, backup, start writing world again.
 sh "$MCWRAPPER" save-all
