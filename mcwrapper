@@ -25,7 +25,7 @@ PID_FILE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$PID_FILE"
 COMMAND_PIPE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$COMMAND_PIPE"
 
 # command for starting minecraft_server.jar
-MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar $MINECRAFT_SERVER_PATH nogui"
+MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER_PATH" nogui"
 
 function read_command {
 	# read from the command pipe
