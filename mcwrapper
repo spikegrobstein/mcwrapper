@@ -97,7 +97,7 @@ if [[ $# -eq 0 ]]; then
 	exit 0
 fi
 
-ACTION=$@
+ACTION=$1;shift
 
 # check to make sure that we're in a sane configuration
 # function exits on error.
@@ -159,14 +159,15 @@ case $ACTION in
 		esac
 		;;
 	* )
-		echo "sending: $ACTION"
+		COMMAND="$ACTION $@"
+		echo "sending: $COMMAND"
 		check_is_running
 		if [[ $? != 0 ]]; then
 			echo "Server is NOT running. Not sending command"
 			exit 1
 		fi
 		
-		send_command "$ACTION"
+		send_command "$COMMAND"
 		exit 0
 		;;
 esac
