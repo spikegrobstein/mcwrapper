@@ -47,16 +47,16 @@ function send_command {
 	check_is_running
 	
 	COMMAND=$1
-	echo "$COMMAND" > $COMMAND_PIPE_PATH
+	echo "$COMMAND" > "$COMMAND_PIPE_PATH"
 }
 
 function check_is_running {
-	if [[ ! -e $PID_FILE_PATH ]]; then
+	if [[ ! -e "$PID_FILE_PATH" ]]; then
 		#echo "Server not running!" >&2
 		return 1 # TODO: set up some real exit codes that are unique
 	fi
 	
-	PID=`cat $PID_FILE_PATH`
+	PID=`cat "$PID_FILE_PATH"`
 	
 	# check to see if we have a wrapper currently running
 	kill -0 $PID 2>&- 1>&-
@@ -71,7 +71,7 @@ function check_is_running {
 function set_up_pipe {
 	if [[ ! -p "$COMMAND_PIPE_PATH" ]]; then
 		echo "Pipe doesn't exist, creating it..." >&2
-		mkfifo $COMMAND_PIPE_PATH
+		mkfifo "$COMMAND_PIPE_PATH"
 		
 		if [[ $? != 0 ]]; then
 			# if mkfifo failed, print error message, exit non-zero.
