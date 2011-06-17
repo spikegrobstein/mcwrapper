@@ -1,9 +1,15 @@
 #! /bin/bash
 
 # path to the minecraft_server.jar
-MINECRAFT_SERVER_PATH="/usr/local/minecraft/minecraft_server.jar"
+# if this is not defined in the existing environment, define here.
+if [[ -z "$MINECRAFT_SERVER_PATH" ]]; then
+	
+	# change this if you don't want to export an environment var from your session
+	MINECRAFT_SERVER_PATH="/usr/local/minecraft/minecraft_server.jar"
+	
+fi
 
-# Java VM settings
+# Java VM settings (increasing these never hurts)
 MX_SIZE="1024M"
 MS_SIZE="1024M"
 
