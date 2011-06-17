@@ -11,11 +11,10 @@ MS_SIZE="1024M"
 MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar $MINECRAFT_SERVER_PATH nogui"
 
 PID_FILE="mcwrapper.pid"
+COMMAND_PIPE="command_input"
 
 # END CONFIGURATION SETTINGS ############
 #########################################
-
-COMMAND_PIPE="command_input"
 
 function read_command {
 	# read from the command pipe
