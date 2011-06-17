@@ -112,6 +112,10 @@ function cleanup_old_backups () {
 	OLD_BACKUPS=`ls -r "$BACKUP_DIR" | grep -v "$LATEST_BACKUP_NAME" | tail +"${BACKUPS_TO_KEEP}"`
 	for o in $OLD_BACKUPS; do
 		rm -rf "${BACKUP_DIR}/$o"
+		if [[ $? != 0 ]]; then
+			#an error occurred but don't exit.
+			echo "An error occurred when deleting a previous backup: $o."
+		fi
 	done
 }
 
