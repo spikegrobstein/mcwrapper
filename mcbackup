@@ -43,6 +43,12 @@ function stop_writing_world () {
 	sh "$MCWRAPPER" save-off
 }
 
+function do_backup () {
+	cp -R "$WORLD_DIR" "$CURRENT_BACKUP_PATH/"
+	cp -R "${MINECRAFT_SERVERDIR}/"*.{txt,properties} "$CURRENT_BACKUP_PATH/"
+}
+
+
 
 
 # path to mcwrapper
@@ -70,9 +76,7 @@ CURRENT_BACKUP_PATH="${BACKUP_DIR}/$CURRENT_BACKUP_NAME"
 
 create_backup_directory
 stop_writing_world
-
-cp -R "$WORLD_DIR" "$CURRENT_BACKUP_PATH/"
-cp -R "${MINECRAFT_SERVERDIR}/"*.{txt,properties} "$CURRENT_BACKUP_PATH/"
+do_backup
 
 sh "$MCWRAPPER" save-on
 
