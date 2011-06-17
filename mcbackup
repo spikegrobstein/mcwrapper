@@ -4,8 +4,21 @@
 # usage:
 #  ./mcbackup <path_to_mcwrapper>
 
+function print_usage () {
+	echo "Usage:"
+	echo "  $0 <path_to_mcwrapper>"
+	echo ""
+}
+
+
 # path to mcwrapper
 MCWRAPPER="$1"
+
+# check to make sure that the app was used properly.
+if [[ -z "$MCWRAPPER" ]]; then
+	print_usage
+	exit 1
+fi
 
 # make sure mcwrapper exists:
 if [[ ! -e "$MCWRAPPER" ]]; then
