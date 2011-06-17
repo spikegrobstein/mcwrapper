@@ -1,0 +1,17 @@
+#! /bin/bash
+
+# mcbackup
+# usage:
+#  ./mcbackup <path_to_mcwrapper>
+
+# path to mcwrapper
+MCWRAPPER="$1"
+
+# make sure that minecraft is running in mcwrapper
+sh "$MCWRAPPER" status
+if [[ $? != 0 ]]; then
+	exit $? # pass the exit code on
+fi
+
+# read configurations
+MCWRAPPER
