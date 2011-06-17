@@ -156,6 +156,10 @@ case $ACTION in
 				echo $MINECRAFT_SERVER_PATH
 				exit 0
 				;;
+			serverdir )
+				echo $MINECRAFT_SERVER_DIR_PATH
+				exit 0
+				;;
 			pidfile )
 				echo $PID_FILE_PATH
 				exit 0
