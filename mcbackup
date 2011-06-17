@@ -9,9 +9,13 @@ MCWRAPPER="$1"
 
 # make sure that minecraft is running in mcwrapper
 sh "$MCWRAPPER" status
-if [[ $? != 0 ]]; then
-	exit $? # pass the exit code on
+STATUS=$?
+if [[ $STATUS != 0 ]]; then
+	exit $STATUS # pass the exit code on
 fi
 
 # read configurations
-MCWRAPPER
+MINECRAFT_SERVERPATH=`sh "$MCWRAPPER" config serverpath`
+
+
+echo "Read server: $MINECRAFT_SERVERPATH"
