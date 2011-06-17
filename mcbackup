@@ -4,11 +4,24 @@
 # usage:
 #  ./mcbackup <path_to_mcwrapper>
 
+# print usage
 function print_usage () {
 	echo "Usage:"
 	echo "  $0 <path_to_mcwrapper>"
 	echo ""
 }
+
+# make sure minecraft is running via mcwrapper
+# if not, exit (mcwrapper will output necessary string)
+function check_status () {
+	# make sure that minecraft is running in mcwrapper
+	sh "$MCWRAPPER" status
+	STATUS=$?
+	if [[ $STATUS != 0 ]]; then
+		exit $STATUS # pass the exit code on
+	fi
+}
+
 
 
 # path to mcwrapper
@@ -26,12 +39,7 @@ if [[ ! -e "$MCWRAPPER" ]]; then
 	exit 1
 fi
 
-# make sure that minecraft is running in mcwrapper
-sh "$MCWRAPPER" status
-STATUS=$?
-if [[ $STATUS != 0 ]]; then
-	exit $STATUS # pass the exit code on
-fi
+check_status
 
 # read configurations
 MINECRAFT_SERVERDIR=`sh "$MCWRAPPER" config serverdir`
