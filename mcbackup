@@ -22,6 +22,15 @@ function check_status () {
 	fi
 }
 
+# make sure mcwrapper exists
+# exit in the event that we fail any tests.
+function sanity_check () {
+	# make sure mcwrapper exists:
+	if [[ ! -e "$MCWRAPPER" ]]; then
+		echo "mcwrapper not found! ($MCWRAPPER)"
+		exit 1
+	fi
+}
 
 
 # path to mcwrapper
@@ -33,12 +42,7 @@ if [[ -z "$MCWRAPPER" ]]; then
 	exit 1
 fi
 
-# make sure mcwrapper exists:
-if [[ ! -e "$MCWRAPPER" ]]; then
-	echo "mcwrapper not found! ($MCWRAPPER)"
-	exit 1
-fi
-
+sanity_check
 check_status
 
 # read configurations
