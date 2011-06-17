@@ -29,7 +29,7 @@ MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER
 
 function read_command {
 	# read from the command pipe
-	exec < $COMMAND_PIPE_PATH
+	exec < "$COMMAND_PIPE_PATH"
 	
 	read INPUT
 	echo $INPUT
