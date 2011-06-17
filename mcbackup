@@ -7,6 +7,12 @@
 # path to mcwrapper
 MCWRAPPER="$1"
 
+# make sure mcwrapper exists:
+if [[ ! -e "$MCWRAPPER" ]]; then
+	echo "mcwrapper not found! ($MCWRAPPER)"
+	exit 1
+fi
+
 # make sure that minecraft is running in mcwrapper
 sh "$MCWRAPPER" status
 STATUS=$?
