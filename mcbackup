@@ -54,6 +54,16 @@ function do_backup () {
 	cp -R "${MINECRAFT_SERVERDIR}/"*.{txt,properties} "$CURRENT_BACKUP_PATH/"
 }
 
+function create_symlink () {
+	# then we symlink the current backup to "latest" in backups directory
+	if [[ -e "$BACKUP_DIR/latest" ]]; then
+		# if the symlink already exists, delete it before creating it.
+		rm "$BACKUP_DIR/latest"
+	fi
+	ln -s "$CURRENT_BACKUP_PATH" "$BACKUP_DIR/latest"
+}
+
+
 
 # path to mcwrapper
 MCWRAPPER="$1"
@@ -82,10 +92,4 @@ create_backup_directory
 stop_writing_world
 do_backup
 start_writing_world
-
-# then we symlink the current backup to "latest" in backups directory
-if [[ -e "$BACKUP_DIR/latest" ]]; then
-	# if the symlink already exists, delete it before creating it.
-	rm "$BACKUP_DIR/latest"
-fi
-ln -s "$CURRENT_BACKUP_PATH" "$BACKUP_DIR/latest"
+create_symlink
