@@ -123,8 +123,36 @@ case $ACTION in
 		exit 1
 		
 		;;
+	config )
+		# dump info about the config
+		CONFIG_SETTING=$1
+		case $CONFIG_SETTING in
+			serverpath )
+				echo $MINECRAFT_SERVER_PATH
+				exit 0
+				;;
+			pidfile )
+				echo $PID_FILE
+				exit 0
+				;;
+			pipe )
+				echo $COMMAND_PIPE
+				exit 0
+				;;
+			*)
+				echo "Unknown config setting: $CONFIG_SETTING"
+				exit 1
+				;;
+		esac
+		;;
 	* )
 		echo "sending: $ACTION"
+		check_is_running
+		if [[ $? != 0 ]]; then
+			echo "Server is NOT running. Not sending command"
+			exit 1
+		fi
+		
 		send_command "$ACTION"
 		exit 0
 		;;
