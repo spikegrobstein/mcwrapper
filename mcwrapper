@@ -82,6 +82,8 @@ function set_up_pipe {
 }
 
 function sanity_check {
+	# TODO: add checks to make sure that PID_FILE_PATH and COMMAND_PIPE_PATH are writable
+	
 	# check to make sure that things that need to exist exist.
 	if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
 		# the minecraft server path does not exist.
