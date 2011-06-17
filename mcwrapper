@@ -23,7 +23,7 @@ COMMAND_PIPE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$COMMAND_PIPE"
 
 function read_command {
 	# read from the command pipe
-	exec < $COMMAND_PIPE
+	exec < $COMMAND_PIPE_PATH
 	
 	read INPUT
 	echo $INPUT
@@ -41,16 +41,16 @@ function send_command {
 	check_is_running
 	
 	COMMAND=$1
-	echo $COMMAND > $COMMAND_PIPE
+	echo "$COMMAND" > $COMMAND_PIPE_PATH
 }
 
 function check_is_running {
-	if [[ ! -e $PID_FILE ]]; then
+	if [[ ! -e $PID_FILE_PATH ]]; then
 		#echo "Server not running!" >&2
 		return 1 # TODO: set up some real exit codes that are unique
 	fi
 	
-	PID=`cat $PID_FILE`
+	PID=`cat $PID_FILE_PATH`
 	
 	# check to see if we have a wrapper currently running
 	kill -0 $PID 2>&- 1>&-
@@ -63,13 +63,13 @@ function check_is_running {
 }
 
 function set_up_pipe {
-	if [[ ! -p "$COMMAND_PIPE" ]]; then
+	if [[ ! -p "$COMMAND_PIPE_PATH" ]]; then
 		echo "Pipe doesn't exist, creating it..." >&2
-		mkfifo $COMMAND_PIPE
+		mkfifo $COMMAND_PIPE_PATH
 		
 		if [[ $? != 0 ]]; then
 			# if mkfifo failed, print error message, exit non-zero.
-			echo "Error creating the pipe ($?)." >&2
+			echo "Error creating the pipe: $COMMAND_PIPE_PATH ($?)." >&2
 			exit 1
 		fi
 	fi
