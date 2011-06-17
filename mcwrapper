@@ -73,7 +73,7 @@ function set_up_pipe {
 
 function sanity_check {
 	# check to make sure that things that need to exist exist.
-	if [[ ! -d "$MINECRAFT_SERVER_PATH" ]]; then
+	if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
 		# the minecraft server path does not exist.
 		echo "Minecraft server not found! ($MINECRAFT_SERVER_PATH)"
 		exit 1
