@@ -84,9 +84,6 @@ function cleanup_old_backups () {
 	done
 }
 
-
-
-
 # path to mcwrapper
 MCWRAPPER="$1"
 
