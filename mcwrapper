@@ -16,6 +16,11 @@ COMMAND_PIPE="command_input"
 # END CONFIGURATION SETTINGS ############
 #########################################
 
+# initialize some vars
+MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
+PID_FILE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$PID_FILE"
+COMMAND_PIPE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$COMMAND_PIPE"
+
 function read_command {
 	# read from the command pipe
 	exec < $COMMAND_PIPE
@@ -95,11 +100,6 @@ if [[ $# -eq 0 ]]; then
 	print_usage
 	exit 0
 fi
-
-# initialize some vars
-MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
-PID_FILE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$PID_FILE"
-COMMAND_PIPE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$COMMAND_PIPE"
 
 ACTION=$1;shift
 
