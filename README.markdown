@@ -1,6 +1,6 @@
 # mcwrapper
 
-A Minecraft Server wrapper. This enables a Minecraft server admin to easily start a server and send commands and also do safe, automatic backups.
+A Minecraft Server wrapper for POSIX compatible operating systems (OSX, Linux, BSD, etc). This enables a Minecraft server admin to easily start and stop their server, send commands and also do safe, automatic world data backups.
 
 *I'm MC Wrapper and I'm here to say that I wanna wrap up minecraft so everything'll be okay.*
 
