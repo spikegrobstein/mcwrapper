@@ -110,13 +110,6 @@ function process_config {
 	
 }
 
-# default config values
-function default_config_for {
-	local KEY="$1"
-	
-	echo "You picked: $KEY"
-}
-
 function read_command {
 	# read from the command pipe
 	exec < "$COMMAND_PIPE"
