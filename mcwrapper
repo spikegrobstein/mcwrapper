@@ -1,31 +1,88 @@
 #! /bin/bash
 
-# path to the minecraft_server.jar
-# if this is not defined in the existing environment, define here.
-if [[ -z "$MINECRAFT_SERVER_PATH" ]]; then
+MCWRAPPER="$0"
+MCWRAPPER_DIR=`dirname "$MCWRAPPER"`
+MCWRAPPER_CONFIG_NAME="mcwrapperrc"
+
+function get_config_path {
+	# let's figure out where the config path is
+	# if it's defined in an ENV var, then let's use that
 	
-	# change this if you don't want to export an environment var from your session
-	MINECRAFT_SERVER_PATH="/usr/local/minecraft/minecraft_server.jar"
+	if [[ ! -z "$MCWRAPPER_CONFIG_PATH" ]]; then
+		echo $MCWRAPPER_CONFIG_PATH
+		return
+	fi
 	
-fi
+	# check ./mcwrapperrc
+	CURRENT_PATH="${MCWRAPPER_DIR}/${MCWRAPPER_CONFIG_NAME}"
+	if [[ -e "$CURRENT_PATH" ]]; then
+		echo $CURRENT_PATH
+		return
+	fi
+	
+	# check ~/.mcwrapperrc
+	CURRENT_PATH=~/".${MCWRAPPER_CONFIG_NAME}"
+	if [[ -e "$CURRENT_PATH" ]]; then
+		echo $CURRENT_PATH
+		return
+	fi
+		
+	# check /etc/mcwrapperrc
+	CURRENT_PATH="/etc/${MCWRAPPER_CONFIG_NAME}"
+	if [[ -e "$CURRENT_PATH" ]]; then
+		echo $CURRENT_PATH
+		return
+	fi
+}
 
-# Java VM settings (increasing these never hurts)
-MX_SIZE="1024M"
-MS_SIZE="1024M"
+# configure self from config file
+function read_config {
+	CONFIG_PATH=`get_config_path`
+	
+	# if it's not found, don't do shit. stick with default values.
+	if [[ -z "$CONFIG_PATH" || ! -d "$CONFIG_PATH" ]]; then
+		return
+	fi
+	
+	# it was found, so we read it by sourcing it.
+	. "$CONFIG_PATH"
+}
 
-PID_FILE="mcwrapper.pid"
-COMMAND_PIPE="command_input"
+function default_config {
+	# path to the minecraft_server.jar
+	# if this is not defined in the existing environment, define here.
+	if [[ -z "$MINECRAFT_SERVER_PATH" ]]; then
 
-# END CONFIGURATION SETTINGS ############
-#########################################
+		# change this if you don't want to export an environment var from your session
+		MINECRAFT_SERVER_PATH="/usr/local/minecraft/minecraft_server.jar"
 
-# initialize some vars
-MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
-PID_FILE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$PID_FILE"
-COMMAND_PIPE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$COMMAND_PIPE"
+	fi
 
-# command for starting minecraft_server.jar
-MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER_PATH" nogui"
+	# Java VM settings (increasing these never hurts)
+	MX_SIZE="1024M"
+	MS_SIZE="1024M"
+
+	PID_FILE="mcwrapper.pid"
+	COMMAND_PIPE="command_input"
+
+	# END CONFIGURATION SETTINGS ############
+	#########################################
+
+	# initialize some vars
+	MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
+	PID_FILE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$PID_FILE"
+	COMMAND_PIPE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$COMMAND_PIPE"
+
+	# command for starting minecraft_server.jar
+	MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER_PATH" nogui"
+}
+
+# default config values
+function default_config_for {
+	local KEY="$1"
+	
+	echo "You picked: $KEY"
+}
 
 function read_command {
 	# read from the command pipe
@@ -119,6 +176,10 @@ fi
 
 ACTION=$1;shift
 
+# selfconfigure
+default_config
+read_config
+
 # check to make sure that we're in a sane configuration
 # function exits on error.
 sanity_check
@@ -174,6 +235,10 @@ case $ACTION in
 				;;
 			pipe )
 				echo $COMMAND_PIPE_PATH
+				exit 0
+				;;
+			configfile )
+				echo $CONFIG_PATH
 				exit 0
 				;;
 			*)
