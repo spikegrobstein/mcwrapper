@@ -77,10 +77,7 @@ function default_config {
 	PID_FILE="mcwrapper.pid"
 	COMMAND_PIPE="command_input"
 
-	# END CONFIGURATION SETTINGS ############
-	#########################################
-
-	# initialize some vars
+	# the directory of the minecraft_server.jar based off $MINECRAFT_SERVER_PATH
 	MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
 }
 
