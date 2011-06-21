@@ -94,7 +94,7 @@ function default_config {
 function process_config {
 	
 	# MINECRAFT_SERVER_PATH can be relative or absolute
-	if [[ ! "$MINECRAFT_SERVER_PATH" =~ ^/ ]]; then
+	if [[ ! "$MINECRAFT_SERVER_PATH" =~ ^/ && ! "$MINECRAFT_SERVER_PATH" =~ "$MCWRAPPER_DIR" ]]; then
 		MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/$MINECRAFT_SERVER_PATH"
 	fi
 	
