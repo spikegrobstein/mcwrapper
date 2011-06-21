@@ -217,7 +217,6 @@ process_config
 sanity_check
 
 # must cd to minecraft server directory to make sure support files are created in the correct place.
-cd `dirname $MINECRAFT_SERVER_PATH`
 
 case $ACTION in
 	start )
@@ -233,7 +232,7 @@ case $ACTION in
 		
 		echo $$ > $PID_FILE
 		set_up_pipe
-		read_command | $MINECRAFT_SERVER_CMD
+		( cd $MINECRAFT_SERVER_DIR_PATH ; read_command | $MINECRAFT_SERVER_CMD )
 		
 		# clean up PID file when done.
 		rm $PID_FILE
