@@ -82,9 +82,6 @@ function default_config {
 
 	# initialize some vars
 	MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
-
-	# command for starting minecraft_server.jar
-	MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER_PATH" nogui"
 }
 
 # run this to process a loaded config
@@ -106,6 +103,13 @@ function process_config {
 	# COMMAND_PIPE can be relative or absolute
 	if [[ ! "$COMMAND_PIPE" =~ ^/ ]]; then
 		COMMAND_PIPE="${MCWRAPPER_DIR}/$COMMAND_PIPE"
+	fi
+	
+	# set MINECRAFT_SERVER_CMD
+	# this may be overridden in the config, so if it's set already, don't set it.
+	if [[ -z "$MINECRAFT_SERVER_CMD" ]]; then
+		# command for starting minecraft_server.jar
+		MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER_PATH" nogui"
 	fi
 	
 }
@@ -189,6 +193,7 @@ function print_usage {
 	echo "               *  serverdir  -- absolute path to server directory (containing minecraft_server.jar)"
 	echo "               *  pidfile    -- absolute path to mcwrapper pidfile"
 	echo "               *  pipe       -- absolute path to the mcwrapper command pipe"
+	echo "               *  command    -- the command that will be used to launch the minecraft server"
 	echo "Any other action is interpretted as a server command and is directed to the minecraft server"
 	echo ""
 }
@@ -266,6 +271,10 @@ case $ACTION in
 				;;
 			configfile )
 				echo $CONFIG_PATH
+				exit 0
+				;;
+			command )
+				echo $MINECRAFT_SERVER_CMD
 				exit 0
 				;;
 			*)
