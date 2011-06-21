@@ -6,11 +6,29 @@ A Minecraft Server wrapper for POSIX compatible operating systems (OSX, Linux, B
 
 ## Quickstart
 
-To use `mcwrapper`, first open `mcwrapper` in your text editor of choice (eg TextMate, `vim`). At the top of the file are configuration parameters. You should set them to their necessary values. The important one is `MINECRAFT_SERVER_PATH` which is the path to the minecraft_server.jar on your filesystem.
+Getting up and running with `mcwrapper` is easier than ever. Provided you have git installed:
 
-When running, `mcwrapper` will use the directory that contains your minecraft_server.jar file to store it's necessary files along with the server's world data.
+ 1. cd into the directory with minecraft_server.jar in it.
+ 2. git clone git://github.com/spikegrobstein/mcwrapper.git
+ 3. cd mcwrapper
+ 4. ./mcwrapper start
+ 
+If you don't have git:
 
-Once you have the script properly configured, you can start the server by running the following:
+ 1. download a zip or tarball of the latest version of mcwrapper from https://github.com/spikegrobstein/mcwrapper
+ 2. unzip/untar it
+ 3. rename resulting directory to 'mcwrapper'
+ 4. copy resulting 'mcwrapper' directory into the same directory as minecraft_server.jar.
+ 5. cd into the 'mcwrapper' directory
+ 6. ./mcwrapper start
+ 
+The above will start up a Minecraft server instance using default settings. All support files related to mcwrapper will be stored in this new mcwrapper directory. Updating to the latest version is as easy as cd'ing into the mcwrapper directory and typing `git pull`
+
+See the Configuration section below for instructions on modifying the default configuration.
+
+### Commands
+
+As seen above, you can start the server by running the following:
 
     ./mcwrapper start
     
@@ -21,7 +39,7 @@ After that, you can execute arbitrary commands to the server:
     ./mcwrapper save-off
     ./mcwrapper save-on
 
-If you'd like to stop the server, issue the following:
+If you'd like to stop the server, issue the following command:
 
     ./mcwrapper stop
     
@@ -31,9 +49,27 @@ You can also find out whether the server is running:
     
 The status action will return 0 if the server is running or 1 if it's stopped.
 
+There is also support for reading information about the running configuration for cases where an external script may want to interact with Minecraft or `mcwrapper`. Example:
+
+    ./mcwrapper config serverpath
+    
+The above will output the path to the `minecraft_server.jar` file that it will wrap. All config commands can be run whether `mcwrapper` is running a server or not. A bug currently exists where if `mcwrapper` cannot locate the minecraft_server.jar, no commands will work.
+
+A full list of configuration options and commands can be found by typing:
+
+    ./mcwrapper help    
+    
+## Configuration
+
+Although `mcwrapper` has a built-in default configuration, there are times when you may want to have it operate slightly differently. `mcwrapper` is bundled with an example mcwrapperrc example file called `mcwrapperrc.example`.
+
+Rename that file to `mcwrapperrc` and you can edit the settings in it. Full documentation exists in there.
+
+`mcwrapperrc` can also live in `~/.mcwrapperrc` or `/etc/mcwrapperrc`. The priority is that order.
+
 ## Details
 
-When running, `mcwrapper` creates 2 files:
+When running, `mcwrapper` uses 2 files:
 
  * mcwrapper.pid -- the pid of the currently running process. This is used by `mcwrapper` for sanity checks but can also be used by 3rd party scripts to see if minecraft_server is running.
  * command_input -- the FIFO used for communicating with the server.
