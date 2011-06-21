@@ -43,12 +43,12 @@ function read_config {
 	CONFIG_PATH=`get_config_path`
 	
 	# if it's not found, don't do shit. stick with default values.
-	if [[ -z "$CONFIG_PATH" || ! -d "$CONFIG_PATH" ]]; then
+	if [[ -z "$CONFIG_PATH" || ! -e "$CONFIG_PATH" ]]; then
 		return
 	fi
 	
 	# it was found, so we read it by sourcing it.
-	. "$CONFIG_PATH"
+	. "$CONFIG_PATH"	
 }
 
 function default_config {
