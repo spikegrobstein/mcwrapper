@@ -1,29 +1,26 @@
 # Example configuration for mcwrapper: mcwrapperrc
 # this file can live in any of the following places (in order of priority):
-# - the value of MCWRAPPER_CONFIG_PATH env variable
-# - same directory as mcwrapper as "mcwrapperrc"
-# - ~/.mcwrapperrc
-# - /etc/mcwrapperrc
+#  - the value of MCWRAPPER_CONFIG_PATH env variable
+#  - same directory as mcwrapper as "mcwrapperrc"
+#  - ~/.mcwrapperrc
+#  - /etc/mcwrapperrc
 #
-# Configuration is actual Bash. You can use conditionals if you want.
+# Configuration is actual Bash. You can use conditionals... not that would.
 
 # path to the minecraft_server.jar
-MINECRAFT_SERVER_PATH="/usr/local/minecraft/minecraft_server.jar"
-
-# the directory of the minecraft server (for convenience)
-MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
+# can be relative or absolute. if relative, it's relative to mcwrapper
+# defaults to either minecraft_server.jar in same directory or one level up.
+# MINECRAFT_SERVER_PATH="/usr/local/minecraft/minecraft_server.jar"
 
 # Java VM settings (increasing these never hurts)
+# these are suggested settings from minecraft.net
 MX_SIZE="1024M"
 MS_SIZE="1024M"
 
-# what mcwrapper calls its pid file and where it lives
+# what mcwrapper calls its pid file.
+# can be relative or absolute. if relative, it's relative to mcwrapper
 PID_FILE="mcwrapper.pid"
-PID_FILE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$PID_FILE"
 
-# what mcwrapper calls its commandpipe and where it lives
+# what mcwrapper calls its commandpipe
+# can be relative or absolute. if relative, it's relative to mcwrapper
 COMMAND_PIPE="command_input"
-COMMAND_PIPE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$COMMAND_PIPE"
-
-# command for starting minecraft_server.jar
-MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER_PATH" nogui"

@@ -57,11 +57,13 @@ function default_config {
 		MINECRAFT_SERVER_PATH="/usr/local/minecraft/minecraft_server.jar"
 
 	fi
-
+	
 	# Java VM settings (increasing these never hurts)
 	MX_SIZE="1024M"
 	MS_SIZE="1024M"
 
+	# these can be relative or absolute paths
+	# if relative, they're relative to the mcwrapper executable
 	PID_FILE="mcwrapper.pid"
 	COMMAND_PIPE="command_input"
 
@@ -70,11 +72,32 @@ function default_config {
 
 	# initialize some vars
 	MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
-	PID_FILE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$PID_FILE"
-	COMMAND_PIPE_PATH="${MINECRAFT_SERVER_DIR_PATH}/$COMMAND_PIPE"
 
 	# command for starting minecraft_server.jar
 	MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER_PATH" nogui"
+}
+
+# run this to process a loaded config
+# some variables require some modification before they can be used
+# for example $PID_FILE which can be relative or absolute.
+# if relative, we want to prepend the MCWRAPPER_DIR to it.
+function process_config {
+	
+	# MINECRAFT_SERVER_PATH can be relative or absolute
+	if [[ ! "$MINECRAFT_SERVER_PATH" =~ ^/ ]]; then
+		MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/$MINECRAFT_SERVER_PATH"
+	fi
+	
+	# PID_FILE can be relative or absolute
+	if [[ ! "$PID_FILE" =~ ^/ ]]; then
+		PID_FILE="${MCWRAPPER_DIR}/$PID_FILE"
+	fi
+	
+	# COMMAND_PIPE can be relative or absolute
+	if [[ ! "$COMMAND_PIPE" =~ ^/ ]]; then
+		COMMAND_PIPE="${MCWRAPPER_DIR}/$COMMAND_PIPE"
+	fi
+	
 }
 
 # default config values
@@ -86,7 +109,7 @@ function default_config_for {
 
 function read_command {
 	# read from the command pipe
-	exec < "$COMMAND_PIPE_PATH"
+	exec < "$COMMAND_PIPE"
 	
 	read INPUT
 	echo $INPUT
@@ -104,16 +127,16 @@ function send_command {
 	check_is_running
 	
 	COMMAND=$1
-	echo "$COMMAND" > "$COMMAND_PIPE_PATH"
+	echo "$COMMAND" > "$COMMAND_PIPE"
 }
 
 function check_is_running {
-	if [[ ! -e "$PID_FILE_PATH" ]]; then
+	if [[ ! -e "$PID_FILE" ]]; then
 		#echo "Server not running!" >&2
 		return 1 # TODO: set up some real exit codes that are unique
 	fi
 	
-	PID=`cat "$PID_FILE_PATH"`
+	PID=`cat "$PID_FILE"`
 	
 	# check to see if we have a wrapper currently running
 	kill -0 $PID 2>&- 1>&-
@@ -126,20 +149,20 @@ function check_is_running {
 }
 
 function set_up_pipe {
-	if [[ ! -p "$COMMAND_PIPE_PATH" ]]; then
+	if [[ ! -p "$COMMAND_PIPE" ]]; then
 		echo "Pipe doesn't exist, creating it..." >&2
-		mkfifo "$COMMAND_PIPE_PATH"
+		mkfifo "$COMMAND_PIPE"
 		
 		if [[ $? != 0 ]]; then
 			# if mkfifo failed, print error message, exit non-zero.
-			echo "Error creating the pipe: $COMMAND_PIPE_PATH ($?)." >&2
+			echo "Error creating the pipe: $COMMAND_PIPE ($?)." >&2
 			exit 1
 		fi
 	fi
 }
 
 function sanity_check {
-	# TODO: add checks to make sure that PID_FILE_PATH and COMMAND_PIPE_PATH are writable
+	# TODO: add checks to make sure that PID_FILE and COMMAND_PIPE are writable
 	
 	# check to make sure that things that need to exist exist.
 	if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
@@ -179,6 +202,7 @@ ACTION=$1;shift
 # selfconfigure
 default_config
 read_config
+process_config
 
 # check to make sure that we're in a sane configuration
 # function exits on error.
@@ -230,15 +254,19 @@ case $ACTION in
 				exit 0
 				;;
 			pidfile )
-				echo $PID_FILE_PATH
+				echo $PID_FILE
 				exit 0
 				;;
 			pipe )
-				echo $COMMAND_PIPE_PATH
+				echo $COMMAND_PIPE
 				exit 0
 				;;
 			configfile )
 				echo $CONFIG_PATH
+				exit 0
+				;;
+			debug )
+				echo $MCWRAPPER_DIR
 				exit 0
 				;;
 			*)
