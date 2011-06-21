@@ -4,6 +4,9 @@ MCWRAPPER="$0"
 MCWRAPPER_DIR=`dirname "$MCWRAPPER"`
 MCWRAPPER_CONFIG_NAME="mcwrapperrc"
 
+# filename of the minecraft server
+MINECRAFT_SERVER_NAME="minecraft_server.jar"
+
 function get_config_path {
 	# let's figure out where the config path is
 	# if it's defined in an ENV var, then let's use that
@@ -53,8 +56,15 @@ function default_config {
 	# if this is not defined in the existing environment, define here.
 	if [[ -z "$MINECRAFT_SERVER_PATH" ]]; then
 
-		# change this if you don't want to export an environment var from your session
-		MINECRAFT_SERVER_PATH="/usr/local/minecraft/minecraft_server.jar"
+		# check in the current directory first, then check one level up for minecraft.
+		# if it's not actually where it thinks it is, it'll break when it tries to do something.
+		# the resulting value of MINECRAFT_SERVER_PATH will be the last place that it looked.
+
+		MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/${MINECRAFT_SERVER_NAME}"
+		
+		if [[ ! -e "$MINECRAFT_SERVER_NAME" ]]; then
+			MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/../${MINECRAFT_SERVER_NAME}"
+		fi
 
 	fi
 	
