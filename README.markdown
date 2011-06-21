@@ -114,6 +114,10 @@ mcbackup will then do the following:
  
 The name of the `latest` backup can be configured by editing that setting in `mcbackup`. You can also configure how many previous backups are kept.
     
+## Known Issues
+
+There currently exists a bug where if you're running mcwrapper using `./mcwrapper`, its PID file and FIFO will both be located in the directory with minecraft_server.jar. This is because of the change in working directories and may not be fixed any time soon.
+
 ## The Future (Todo List)
 
 In the future I aim to create sysV init scripts for Linux (Ubuntu flavoured) and OSX launchd configs. I also plan on including Minecraft backup support to SnapBackup, my backup script (http://github.com/spikegrobstein/snapbackup).
