@@ -275,10 +275,6 @@ case $ACTION in
 				echo $CONFIG_PATH
 				exit 0
 				;;
-			debug )
-				echo $MCWRAPPER_DIR
-				exit 0
-				;;
 			*)
 				echo "Unknown config setting: $CONFIG_SETTING"
 				exit 1
