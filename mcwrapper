@@ -7,10 +7,10 @@ MCWRAPPER_CONFIG_NAME="mcwrapperrc"
 # filename of the minecraft server
 MINECRAFT_SERVER_NAME="minecraft_server.jar"
 
+# figure out where the config file lives
 function get_config_path {
-	# let's figure out where the config path is
-	# if it's defined in an ENV var, then let's use that
 	
+	# if it's defined in an ENV var, then let's use that	
 	if [[ ! -z "$MCWRAPPER_CONFIG_PATH" ]]; then
 		echo $MCWRAPPER_CONFIG_PATH
 		return
