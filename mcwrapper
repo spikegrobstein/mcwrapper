@@ -281,6 +281,10 @@ case $ACTION in
 				;;
 		esac
 		;;
+	help )
+		print_usage
+		exit 0
+		;;
 	* )
 		COMMAND="$ACTION $@"
 		echo "sending: $COMMAND"
