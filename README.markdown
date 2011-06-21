@@ -61,11 +61,7 @@ A full list of configuration options and commands can be found by typing:
     
 ## Configuration
 
-Although `mcwrapper` has a built-in default configuration, there are times when you may want to have it operate slightly differently. `mcwrapper` is bundled with an example mcwrapperrc example file called `mcwrapperrc.example`.
-
-Rename that file to `mcwrapperrc` and you can edit the settings in it. Full documentation exists in there.
-
-`mcwrapperrc` can also live in `~/.mcwrapperrc` or `/etc/mcwrapperrc`. The priority is that order.
+Although `mcwrapper` has a built-in default configuration, there are times when you may want to have it operate slightly differently. `mcwrapper` is bundled with an example mcwrapperrc example file called `mcwrapperrc.example`. See that file for full configuration documentation.
 
 ## Details
 
