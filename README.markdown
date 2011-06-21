@@ -74,7 +74,7 @@ When running, `mcwrapper` uses 2 files:
  * mcwrapper.pid -- the pid of the currently running process. This is used by `mcwrapper` for sanity checks but can also be used by 3rd party scripts to see if minecraft_server is running.
  * command_input -- the FIFO used for communicating with the server.
  
-The names of the above files are both configurable using the variables at the top of `mcwrapper`
+The names and locations of the above files are both configurable in `mcwrapperrc`.
 
 You can run arbitrary commands either through the mcwrapper script as seen in the Quickstart or you can output commands directly to the command_input FIFO. This is handy if you write re-usable Minecraft scripts.
 
