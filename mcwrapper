@@ -186,7 +186,7 @@ function read_command {
 	
 	# if the user said "stop" then exit after the command completes.
 	if [[ "$INPUT" = "stop" ]]; then
-		remove_pid
+		clean_up
 		exit 0
 	fi
 	
@@ -301,6 +301,13 @@ function sanity_check {
 		echo "Minecraft server not found! ($MINECRAFT_SERVER_PATH)"
 		exit 1
 	fi
+}
+
+# performs cleanup after stopping mcwrapper
+# removes pid and pipe
+function clean_up {
+	remove_pid
+	remove_pipe
 }
 
 ##########################################################################################
