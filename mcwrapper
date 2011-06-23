@@ -241,7 +241,7 @@ function create_backup_directory () {
 	
 	if [[ $? != 0 ]]; then
 		#an error occurred
-		echo "An error occurred when creating the backup directory."
+		echo "An error occurred when creating the backup directory." >&2
 		exit 1
 	fi
 }
@@ -265,7 +265,7 @@ function do_backup () {
 	
 	if [[ $? != 0 ]]; then
 		#an error occurred
-		echo "An error occurred when copying the world data."
+		echo "An error occurred when copying the world data." >&2
 		exit 1
 	fi
 	
@@ -273,7 +273,7 @@ function do_backup () {
 	
 	if [[ $? != 0 ]]; then
 		#an error occurred
-		echo "An error occurred when copying the configuration information"
+		echo "An error occurred when copying the configuration information" >&2
 		exit 1
 	fi
 }
@@ -286,7 +286,7 @@ function create_symlink () {
 		
 		if [[ $? != 0 ]]; then
 			#an error occurred
-			echo "An error occurred when deleting the old symlink."
+			echo "An error occurred when deleting the old symlink." >&2
 			exit 1
 		fi
 	fi
@@ -294,7 +294,7 @@ function create_symlink () {
 	
 	if [[ $? != 0 ]]; then
 		#an error occurred
-		echo "An error occurred when creating the symlink."
+		echo "An error occurred when creating the symlink." >&2
 		exit 1
 	fi
 }
@@ -307,7 +307,7 @@ function cleanup_old_backups () {
 		rm -rf "${BACKUP_DIRECTORY_PATH}/$old_backup"
 		if [[ $? != 0 ]]; then
 			#an error occurred but don't exit.
-			echo "An error occurred when deleting a previous backup: ${old_backup}."
+			echo "An error occurred when deleting a previous backup: ${old_backup}." >&2
 		fi
 	done
 }
