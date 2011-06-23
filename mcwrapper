@@ -2,7 +2,7 @@
 
 MCWRAPPER="$0"
 MCWRAPPER_DIR=`dirname "$MCWRAPPER"`
-MCWRAPPER_CONFIG_NAME="mcwrapperrc"
+MCWRAPPER_CONFIG_NAME="mcwrapper.conf"
 
 # filename of the minecraft server
 MINECRAFT_SERVER_NAME="minecraft_server.jar"

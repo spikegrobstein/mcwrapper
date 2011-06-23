@@ -61,7 +61,7 @@ A full list of configuration options and commands can be found by typing:
     
 ## Configuration
 
-Although `mcwrapper` has a built-in default configuration, there are times when you may want to have it operate slightly differently. `mcwrapper` is bundled with an example mcwrapperrc example file called `mcwrapperrc.example`. See that file for full configuration documentation.
+Although `mcwrapper` has a built-in default configuration, there are times when you may want to have it operate slightly differently. `mcwrapper` is bundled with an example mcwrapper.conf example file called `mcwrapper.conf-example`. See that file for full configuration documentation.
 
 ## Details
 
@@ -70,7 +70,7 @@ When running, `mcwrapper` uses 2 files:
  * mcwrapper.pid -- the pid of the currently running process. This is used by `mcwrapper` for sanity checks but can also be used by 3rd party scripts to see if minecraft_server is running.
  * command_input -- the FIFO used for communicating with the server.
  
-The names and locations of the above files are both configurable in `mcwrapperrc`.
+The names and locations of the above files are both configurable in `mcwrapper.conf`.
 
 You can run arbitrary commands either through the mcwrapper script as seen in the Quickstart or you can output commands directly to the command_input FIFO. This is handy if you write re-usable Minecraft scripts.
 
