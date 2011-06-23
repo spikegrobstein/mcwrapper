@@ -240,7 +240,7 @@ function print_usage {
 
 
 # create the backup directory
-function create_BACKUP_DIRECTORY_PATHectory () {
+function create_backup_directory () {
 	mkdir -p "$CURRENT_BACKUP_PATH"
 	
 	if [[ $? != 0 ]]; then
@@ -317,7 +317,7 @@ function cleanup_old_backups () {
 
 # does the actual backup
 function backup_world {
-	create_BACKUP_DIRECTORY_PATHectory
+	create_backup_directory
 	stop_writing_world
 	do_backup
 	start_writing_world
