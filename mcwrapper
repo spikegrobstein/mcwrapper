@@ -16,21 +16,21 @@ function get_config_path {
 		return
 	fi
 	
-	# check ./mcwrapperrc
+	# check ./mcwrapper.conf
 	CURRENT_PATH="${MCWRAPPER_DIR}/${MCWRAPPER_CONFIG_NAME}"
 	if [[ -e "$CURRENT_PATH" ]]; then
 		echo $CURRENT_PATH
 		return
 	fi
 	
-	# check ~/.mcwrapperrc
+	# check ~/.mcwrapper.conf
 	CURRENT_PATH=~/".${MCWRAPPER_CONFIG_NAME}"
 	if [[ -e "$CURRENT_PATH" ]]; then
 		echo $CURRENT_PATH
 		return
 	fi
 		
-	# check /etc/mcwrapperrc
+	# check /etc/mcwrapper.conf
 	CURRENT_PATH="/etc/${MCWRAPPER_CONFIG_NAME}"
 	if [[ -e "$CURRENT_PATH" ]]; then
 		echo $CURRENT_PATH
