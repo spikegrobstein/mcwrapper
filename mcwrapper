@@ -236,6 +236,7 @@ function print_usage {
 
 
 # create the backup directory
+# if it exists, this effectively does nothing.
 function create_backup_directory () {
 	mkdir -p "$CURRENT_BACKUP_PATH"
 	
