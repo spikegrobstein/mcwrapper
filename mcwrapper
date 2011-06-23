@@ -184,6 +184,7 @@ function read_command {
 	
 	# if the user said "stop" then exit after the command completes.
 	if [[ "$INPUT" = "stop" ]]; then
+		remove_pid
 		exit 0
 	fi
 	
@@ -199,7 +200,8 @@ function send_command {
 }
 
 function create_pid {
-	echo $$ > $PID_FILE
+	PID_VALUE=$1
+	echo $PID_VALUE > $PID_FILE
 }
 
 function remove_pid {
@@ -250,11 +252,13 @@ function start_minecraft {
 		exit 1
 	fi
 	
-	create_pid
 	set_up_pipe
-	( cd $MINECRAFT_SERVER_DIR_PATH ; read_command | $MINECRAFT_SERVER_CMD )
 	
-	remove_pid
+	# now we `cd` to the minecraft_server directory and start the server in a background process
+	cd $MINECRAFT_SERVER_DIR_PATH
+	( read_command | $MINECRAFT_SERVER_CMD 2>&1 ) >> /dev/null &
+	
+	create_pid $!	
 }
 
 function sanity_check {
