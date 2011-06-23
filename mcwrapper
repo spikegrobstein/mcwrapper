@@ -495,7 +495,7 @@ case $ACTION in
 		;;
 	* )
 		COMMAND="$ACTION $@"
-		echo "sending: $COMMAND"
+		echo -n "sending: $COMMAND ... "
 		check_is_running
 		if [[ $? != 0 ]]; then
 			echo "Server is NOT running. Not sending command"
@@ -503,6 +503,7 @@ case $ACTION in
 		fi
 		
 		send_command "$COMMAND"
+		echo "Done."
 		exit 0
 		;;
 esac
