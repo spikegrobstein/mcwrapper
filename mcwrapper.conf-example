@@ -1,9 +1,9 @@
-# Example configuration for mcwrapper: mcwrapperrc
+# Example configuration for mcwrapper: mcwrapper.conf
 # this file can live in any of the following places (in order of priority):
 #  - the value of MCWRAPPER_CONFIG_PATH env variable
-#  - same directory as mcwrapper as "mcwrapperrc"
-#  - ~/.mcwrapperrc
-#  - /etc/mcwrapperrc
+#  - same directory as mcwrapper as "mcwrapper.conf"
+#  - ~/.mcwrapper.conf
+#  - /etc/mcwrapper.conf
 #
 # Configuration is actual Bash. You can use conditionals... not that would.
 
