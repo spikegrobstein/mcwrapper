@@ -7,6 +7,9 @@ MCWRAPPER_CONFIG_NAME="mcwrapper.conf"
 # filename of the minecraft server
 MINECRAFT_SERVER_NAME="minecraft_server.jar"
 
+# filename of the minecraft server.properties file
+MINECRAFT_SERVER_PROPERTIES_NAME="server.properties"
+
 # figure out where the config file lives
 function get_config_path {
 	
@@ -109,6 +112,17 @@ function process_config {
 		MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER_PATH" nogui"
 	fi
 	
+	# the path to the server.properties file
+	if [[ -z "$SERVER_PROPERTIES_PATH" ]]; then
+		SERVER_PROPERTIES_PATH=`dirname "$MINECRAFT_SERVER_PATH"`"/${MINECRAFT_SERVER_PROPERTIES_NAME}"
+	fi
+}
+
+function read_server_property {
+	# takes 1 arg... the property name
+	PROP_NAME=$1;shift
+		
+	cat $SERVER_PROPERTIES_PATH | grep $PROP_NAME | awk -F '=' '{ print $2 }'
 }
 
 function read_command {
@@ -278,6 +292,11 @@ case $ACTION in
 				exit 1
 				;;
 		esac
+		;;
+	prop )
+		PROP=$1
+		read_server_property $PROP
+		exit 0
 		;;
 	help )
 		print_usage
