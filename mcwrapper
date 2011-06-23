@@ -10,10 +10,6 @@ MINECRAFT_SERVER_NAME="minecraft_server.jar"
 # filename of the minecraft server.properties file
 MINECRAFT_SERVER_PROPERTIES_NAME="server.properties"
 
-CURRENT_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/$CURRENT_BACKUP_NAME"
-LATEST_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/latest"
-
-
 # figure out where the config file lives
 function get_config_path {
 	
@@ -87,7 +83,7 @@ function default_config {
 	# the directory of the minecraft_server.jar based off $MINECRAFT_SERVER_PATH
 	MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
 	
-	BACKUP_DIRECTORY_NAME="backups"
+	BACKUP_DIRECTORY_PATH="backups"
 	
 	# what the name of the symlink is.
 	LATEST_BACKUP_NAME="latest"
@@ -139,8 +135,8 @@ function process_config {
 	fi
 	
 	# BACKUP_DIRECTORY_PATH can be relative or absolute
-	if [[ -z "$BACKUP_DIRECTORY_PATH" ]]; then
-		BACKUP_DIRECTORY_PATH="${MINECRAFT_SERVER_DIR}/${BACKUP_DIRECTORY_NAME}"
+	if [[ ! "$BACKUP_DIRECTORY_PATH" =~ ^/ ]]; then
+		BACKUP_DIRECTORY_PATH="${MCWRAPPER_DIR}/${BACKUP_DIRECTORY_PATH}"
 	fi
 }
 
@@ -252,13 +248,13 @@ function create_backup_directory () {
 
 # stop writing to the world file(s) after flushing the buffer
 function stop_writing_world () {
-	sh "$MCWRAPPER" save-all
-	sh "$MCWRAPPER" save-off
+	send_command "save-all"
+	send_command "save-off"
 }
 
 # begin writing the world data again
 function start_writing_world () {
-	sh "$MCWRAPPER" save-on
+	send_command "save-on"
 }
 
 # copy the world data and configuration
@@ -284,7 +280,7 @@ function do_backup () {
 
 function create_symlink () {
 	# then we symlink the current backup to "latest" in backups directory
-	if [[ -e "$LATEST_BACKUP_PATH" ]]; then
+	if [[ -L "$LATEST_BACKUP_PATH" ]]; then
 		# if the symlink already exists, delete it before creating it.
 		rm "$LATEST_BACKUP_PATH"
 		
@@ -317,10 +313,26 @@ function cleanup_old_backups () {
 
 # does the actual backup
 function backup_world {
+	# the path to the to-be-backed-up directory
+	CURRENT_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/$CURRENT_BACKUP_NAME"
+	
+	# the path to the symlink to the above.
+	LATEST_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_NAME}"
+	
 	create_backup_directory
-	stop_writing_world
+	
+	# stop writing world if we're running
+	if [[ $(check_is_running) ]]; then
+		stop_writing_world
+	fi
+	
 	do_backup
-	start_writing_world
+	
+	# start writing world only if we're running
+	if [[ $(check_is_running) ]]; then
+		start_writing_world
+	fi
+	
 	create_symlink
 	cleanup_old_backups
 }
@@ -377,6 +389,10 @@ case $ACTION in
 		echo "Server is NOT running." >&2
 		exit 1
 		
+		;;
+	backup )
+		backup_world
+		exit 0
 		;;
 	config )
 		# dump info about the config
