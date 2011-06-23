@@ -302,11 +302,12 @@ function create_symlink () {
 # delete old backups
 function cleanup_old_backups () {
 	OLD_BACKUPS=`ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail +"${BACKUPS_TO_KEEP}"`
-	for o in $OLD_BACKUPS; do
-		rm -rf "${BACKUP_DIRECTORY_PATH}/$o"
+	
+	for old_backup in $OLD_BACKUPS; do
+		rm -rf "${BACKUP_DIRECTORY_PATH}/$old_backup"
 		if [[ $? != 0 ]]; then
 			#an error occurred but don't exit.
-			echo "An error occurred when deleting a previous backup: $o."
+			echo "An error occurred when deleting a previous backup: ${old_backup}."
 		fi
 	done
 }
