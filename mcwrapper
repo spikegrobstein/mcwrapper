@@ -198,6 +198,15 @@ function send_command {
 	echo "$COMMAND" > "$COMMAND_PIPE"
 }
 
+function create_pid {
+	echo $$ > $PID_FILE
+}
+
+function remove_pid {
+	# clean up PID file when done.
+	rm $PID_FILE
+}
+
 function check_is_running {
 	if [[ ! -e "$PID_FILE" ]]; then
 		#echo "Server not running!" >&2
@@ -241,12 +250,11 @@ function start_minecraft {
 		exit 1
 	fi
 	
-	echo $$ > $PID_FILE
+	create_pid
 	set_up_pipe
 	( cd $MINECRAFT_SERVER_DIR_PATH ; read_command | $MINECRAFT_SERVER_CMD )
 	
-	# clean up PID file when done.
-	rm $PID_FILE
+	remove_pid
 }
 
 function sanity_check {
