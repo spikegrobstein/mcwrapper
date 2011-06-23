@@ -382,6 +382,7 @@ case $ACTION in
 		rm $PID_FILE
 		;;
 	status )
+		# TODO: this can be put into a single if statement for clarity; if [[ $(check_is_running) ]]
 		check_is_running
 		if [[ $? = 0 ]]; then
 			echo "Server is running." >&2
