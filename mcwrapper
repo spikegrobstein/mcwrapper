@@ -242,6 +242,12 @@ function set_up_pipe {
 	fi
 }
 
+function remove_pipe {
+	if [[ -p "$COMMAND_PIPE" ]]; then
+		rm "$COMMAND_PIPE"
+	fi
+}
+
 function start_minecraft {
 	# write the PID file and start'er up!
 	# don't start if we're already running.
