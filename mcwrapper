@@ -122,7 +122,7 @@ function read_server_property {
 	# takes 1 arg... the property name
 	PROP_NAME=$1;shift
 		
-	cat $SERVER_PROPERTIES_PATH | grep $PROP_NAME | awk -F '=' '{ print $2 }'
+	cat $SERVER_PROPERTIES_PATH | grep "$PROP_NAME" | awk -F '=' '{ print $2 }'
 }
 
 function read_command {
