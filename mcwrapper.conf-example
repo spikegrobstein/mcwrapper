@@ -24,3 +24,21 @@ PID_FILE="mcwrapper.pid"
 # what mcwrapper calls its commandpipe
 # can be relative or absolute. if relative, it's relative to mcwrapper
 COMMAND_PIPE="command_input"
+
+# Backup configuration:
+
+# directory to store backups
+# can be relative or absolute. if relative, it's relative to mcwrapper
+#BACKUP_DIRECTORY_PATH="backups"
+
+# how many backups to keep in the backups directory
+# (we automatically delete old backups)
+# TODO: implement the following rules.
+# set to -1 to retain ALL backups (never delete)
+# set to 0 to completely disable backups.
+#BACKUPS_TO_KEEP=5
+
+# set backup name to
+#   +%Y%m%d       -- just the datestamp; no time.
+#   +%Y%m%d%H%M%S -- full timestamp including hour, minute, second
+#CURRENT_BACKUP_NAME=`date +%Y%m%d%H%M%S`
