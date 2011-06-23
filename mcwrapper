@@ -366,6 +366,7 @@ case $ACTION in
 		# write the PID file and start'er up!
 		# don't start if we're already running.
 		
+		# TODO: this can be put into a single if statement for clarity; if [[ $(check_is_running) ]]
 		check_is_running
 		
 		if [[ $? = 0 ]]; then
