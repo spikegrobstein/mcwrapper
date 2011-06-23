@@ -268,7 +268,19 @@ function stop_minecraft {
 
 function restart_minecraft {
 	stop_minecraft
+	wait_for_minecraft_to_stop
 	start_minecraft
+}
+
+# waits for minecraft to stop
+# TODO: Make this timeout and make time configurable.
+function wait_for_minecraft_to_stop {
+	if [[ $(check_is_running) ]]; then
+		# if it's still running... sleep for 1 second and try again
+		echo -n "."
+		sleep 1
+		wait_for_minecraft_to_stop
+	fi
 }
 
 function sanity_check {
