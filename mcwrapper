@@ -266,6 +266,11 @@ function stop_minecraft {
 	send_command "stop"
 }
 
+function restart_minecraft {
+	stop_minecraft
+	start_minecraft
+}
+
 function sanity_check {
 	# TODO: add checks to make sure that PID_FILE and COMMAND_PIPE are writable
 	
@@ -412,11 +417,21 @@ sanity_check
 
 case $ACTION in
 	start )
+		echo -n "Starting minecraft... "	
 		start_minecraft
+		echo "Done."
 		exit 0
 		;;
 	stop )
+		echo -n "Stopping minecraft... "
 		stop_minecraft
+		echo "Done."
+		exit 0
+		;;
+	restart )
+		echo -n "Restarting minecraft... "
+		restart_minecraft
+		echo -n "Done."
 		exit 0
 		;;
 	status )
