@@ -229,6 +229,26 @@ function set_up_pipe {
 	fi
 }
 
+function start_minecraft {
+	# write the PID file and start'er up!
+	# don't start if we're already running.
+	
+	# TODO: this can be put into a single if statement for clarity; if [[ $(check_is_running) ]]
+	check_is_running
+	
+	if [[ $? = 0 ]]; then
+		echo "Server is already running. Exiting..." >&2
+		exit 1
+	fi
+	
+	echo $$ > $PID_FILE
+	set_up_pipe
+	( cd $MINECRAFT_SERVER_DIR_PATH ; read_command | $MINECRAFT_SERVER_CMD )
+	
+	# clean up PID file when done.
+	rm $PID_FILE
+}
+
 function sanity_check {
 	# TODO: add checks to make sure that PID_FILE and COMMAND_PIPE are writable
 	
@@ -375,23 +395,7 @@ sanity_check
 
 case $ACTION in
 	start )
-		# write the PID file and start'er up!
-		# don't start if we're already running.
-		
-		# TODO: this can be put into a single if statement for clarity; if [[ $(check_is_running) ]]
-		check_is_running
-		
-		if [[ $? = 0 ]]; then
-			echo "Server is already running. Exiting..." >&2
-			exit 1
-		fi
-		
-		echo $$ > $PID_FILE
-		set_up_pipe
-		( cd $MINECRAFT_SERVER_DIR_PATH ; read_command | $MINECRAFT_SERVER_CMD )
-		
-		# clean up PID file when done.
-		rm $PID_FILE
+		start_minecraft
 		;;
 	status )
 		# TODO: this can be put into a single if statement for clarity; if [[ $(check_is_running) ]]
