@@ -365,6 +365,8 @@ function do_backup () {
 	fi
 	
 	if [[ ! -z "$COMPRESS_BACKUP" ]]; then
+		# TODO: add support for bz2
+		# TODO: make this code a little more readable without the secret, back alley variable updating.
 		case "$COMPRESS_BACKUP" in
 			zip )
 				zip_backup
