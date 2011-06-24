@@ -346,7 +346,7 @@ function start_writing_world () {
 # copy the world data and configuration
 function do_backup () {
 	local LEVEL_NAME=`read_server_property level-name`
-	WORLD_DATA_DIR="${MINECRAFT_SERVER_DIR_PATH}/${LEVEL_NAME}"
+	local WORLD_DATA_DIR="${MINECRAFT_SERVER_DIR_PATH}/${LEVEL_NAME}"
 	
 	cp -R "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH/"
 	
@@ -363,6 +363,31 @@ function do_backup () {
 		echo "An error occurred when copying the configuration information" >&2
 		exit 1
 	fi
+	
+	if [[ ! -z "$COMPRESS_BACKUP" ]]; then
+		case "$COMPRESS_BACKUP" in
+			zip )
+				zip_backup
+				;;
+			tgz )
+				tgz_backup
+				;;
+			* )
+				echo "UKNOWN COMPRESSION TYPE: $COMPRESS_BACKUP"
+				exit 1
+				;;
+		esac
+	fi
+}
+
+function tgz_backup {
+	echo "NOT YET IMPLEMENTED: tgz"
+	exit 1
+}
+
+function zip_backup {
+	echo "NOT YET IMPLEMENTED: zip"
+	exit 1
 }
 
 function create_symlink () {
