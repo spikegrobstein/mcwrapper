@@ -387,6 +387,8 @@ function do_backup () {
 	fi
 }
 
+
+#TODO: there's some duplicate code here... should probably fix it.
 function tgz_backup {
 	# cd to the backup directory
 	# create new tgz backup
