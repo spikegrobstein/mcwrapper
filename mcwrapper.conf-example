@@ -42,3 +42,8 @@ COMMAND_PIPE="command_input"
 #   +%Y%m%d       -- just the datestamp; no time.
 #   +%Y%m%d%H%M%S -- full timestamp including hour, minute, second
 #CURRENT_BACKUP_NAME=`date +%Y%m%d%H%M%S`
+
+# How to compress the backup
+# leave undefined (commented out) to not use compression
+# accepted values are: tgz, zip
+#COMPRESS_BACKUP='tgz'
