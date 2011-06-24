@@ -118,7 +118,7 @@ In the future I aim to create sysV init scripts for Linux (Ubuntu flavoured) and
 
 I also hope to create a configuration wizard for the most common configuration options as well as build a robust installer script to get you started.
 
-Also need to come up with a way to restore a minecraft world in the event that it needs to be done.
+Also need to come up with a way to restore a backup of a minecraft world.
 
 ## About
 
