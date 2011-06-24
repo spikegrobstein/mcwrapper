@@ -402,7 +402,13 @@ function create_symlink () {
 			exit 1
 		fi
 	fi
-	ln -s "$CURRENT_BACKUP_PATH" "$LATEST_BACKUP_PATH"
+	
+	# just the directory/filename of the current backup
+	# this way, the symlink isn't an absolute path, so you can move the 
+	# backup directory without issue.
+	local NEW_BACKUP=`basename "$CURRENT_BACKUP_PATH"`
+	
+	ln -s "$NEW_BACKUP" "$LATEST_BACKUP_PATH"
 	
 	if [[ $? != 0 ]]; then
 		#an error occurred
