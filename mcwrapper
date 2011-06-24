@@ -231,7 +231,6 @@ function check_is_running {
 
 function set_up_pipe {
 	if [[ ! -p "$COMMAND_PIPE" ]]; then
-		echo "Pipe doesn't exist, creating it..." >&2
 		mkfifo "$COMMAND_PIPE"
 		
 		if [[ $? != 0 ]]; then
