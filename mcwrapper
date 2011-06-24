@@ -401,8 +401,14 @@ function tgz_backup {
 }
 
 function zip_backup {
-	echo "NOT YET IMPLEMENTED: zip"
-	exit 1
+	cd "$BACKUP_DIRECTORY_PATH"
+	
+	local FILENAME=`basename "$CURRENT_BACKUP_PATH"`
+	ARCHIVE_FILENAME="${FILENAME}.zip"
+	
+	zip -q -r "$ARCHIVE_FILENAME" "$FILENAME"
+	
+	cd -
 }
 
 function create_symlink () {
