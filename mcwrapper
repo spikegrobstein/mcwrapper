@@ -453,6 +453,7 @@ function cleanup_old_backups () {
 	OLD_BACKUPS=`ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail +"${BACKUPS_TO_KEEP}"`
 	
 	for old_backup in $OLD_BACKUPS; do
+	  echo "Removing $old_backup"
 		rm -rf "${BACKUP_DIRECTORY_PATH}/$old_backup"
 		if [[ $? != 0 ]]; then
 			#an error occurred but don't exit.
@@ -485,6 +486,9 @@ function backup_world {
 	fi
 	
 	create_symlink
+	
+	echo "Cleaning up old backups..."
+	
 	cleanup_old_backups
 }
 
@@ -543,7 +547,9 @@ case $ACTION in
 		
 		;;
 	backup )
+	  echo "Backing up minecraft world data..."
 		backup_world
+		echo "Done."
 		exit 0
 		;;
 	config )
