@@ -57,7 +57,7 @@ function get_config_path {
 	fi
 	
 	# check ./mcwrapper.conf
-	CURRENT_PATH="${MCWRAPPER_DIR}/${MCWRAPPER_CONFIG_NAME}"
+	local CURRENT_PATH="${MCWRAPPER_DIR}/${MCWRAPPER_CONFIG_NAME}"
 	if [[ -e "$CURRENT_PATH" ]]; then
 		echo $CURRENT_PATH
 		return
@@ -76,6 +76,8 @@ function get_config_path {
 		echo $CURRENT_PATH
 		return
 	fi
+	
+	# if we can't find the config, it's no big deal. we'll just use defaults and not read it.
 }
 
 # configure self from config file
