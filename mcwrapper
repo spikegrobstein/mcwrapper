@@ -377,12 +377,25 @@ function do_backup () {
 				exit 1
 				;;
 		esac
+		
+		# after the backup is compressed, remove the uncompressed version
+		rm -rf "$CURRENT_BACKUP_PATH"
+		
+		# ARCHIVE_FILENAME gets set in the compressor ({tgz,zip}_backup) functions
+		# we set CURRENT_BACKUP_PATH so the symlink gets pointed to the archive rather than the directory we just deleted
+		CURRENT_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${ARCHIVE_FILENAME}"
 	fi
 }
 
 function tgz_backup {
-	echo "NOT YET IMPLEMENTED: tgz"
-	exit 1
+	# cd to the backup directory
+	# create new tgz backup
+	cd "$BACKUP_DIRECTORY_PATH"
+	
+	local FILENAME=`basename "$CURRENT_BACKUP_PATH"`
+	ARCHIVE_FILENAME="${FILENAME}.tar.gz"
+	
+	tar cfz "$ARCHIVE_FILENAME" "$FILENAME"	
 }
 
 function zip_backup {
