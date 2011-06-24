@@ -450,6 +450,13 @@ function create_symlink () {
 
 # delete old backups
 function cleanup_old_backups () {
+  if [[ "$BACKUPS_TO_KEEP" = "-1" ]]; then
+    # if we want infinite retention, then set BACKUPS_TO_KEEP to -1
+    return
+  fi
+  
+  echo "Cleaning up old backups..."
+  
 	OLD_BACKUPS=`ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail +"${BACKUPS_TO_KEEP}"`
 	
 	for old_backup in $OLD_BACKUPS; do
@@ -486,9 +493,7 @@ function backup_world {
 	fi
 	
 	create_symlink
-	
-	echo "Cleaning up old backups..."
-	
+		
 	cleanup_old_backups
 }
 
