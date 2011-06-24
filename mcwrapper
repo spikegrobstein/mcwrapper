@@ -102,7 +102,7 @@ function default_config {
 
 		MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/${MINECRAFT_SERVER_NAME}"
 		
-		if [[ ! -e "$MINECRAFT_SERVER_NAME" ]]; then
+		if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
 			MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/../${MINECRAFT_SERVER_NAME}"
 		fi
 
