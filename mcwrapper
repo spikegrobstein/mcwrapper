@@ -17,9 +17,6 @@ elif [[ "$MCWRAPPER_DIR" =~ ^(\.\.?/)|(\[^/\]) ]]; then
 	MCWRAPPER_DIR=`pwd`"/${MCWRAPPER_DIR}"
 fi
 
-echo $MCWRAPPER_DIR
-exit
-
 # filename of the minecraft server
 MINECRAFT_SERVER_NAME="minecraft_server.jar"
 
