@@ -148,6 +148,7 @@ function process_config {
 	if [[ ! "$MINECRAFT_SERVER_PATH" =~ ^/ && ! "$MINECRAFT_SERVER_PATH" =~ "$MCWRAPPER_DIR" ]]; then
 		MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/$MINECRAFT_SERVER_PATH"
 	fi
+	MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
 	
 	# PID_FILE can be relative or absolute
 	if [[ ! "$PID_FILE" =~ ^/ ]]; then
