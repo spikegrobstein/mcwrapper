@@ -393,7 +393,7 @@ function tgz_backup {
 	cd "$BACKUP_DIRECTORY_PATH"
 	
 	local FILENAME=`basename "$CURRENT_BACKUP_PATH"`
-	ARCHIVE_FILENAME="${FILENAME}.tar.gz"
+	ARCHIVE_FILENAME="${FILENAME}.tgz"
 	
 	tar cfz "$ARCHIVE_FILENAME" "$FILENAME"	
 }
