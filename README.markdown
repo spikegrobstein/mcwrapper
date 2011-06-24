@@ -32,7 +32,7 @@ As seen above, you can start the server by running the following:
 
     ./mcwrapper start
     
-After that, you can execute arbitrary commands to the server:
+The Minecraft server will be started in the background. You can then execute arbitrary commands to the server:
 
     ./mcwrapper op spizzike
     ./mcwrapper save-all
