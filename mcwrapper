@@ -396,6 +396,8 @@ function tgz_backup {
 	ARCHIVE_FILENAME="${FILENAME}.tgz"
 	
 	tar cfz "$ARCHIVE_FILENAME" "$FILENAME"	
+	
+	cd -
 }
 
 function zip_backup {
