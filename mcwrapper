@@ -180,6 +180,11 @@ function process_config {
 function read_server_property {
 	# takes 1 arg... the property name
 	PROP_NAME=$1;shift
+	
+	if [[ ! -e "$SERVER_PROPERTIES_PATH" ]]; then
+	  echo "Cannot locate server.properties path. ($SERVER_PROPERTIES_PATH)" >&2
+	  exit 1
+	fi
 		
 	cat $SERVER_PROPERTIES_PATH | grep "$PROP_NAME\=" | awk -F '=' '{ print $2 }'
 }
