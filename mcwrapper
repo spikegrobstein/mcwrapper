@@ -5,10 +5,20 @@ MCWRAPPER_DIR=`dirname "$MCWRAPPER"`
 MCWRAPPER_CONFIG_NAME="mcwrapper.conf"
 
 # make sure that MCWRAPPER_DIR is an absolute path
-# if it starts with ./, then we need to use `pwd` to figure out the full path
-if [[ "$MCWRAPPER_DIR" =~ ^\.$ || "$MCWRAPPER_DIR" =~ ^\./ ]]; then
+# if the dir is '.' then set directory to current_directory 
+if [[ "$MCWRAPPER_DIR" =~ ^\.$ ]]; then
 	MCWRAPPER_DIR=`pwd`
+	
+# if the dir is relative, then build the path
+# matches:
+#    ./foo/bar
+#    foo/bar
+elif [[ "$MCWRAPPER_DIR" =~ ^(\.\.?/)|(\[^/\]) ]]; then
+	MCWRAPPER_DIR=`pwd`"/${MCWRAPPER_DIR}"
 fi
+
+echo $MCWRAPPER_DIR
+exit
 
 # filename of the minecraft server
 MINECRAFT_SERVER_NAME="minecraft_server.jar"
