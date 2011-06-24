@@ -44,6 +44,7 @@ function print_usage {
 	echo "               best when used with external scripts"
 	echo "               example: $MCWRAPPER prop level-name"
 	echo "Any other action is interpretted as a server command and is directed to the minecraft server"
+	echo "For README and other documentation, see: https://github.com/spikegrobstein/mcwrapper"
 	echo ""
 }
 
