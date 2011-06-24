@@ -33,7 +33,6 @@ COMMAND_PIPE="command_input"
 
 # how many backups to keep in the backups directory
 # (we automatically delete old backups)
-# TODO: implement the following rules.
 # set to -1 to retain ALL backups (never delete)
 # set to 0 to completely disable backups.
 #BACKUPS_TO_KEEP=5
