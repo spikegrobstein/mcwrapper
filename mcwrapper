@@ -472,6 +472,12 @@ function cleanup_old_backups () {
 # call this to go through the whole backup procedure
 # makes sure backup directory exists, makes sure we don't back up a worldfile that's actively being written to, backs it up, symlinks it. everything.
 function backup_world {
+  if [[ "$BACKUPS_TO_KEEP" = "0" ]]; then
+    # set BACKUPS_TO_KEEP to "0" to disable backups entirely.
+    echo "Backups are disabled. Not backing anything up."
+    exit 1
+  fi
+  
 	# the path to the to-be-backed-up directory
 	CURRENT_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/$CURRENT_BACKUP_NAME"
 	
