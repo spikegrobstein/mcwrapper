@@ -44,6 +44,7 @@ function print_usage {
 	echo "               best when used with external scripts"
 	echo "               example: $MCWRAPPER prop level-name"
 	echo "Any other action is interpretted as a server command and is directed to the minecraft server"
+	echo "For README and other documentation, see: https://github.com/spikegrobstein/mcwrapper"
 	echo ""
 }
 
@@ -57,7 +58,7 @@ function get_config_path {
 	fi
 	
 	# check ./mcwrapper.conf
-	CURRENT_PATH="${MCWRAPPER_DIR}/${MCWRAPPER_CONFIG_NAME}"
+	local CURRENT_PATH="${MCWRAPPER_DIR}/${MCWRAPPER_CONFIG_NAME}"
 	if [[ -e "$CURRENT_PATH" ]]; then
 		echo $CURRENT_PATH
 		return
@@ -76,6 +77,8 @@ function get_config_path {
 		echo $CURRENT_PATH
 		return
 	fi
+	
+	# if we can't find the config, it's no big deal. we'll just use defaults and not read it.
 }
 
 # configure self from config file
@@ -148,6 +151,7 @@ function process_config {
 	if [[ ! "$MINECRAFT_SERVER_PATH" =~ ^/ && ! "$MINECRAFT_SERVER_PATH" =~ "$MCWRAPPER_DIR" ]]; then
 		MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/$MINECRAFT_SERVER_PATH"
 	fi
+	MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
 	
 	# PID_FILE can be relative or absolute
 	if [[ ! "$PID_FILE" =~ ^/ ]]; then
@@ -180,8 +184,13 @@ function process_config {
 function read_server_property {
 	# takes 1 arg... the property name
 	PROP_NAME=$1;shift
+	
+	if [[ ! -e "$SERVER_PROPERTIES_PATH" ]]; then
+	  echo "Cannot locate server.properties path. ($SERVER_PROPERTIES_PATH)" >&2
+	  exit 1
+	fi
 		
-	cat $SERVER_PROPERTIES_PATH | grep "$PROP_NAME\=" | awk -F '=' '{ print $2 }'
+	cat "$SERVER_PROPERTIES_PATH" | grep "$PROP_NAME\=" | awk -F '=' '{ print $2 }'
 }
 
 function read_command {
@@ -444,9 +453,17 @@ function create_symlink () {
 
 # delete old backups
 function cleanup_old_backups () {
+  if [[ "$BACKUPS_TO_KEEP" = "-1" ]]; then
+    # if we want infinite retention, then set BACKUPS_TO_KEEP to -1
+    return
+  fi
+  
+  echo "Cleaning up old backups..."
+  
 	OLD_BACKUPS=`ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail +"${BACKUPS_TO_KEEP}"`
 	
 	for old_backup in $OLD_BACKUPS; do
+	  echo "Removing $old_backup"
 		rm -rf "${BACKUP_DIRECTORY_PATH}/$old_backup"
 		if [[ $? != 0 ]]; then
 			#an error occurred but don't exit.
@@ -458,6 +475,12 @@ function cleanup_old_backups () {
 # call this to go through the whole backup procedure
 # makes sure backup directory exists, makes sure we don't back up a worldfile that's actively being written to, backs it up, symlinks it. everything.
 function backup_world {
+  if [[ "$BACKUPS_TO_KEEP" = "0" ]]; then
+    # set BACKUPS_TO_KEEP to "0" to disable backups entirely.
+    echo "Backups are disabled. Not backing anything up."
+    exit 1
+  fi
+  
 	# the path to the to-be-backed-up directory
 	CURRENT_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/$CURRENT_BACKUP_NAME"
 	
@@ -479,6 +502,7 @@ function backup_world {
 	fi
 	
 	create_symlink
+		
 	cleanup_old_backups
 }
 
@@ -537,7 +561,9 @@ case $ACTION in
 		
 		;;
 	backup )
+	  echo "Backing up minecraft world data..."
 		backup_world
+		echo "Done."
 		exit 0
 		;;
 	config )

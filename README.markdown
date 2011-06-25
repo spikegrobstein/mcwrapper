@@ -32,7 +32,7 @@ As seen above, you can start the server by running the following:
 
     ./mcwrapper start
     
-After that, you can execute arbitrary commands to the server:
+The Minecraft server will be started in the background. You can then execute arbitrary commands to the server:
 
     ./mcwrapper op spizzike
     ./mcwrapper save-all
@@ -95,28 +95,30 @@ You can run that all through the Minecraft server with the following command:
 
 Since it's not safe to back up the world data while the server is running, you need to force a save, then disable writing world data to disk during a backup.
 
-I've built a helper script for this called `mcbackup`.
+`mcwrapper` contains a backup action for just this purpose. To back up your current world data directory, run the following command:
 
-`mcbackup` is passed a path to `mcwrapper` as its only commandline argument. From there, it reads configuration settings, then issues commands to the server to stop writing world data after flushing anything in memory, creates a timestamped directory in the minecraft server directory and creates a symlink to the latest backup called `latest`.
-
-Example usage follows.
-
-Assuming your `mcwrapper` lives in `/usr/local/minecraft/mcwrapper`, run `mcbackup` like this:
-
-    ./mcbackup /usr/local/minecraft/mcwrapper
+    ./mcwrapper backup
     
-mcbackup will then do the following:
+`mcwrapper` will read your `server.properties` file to learn the location of your world data and, after flushing anything in memory, creates a timestamped directory in the minecraft server directory and creates a symlink to the latest backup called `latest`.
+
+By default, the backup action will simply copy your world data and server configuration (white lists, server.properties, ban lists, etc) into the backups directory, but it can be configured to zip or tgz the backup data. See `mcwrapper.conf-example` for information on this.
+
+Assuming your `mcwrapper` lives in `/usr/local/minecraft/mcwrapper`, `backup` will do the following:
 
  1. create `/usr/local/minecraft/backups/YYYYMMDDHHMMSS` where YYYYMMDDHHMMSS is the current timestamp
  2. copy `/usr/local/minecraft/world` and any other configuration data in `/usr/local/minecraft` into the above directory
  3. create a symlink to the latest backup at `/usr/local/minecraft/backups/latest`
  4. delete old backups. Defaults to keeping the latest 5.
  
-The name of the `latest` backup can be configured by editing that setting in `mcbackup`. You can also configure how many previous backups are kept.
+The name of the `latest` backup can be configured by editing that setting in `mcbackup`. You can also configure how many previous backups are kept. Again, see `mcwrapper.conf-example` for information on doing this.
     
 ## The Future (Todo List)
 
 In the future I aim to create sysV init scripts for Linux (Ubuntu flavoured) and OSX launchd configs. I also plan on including Minecraft backup support to SnapBackup, my backup script (http://github.com/spikegrobstein/snapbackup).
+
+I also hope to create a configuration wizard for the most common configuration options as well as build a robust installer script to get you started.
+
+Also need to come up with a way to restore a backup of a minecraft world.
 
 ## About
 
