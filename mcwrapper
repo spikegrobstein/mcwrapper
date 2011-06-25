@@ -636,8 +636,8 @@ case $ACTION in
 		print_usage
 		exit 0
 		;;
-	* )
-		COMMAND="$ACTION $@"
+	command|cmd )
+		COMMAND="$@"
 		echo -n "sending: $COMMAND ... "
 		check_is_running
 		if [[ $? != 0 ]]; then
@@ -649,6 +649,11 @@ case $ACTION in
 		echo "Done."
 		exit 0
 		;;
+	* )
+		echo "Invalid action: $ACTION" >&2
+		echo "" >&2
+		print_usage
+		exit 1
 esac
 
 exit 0
