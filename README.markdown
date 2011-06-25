@@ -24,6 +24,14 @@ If you don't have git:
  
 The above will start up a Minecraft server instance using default settings. All support files related to mcwrapper will be stored in this new mcwrapper directory. Updating to the latest version is as easy as cd'ing into the mcwrapper directory and typing `git pull`
 
+Basic usage is:
+
+    ./mcwrapper <action> [ <action_params> ]
+    
+Use the help action to see a full breakdown of usage:
+
+    ./mcwrapper help
+
 See the Configuration section below for instructions on modifying the default configuration.
 
 ### Commands
