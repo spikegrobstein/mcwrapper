@@ -594,6 +594,10 @@ case $ACTION in
 				echo $MINECRAFT_SERVER_CMD
 				exit 0
 				;;
+			backupdir )
+				echo $BACKUP_DIRECTORY_PATH
+				exit 0
+				;;
 			*)
 				echo "Unknown config setting: $CONFIG_SETTING"
 				exit 1
