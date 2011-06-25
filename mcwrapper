@@ -216,6 +216,11 @@ function read_command {
 function send_command {
 	check_is_running
 	
+	if [[ $? != 0 ]]; then
+		echo "Server is NOT running. Not sending command" >&2
+		exit 1
+	fi
+	
 	COMMAND=$1
 	echo "$COMMAND" > "$COMMAND_PIPE"
 }
@@ -602,6 +607,7 @@ case $ACTION in
 				exit 0
 				;;
 			latestbackup )
+				# TODO: move this to a function to keep all this shit simple.
 				LATEST_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_NAME}"
 				
 				# if the link doesn't exist, then warn the user and exit with a 1
@@ -640,12 +646,6 @@ case $ACTION in
 	command|cmd )
 		COMMAND="$@"
 		echo -n "sending: $COMMAND ... "
-		check_is_running
-		if [[ $? != 0 ]]; then
-			echo "Server is NOT running. Not sending command"
-			exit 1
-		fi
-		
 		send_command "$COMMAND"
 		echo "Done."
 		exit 0
