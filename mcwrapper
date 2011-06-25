@@ -598,6 +598,27 @@ case $ACTION in
 				echo $BACKUP_DIRECTORY_PATH
 				exit 0
 				;;
+			latestbackup )
+				LATEST_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_NAME}"
+				
+				# if the link doesn't exist, then warn the user and exit with a 1
+				if [[ ! -L "$LATEST_BACKUP_PATH" ]]; then
+					echo "Latest backup not found. Either never created or not a link or something. ($LATEST_BACKUP_PATH)" >&2
+					exit 1
+				fi
+				
+				# read the link to the latest backup
+				LATEST_BACKUP_LINK=`readlink "$LATEST_BACKUP_PATH"`
+				
+				# if the link to the latest backup is absolute, output that, otherwise, build the path and output that.
+				if [[ "$LATEST_BACKUP_LINK" =~ ^/ ]]; then
+					echo $LATEST_BACKUP_LINK
+					exit 0
+				fi
+				
+				echo "${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_LINK}"				
+				exit 0
+				;;
 			*)
 				echo "Unknown config setting: $CONFIG_SETTING"
 				exit 1
