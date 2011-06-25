@@ -40,12 +40,13 @@ As seen above, you can start the server by running the following:
 
     ./mcwrapper start
     
-The Minecraft server will be started in the background. You can then execute arbitrary commands to the server:
+The Minecraft server will be started in the background. You can then execute arbitrary commands to the server using the `command` action. The `command` action is also aliased as `cmd`:
 
-    ./mcwrapper op spizzike
-    ./mcwrapper save-all
-    ./mcwrapper save-off
-    ./mcwrapper save-on
+    ./mcwrapper cmd op spizzike
+    ./mcwrapper cmd say hi
+    ./mcwrapper cmd save-all
+    ./mcwrapper cmd save-off
+    ./mcwrapper cmd save-on
 
 If you'd like to stop the server, issue the following command:
 
@@ -61,11 +62,7 @@ There is also support for reading information about the running configuration fo
 
     ./mcwrapper config serverpath
     
-The above will output the path to the `minecraft_server.jar` file that it will wrap. All config commands can be run whether `mcwrapper` is running a server or not. A bug currently exists where if `mcwrapper` cannot locate the minecraft_server.jar, no commands will work.
-
-A full list of configuration options and commands can be found by typing:
-
-    ./mcwrapper help    
+The above will output the path to the `minecraft_server.jar` file that it will wrap. All config commands can be run whether `mcwrapper` is running a server or not. A bug currently exists where if `mcwrapper` cannot locate the minecraft_server.jar, no commands will work.  
     
 ## Configuration
 
