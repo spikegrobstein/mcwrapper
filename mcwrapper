@@ -142,6 +142,9 @@ function default_config {
 	#   +%Y%m%d       -- just the datestamp; no time.
 	#   +%Y%m%d%H%M%S -- full timestamp including hour, minute, second
 	CURRENT_BACKUP_NAME=`date +%Y%m%d%H%M%S`
+	
+	# self-updater vars:
+	MINECRAFT_VERSION_FILE_PATH="MINECRAFT_VERSION"
 }
 
 # run this to process a loaded config
@@ -182,6 +185,12 @@ function process_config {
 	if [[ ! "$BACKUP_DIRECTORY_PATH" =~ ^/ ]]; then
 		BACKUP_DIRECTORY_PATH="${MCWRAPPER_DIR}/${BACKUP_DIRECTORY_PATH}"
 	fi
+	
+	# MINECRAFT_VERSION_FILE_PATH can be relative or absolute
+	if [[ ! "$MINECRAFT_VERSION_FILE_PATH" =~ ^/ ]]; then
+		MINECRAFT_VERSION_FILE_PATH="${MCWRAPPER_DIR}/${MINECRAFT_VERSION_FILE_PATH}"
+	fi
+	
 }
 
 function read_server_property {
