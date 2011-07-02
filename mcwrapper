@@ -143,7 +143,7 @@ function default_config {
 	#   +%Y%m%d%H%M%S -- full timestamp including hour, minute, second
 	CURRENT_BACKUP_NAME=`date +%Y%m%d%H%M%S`
 	
-	# self-updater vars:
+	# self-updater vars. This is the file that we store the last (automatically) installed MC server version in
 	MINECRAFT_VERSION_FILE_PATH="MINECRAFT_VERSION"
 }
 
@@ -526,6 +526,34 @@ function backup_world {
 ## End MCBackup portion.
 ##########################################################################################
 
+##########################################################################################
+## updater code >>>>>>>>>>>>>>>>>>>>>>>>
+
+# compares local version to latest version on minecraft.net
+# if they differ, assume that an update is available online
+# returns 0 on update being available
+# returns 1 on no update available.
+function is_update_available {
+	echo "NOT IMPLEMENTED"
+}
+
+# returns the value of the local version of minecraft
+# stored in MINECRAFT_VERSION file
+function local_version {
+	if [[ ! -e "$MINECRAFT_VERSION_FILE_PATH" ]]; then
+		# MINECRAFT VERSION file not found.
+		# spit out a warning on STDERR and return 1
+		echo "No MINECRAFT_VERSION_FILE_PATH ($MINECRAFT_VERSION_FILE_PATH)" >&2
+		return 1
+	fi
+	
+	# return the version
+	cat "$MINECRAFT_VERSION_FILE_PATH"
+}
+
+## End updater code
+##########################################################################################
+
 ## begin meat of program:
 
 if [[ $# -eq 0 ]]; then
@@ -582,6 +610,24 @@ case $ACTION in
 		backup_world
 		echo "Done."
 		exit 0
+		;;
+	checkupdate )
+		echo "Checking for updates..."
+		
+		echo "Local version: `local_version`"
+		
+		exit 1
+		
+		is_update_available
+		if [[ $? = 0 ]]; then
+			# update is available
+			echo "An update is available!"
+			exit 0
+		else
+			# update is not available
+			echo "You are running the latest version!"
+			exit 1
+		fi
 		;;
 	config )
 		# dump info about the config
