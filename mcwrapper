@@ -534,7 +534,16 @@ function backup_world {
 # returns 0 on update being available
 # returns 1 on no update available.
 function is_update_available {
-	echo "NOT IMPLEMENTED"
+	local LV=`local_version`
+	local RV=`remote_version`
+	
+	echo $LV / $RV
+	
+	if [[ "$LV" -ne "$RV" ]]; then
+		return 0
+	fi
+	
+	return 1
 }
 
 # returns the value of the local version of minecraft
@@ -549,6 +558,14 @@ function local_version {
 	
 	# return the version
 	cat "$MINECRAFT_VERSION_FILE_PATH"
+}
+
+# returns the version currently being served up at minecraft.net
+function remote_version {
+	local DOWNLOAD_PAGE_URL="http://www.minecraft.net/download.jsp"
+	
+	# look for minecraft_server.jar?v=XXXXXXXXXXXXX link
+	curl -s "$DOWNLOAD_PAGE_URL" | grep -E -o "minecraft_server.jar\?v=[[:digit:]]+" | grep -E -o "[[:digit:]]+$"
 }
 
 ## End updater code
@@ -613,11 +630,7 @@ case $ACTION in
 		;;
 	checkupdate )
 		echo "Checking for updates..."
-		
-		echo "Local version: `local_version`"
-		
-		exit 1
-		
+				
 		is_update_available
 		if [[ $? = 0 ]]; then
 			# update is available
