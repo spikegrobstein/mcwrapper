@@ -315,6 +315,11 @@ function wait_for_minecraft_to_stop {
 	fi
 }
 
+
+function tail_server_log {
+	tail -F "${MINECRAFT_SERVER_DIR_PATH}/server.log"
+}
+
 function sanity_check {
 	# TODO: add checks to make sure that PID_FILE and COMMAND_PIPE are writable
 	
@@ -572,6 +577,15 @@ case $ACTION in
 	  echo "Backing up minecraft world data..."
 		backup_world
 		echo "Done."
+		exit 0
+		;;
+	log )
+		echo "Tailing from: ${MINECRAFT_SERVER_DIR_PATH}/server.log" >&2
+		echo "Press ^C to cancel." >&2
+		echo "-------------------------------------------------------------------------------------------" >&2
+		
+		tail_server_log
+		
 		exit 0
 		;;
 	config )
