@@ -315,9 +315,28 @@ function wait_for_minecraft_to_stop {
 	fi
 }
 
+function server_log_path {
+	echo "${MINECRAFT_SERVER_DIR_PATH}/server.log"
+}
 
+function check_server_log_exists {
+	local SERVER_LOG_PATH=`server_log_path`
+	
+	# make sure that the log file exists before trying to tail it.
+	if [[ ! -e "$SERVER_LOG_PATH" ]]; then
+		echo "Server log not found! ($SERVER_LOG_PATH)" >&2
+		echo ""
+		exit 1
+	fi
+}
+
+# tail and follow the server.log
+# ^C to stop
 function tail_server_log {
-	tail -F "${MINECRAFT_SERVER_DIR_PATH}/server.log"
+	local SERVER_LOG_PATH=`server_log_path`
+	check_server_log_exists
+	
+	tail -F "$SERVER_LOG_PATH"
 }
 
 function sanity_check {
@@ -580,6 +599,7 @@ case $ACTION in
 		exit 0
 		;;
 	log )
+		check_server_log_exists
 		echo "Tailing from: ${MINECRAFT_SERVER_DIR_PATH}/server.log" >&2
 		echo "Press ^C to cancel." >&2
 		echo "-------------------------------------------------------------------------------------------" >&2
