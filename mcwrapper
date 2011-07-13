@@ -39,6 +39,7 @@ function print_usage {
 	echo "                *  serverpath   -- absolute path to minecraft_server.jar"
 	echo "                *  serverdir    -- absolute path to server directory (containing minecraft_server.jar)"
 	echo "                *  pidfile      -- absolute path to mcwrapper pidfile"
+	echo "                *  pid          -- the pid of the currently running minecraft server process"
 	echo "                *  pipe         -- absolute path to the mcwrapper command pipe"
 	echo "                *  command      -- the command that will be used to launch the minecraft server"
 	echo "                *  backupdir    -- the path to the backup directory"
@@ -236,13 +237,25 @@ function remove_pid {
 	rm $PID_FILE
 }
 
-function check_is_running {
+# reads the pidfile and echos it
+# returns 1 if the pidfile does not exist or if there was an error reading it.
+function read_pid {
 	if [[ ! -e "$PID_FILE" ]]; then
 		#echo "Server not running!" >&2
 		return 1 # TODO: set up some real exit codes that are unique
 	fi
 	
-	PID=`cat "$PID_FILE"`
+	# TODO: detect errors reading the pid (not readable?) and return non-zero in one of those cases
+	cat "$PID_FILE"
+}
+
+function check_is_running {
+	PID=`read_pid`
+	
+	# if read_pid returned a non-zero status, then we're not running
+	if [[ $? != 0 ]]; then
+		return 1
+	fi
 	
 	# check to see if we have a wrapper currently running
 	kill -0 $PID 2>&- 1>&-
@@ -623,6 +636,16 @@ case $ACTION in
 				;;
 			pidfile )
 				echo $PID_FILE
+				exit 0
+				;;
+			pid )
+				check_is_running
+				if [[ $? != 0 ]]; then
+					echo "Server is NOT running." >&2
+					exit 1
+				fi
+				
+				echo `read_pid`
 				exit 0
 				;;
 			pipe )
