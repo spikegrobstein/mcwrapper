@@ -237,12 +237,15 @@ function remove_pid {
 	rm $PID_FILE
 }
 
+# reads the pidfile and echos it
+# returns 1 if the pidfile does not exist or if there was an error reading it.
 function read_pid {
 	if [[ ! -e "$PID_FILE" ]]; then
 		#echo "Server not running!" >&2
 		return 1 # TODO: set up some real exit codes that are unique
 	fi
 	
+	# TODO: detect errors reading the pid (not readable?) and return non-zero in one of those cases
 	cat "$PID_FILE"
 }
 
