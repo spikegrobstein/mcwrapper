@@ -39,6 +39,7 @@ function print_usage {
 	echo "                *  serverpath   -- absolute path to minecraft_server.jar"
 	echo "                *  serverdir    -- absolute path to server directory (containing minecraft_server.jar)"
 	echo "                *  pidfile      -- absolute path to mcwrapper pidfile"
+	echo "                *  pid          -- the pid of the currently running minecraft server process"
 	echo "                *  pipe         -- absolute path to the mcwrapper command pipe"
 	echo "                *  command      -- the command that will be used to launch the minecraft server"
 	echo "                *  backupdir    -- the path to the backup directory"
