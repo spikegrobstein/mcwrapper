@@ -634,6 +634,16 @@ case $ACTION in
 				echo $PID_FILE
 				exit 0
 				;;
+			pid )
+				check_is_running
+				if [[ $? != 0 ]]; then
+					echo "Server is NOT running." >&2
+					exit 1
+				fi
+				
+				echo `read_pid`
+				exit 0
+				;;
 			pipe )
 				echo $COMMAND_PIPE
 				exit 0
