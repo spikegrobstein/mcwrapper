@@ -236,13 +236,22 @@ function remove_pid {
 	rm $PID_FILE
 }
 
-function check_is_running {
+function read_pid {
 	if [[ ! -e "$PID_FILE" ]]; then
 		#echo "Server not running!" >&2
 		return 1 # TODO: set up some real exit codes that are unique
 	fi
 	
-	PID=`cat "$PID_FILE"`
+	cat "$PID_FILE"
+}
+
+function check_is_running {
+	PID=`read_pid`
+	
+	# if read_pid returned a non-zero status, then we're not running
+	if [[ $? != 0 ]]; then
+		return 1
+	fi
 	
 	# check to see if we have a wrapper currently running
 	kill -0 $PID 2>&- 1>&-
