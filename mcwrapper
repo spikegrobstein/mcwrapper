@@ -17,7 +17,7 @@ elif [[ "$MCWRAPPER_DIR" =~ ^(\.\.?/)|(\[^/\]) ]]; then
 	MCWRAPPER_DIR=`pwd`"/${MCWRAPPER_DIR}"
 fi
 
-# filename of the minecraft server
+# default filename of the minecraft server
 MINECRAFT_SERVER_NAME="minecraft_server.jar"
 
 # filename of the minecraft server.properties file
