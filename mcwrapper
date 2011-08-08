@@ -580,6 +580,17 @@ case $ACTION in
 		echo -n "Starting minecraft... "	
 		start_minecraft
 		echo "Done."
+		
+		read_pid
+		
+		check_is_running
+		if [[ $? = 0 ]]; then
+			echo "Server is running." >&2
+			exit 0
+		fi
+		
+		echo "Server is NOT running." >&2
+		
 		exit 0
 		;;
 	stop )
