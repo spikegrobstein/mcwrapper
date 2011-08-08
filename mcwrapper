@@ -202,17 +202,19 @@ function read_command {
 	# read from the command pipe
 	exec < "$COMMAND_PIPE"
 	
-	read INPUT
-	echo $INPUT
+	# initialize INPUT to be empty string
+	INPUT=""
 	
-	# if the user said "stop" then exit after the command completes.
-	if [[ "$INPUT" = "stop" ]]; then
-		clean_up
-		exit 0
-	fi
-	
-	# recurse
-	read_command
+	while [[ "$INPUT" != 'stop' ]]; do
+    read INPUT
+  	echo $INPUT
+
+  	# if the user said "stop" then exit after the command completes.
+  	if [[ "$INPUT" = "stop" ]]; then
+  		clean_up
+  		exit 0
+  	fi
+	done
 }
 
 function send_command {
