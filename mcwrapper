@@ -294,6 +294,15 @@ function start_minecraft {
 
 # stops the minecraft server by sending it the 'stop' command via the FIFO
 function stop_minecraft {
+  # if $BACKUP_ON_EXIT is non-zero length, then backup the world before exiting.
+  if [[ ! -z "$BACKUP_ON_EXIT" ]]; then
+    echo ""
+    echo -n "Backing up world data before exiting..." >&2
+    ( backup_world )
+    # TODO: check status of backup_world. Don't say "Done" if we didn't back anything up.
+    echo "Done." >&2
+  fi
+  
 	send_command "stop"
 }
 
@@ -485,6 +494,7 @@ function cleanup_old_backups () {
 function backup_world {
   if [[ "$BACKUPS_TO_KEEP" = "0" ]]; then
     # set BACKUPS_TO_KEEP to "0" to disable backups entirely.
+    echo ""
     echo "Backups are disabled. Not backing anything up."
     exit 1
   fi
