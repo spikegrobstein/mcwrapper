@@ -29,6 +29,7 @@ COMMAND_PIPE="command_input"
 
 # directory to store backups
 # can be relative or absolute. if relative, it's relative to mcwrapper
+# default: 'backups'
 #BACKUP_DIRECTORY_PATH="backups"
 
 # how many backups to keep in the backups directory
@@ -46,3 +47,9 @@ COMMAND_PIPE="command_input"
 # leave undefined (commented out) to not use compression
 # accepted values are: tgz, zip
 #COMPRESS_BACKUP='tgz'
+
+# Whether to automatically backup when exiting.
+# this is only called when you run `mcwrapper stop`
+# uncomment to backup when exiting.
+# default: ""
+#BACKUP_ON_EXIT=1
