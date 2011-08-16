@@ -62,7 +62,11 @@ There is also support for reading information about the running configuration fo
 
     ./mcwrapper config serverpath
     
-The above will output the path to the `minecraft_server.jar` file that it will wrap. All config commands can be run whether `mcwrapper` is running a server or not. A bug currently exists where if `mcwrapper` cannot locate the minecraft_server.jar, no commands will work.  
+The above will output the path to the `minecraft_server.jar` file that it will wrap. All config commands can be run whether `mcwrapper` is running a server or not. A bug currently exists where if `mcwrapper` cannot locate the minecraft_server.jar, no commands will work.
+
+### Convenience Scripts
+
+`mcwrapper` comes with a set of convenience scripts for the commandline-impared user. These scripts can be run by double-clicking them in OSX or Linux and will execute the specified command. The scripts should not be moved outside of that directory or they will not work.
     
 ## Configuration
 
