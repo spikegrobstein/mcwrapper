@@ -1,0 +1,7 @@
+#! /bin/bash
+
+SCRIPT="$0"
+MCWRAPPER_DIR=`dirname "$SCRIPT"`/..
+MCWRAPPER="${MCWRAPPER_DIR}/mcwrapper"
+
+"$MCWRAPPER" start
