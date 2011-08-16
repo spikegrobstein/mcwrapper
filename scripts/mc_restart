@@ -1,7 +1,18 @@
 #! /bin/bash
 
+# mcwrapper convenience script
+# runs the `restart` action of mcwrapper
+# this should be able to be double-clicked in the GUI on OSX and Linux
+# if using the commandline, you can either use these scripts or the mcwrapper commandline script.
+
 SCRIPT="$0"
 MCWRAPPER_DIR=`dirname "$SCRIPT"`/..
 MCWRAPPER="${MCWRAPPER_DIR}/mcwrapper"
+
+if [[ -f "$MCWRAPPER" ]]; then
+  echo "mcwrapper not found (${MCWRAPPER})" &>2
+  echo "" &>2
+  exit 1
+fi
 
 "$MCWRAPPER" restart
