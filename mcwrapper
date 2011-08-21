@@ -1,5 +1,42 @@
 #! /bin/bash
 
+#### Exit Codes
+
+# no error
+EXIT_SUCCESS=0
+
+# generic bad exit code
+EXIT_GENERIC_FAILURE=1
+
+# bad commandline params
+EXIT_BAD_PARAMS=2
+EXIT_UNKNOWN_CONFIG_SETTING=3
+EXIT_INVALID_ACTION=4
+
+# server-running related failures
+EXIT_SERVER_NOT_RUNNING=5
+EXIT_SERVER_ALREADY_RUNNING=6
+
+# support file related codes:
+EXIT_MINECRAFT_SERVER_NOT_FOUND=10
+EXIT_NO_SERVER_PROPERTIES=11
+EXIT_SERVER_LOG_NOT_FOUND=12
+
+EXIT_MAKE_FIFO_FAILED=20
+
+# backup related codes:
+EXIT_CANNOT_CREATE_BACKUP_DIR=50
+EXIT_CANNOT_BACKUP_WORLD_DATA=51
+EXIT_CANNOT_BACKUP_CONFIGS=52
+EXIT_FAILED_TO_DELETE_SYMLINK=53
+EXIT_ERORR_CREATING_SYMLINK=54
+EXIT_BACKUPS_DISABLED=55
+EXIT_LATEST_BACKUP_NOT_FOUND=56
+
+EXIT_BAD_COMPRESSION_TYPE=60
+
+#### End Exit Codes
+
 MCWRAPPER="$0"
 MCWRAPPER_DIR=`dirname "$MCWRAPPER"`
 MCWRAPPER_CONFIG_NAME="mcwrapper.conf"
@@ -192,7 +229,7 @@ function read_server_property {
 	
 	if [[ ! -e "$SERVER_PROPERTIES_PATH" ]]; then
 	  echo "Cannot locate server.properties path. ($SERVER_PROPERTIES_PATH)" >&2
-	  exit 1
+	  exit $EXIT_NO_SERVER_PROPERTIES
 	fi
 		
 	cat "$SERVER_PROPERTIES_PATH" | grep "$PROP_NAME\=" | awk -F '=' '{ print $2 }'
@@ -212,7 +249,7 @@ function read_command {
   	# if the user said "stop" then exit after the command completes.
   	if [[ "$INPUT" = "stop" ]]; then
   		clean_up
-  		exit 0
+  		exit $EXIT_SUCCESS
   	fi
 	done
 }
@@ -222,7 +259,7 @@ function send_command {
 	
 	if [[ $? != 0 ]]; then
 		echo "Server is NOT running. Not sending command" >&2
-		exit 1
+		exit $SERVER_NOT_RUNNING
 	fi
 	
 	COMMAND=$1
@@ -244,7 +281,7 @@ function remove_pid {
 function read_pid {
 	if [[ ! -e "$PID_FILE" ]]; then
 		#echo "Server not running!" >&2
-		return 1 # TODO: set up some real exit codes that are unique
+		return $EXIT_SERVER_NOT_RUNNING
 	fi
 	
 	# TODO: detect errors reading the pid (not readable?) and return non-zero in one of those cases
@@ -255,18 +292,18 @@ function check_is_running {
 	PID=`read_pid`
 	
 	# if read_pid returned a non-zero status, then we're not running
-	if [[ $? != 0 ]]; then
-		return 1
+	if [[ $? != $EXIT_SUCCESS ]]; then
+		return $SERVER_NOT_RUNNING
 	fi
 	
 	# check to see if we have a wrapper currently running
 	kill -0 $PID 2>&- 1>&-
-	if [[ $? != 0 ]]; then
+	if [[ $? != $EXIT_SUCCESS ]]; then
 		#echo "Server not running!" >&2
-		return 1 # TODO: set up some real exit codes that are unique
+		return $EXIT_SERVER_NOT_RUNNING
 	fi
 	
-	return 0
+	return $EXIT_SUCCESS
 }
 
 function set_up_pipe {
@@ -276,7 +313,7 @@ function set_up_pipe {
 		if [[ $? != 0 ]]; then
 			# if mkfifo failed, print error message, exit non-zero.
 			echo "Error creating the pipe: $COMMAND_PIPE ($?)." >&2
-			exit 1
+			exit $EXIT_MAKE_FIFO_FAILED
 		fi
 	fi
 }
@@ -296,7 +333,7 @@ function start_minecraft {
 	
 	if [[ $? = 0 ]]; then
 		echo "Server is already running. Exiting..." >&2
-		exit 1
+		exit $EXIT_SERVER_ALREADY_RUNNING
 	fi
 	
 	set_up_pipe
@@ -351,7 +388,7 @@ function check_server_log_exists {
 	if [[ ! -e "$SERVER_LOG_PATH" ]]; then
 		echo "Server log not found! ($SERVER_LOG_PATH)" >&2
 		echo ""
-		exit 1
+		exit $EXIT_SERVER_LOG_NOT_FOUND
 	fi
 }
 
@@ -371,7 +408,7 @@ function sanity_check {
 	if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
 		# the minecraft server path does not exist.
 		echo "Minecraft server not found! ($MINECRAFT_SERVER_PATH)"
-		exit 1
+		exit $EXIT_MINECRAFT_SERVER_NOT_FOUND
 	fi
 }
 
@@ -394,7 +431,7 @@ function create_backup_directory () {
 	if [[ $? != 0 ]]; then
 		#an error occurred
 		echo "An error occurred when creating the backup directory." >&2
-		exit 1
+		exit $EXIT_CANNOT_CREATE_BACKUP_DIR
 	fi
 }
 
@@ -419,7 +456,7 @@ function do_backup () {
 	if [[ $? != 0 ]]; then
 		#an error occurred
 		echo "An error occurred when copying the world data." >&2
-		exit 1
+		exit $EXIT_CANNOT_BACKUP_WORLD_DATA
 	fi
 	
 	cp -R "${MINECRAFT_SERVER_DIR_PATH}/"*.{txt,properties} "$CURRENT_BACKUP_PATH/"
@@ -427,7 +464,7 @@ function do_backup () {
 	if [[ $? != 0 ]]; then
 		#an error occurred
 		echo "An error occurred when copying the configuration information" >&2
-		exit 1
+		exit $EXIT_CANNOT_BACKUP_CONFIGS
 	fi
 	
 	if [[ ! -z "$COMPRESS_BACKUP" ]]; then
@@ -442,7 +479,7 @@ function do_backup () {
 				;;
 			* )
 				echo "UKNOWN COMPRESSION TYPE: $COMPRESS_BACKUP"
-				exit 1
+				exit $EXIT_BAD_COMPRESSION_TYPE
 				;;
 		esac
 		
@@ -490,7 +527,7 @@ function create_symlink () {
 		if [[ $? != 0 ]]; then
 			#an error occurred
 			echo "An error occurred when deleting the old symlink." >&2
-			exit 1
+			exit $EXIT_FAILED_TO_DELETE_SYMLINK
 		fi
 	fi
 	
@@ -504,7 +541,7 @@ function create_symlink () {
 	if [[ $? != 0 ]]; then
 		#an error occurred
 		echo "An error occurred when creating the symlink." >&2
-		exit 1
+		exit $EXIT_ERORR_CREATING_SYMLINK
 	fi
 }
 
@@ -536,7 +573,7 @@ function backup_world {
     # set BACKUPS_TO_KEEP to "0" to disable backups entirely.
     echo ""
     echo "Backups are disabled. Not backing anything up."
-    exit 1
+    exit $EXIT_BACKUPS_DISABLED
   fi
   
 	# the path to the to-be-backed-up directory
@@ -571,7 +608,7 @@ function backup_world {
 
 if [[ $# -eq 0 ]]; then
 	print_usage
-	exit 0
+	exit $EXIT_SUCCESS
 fi
 
 ACTION=$1;shift
@@ -592,37 +629,37 @@ case $ACTION in
 		echo -n "Starting minecraft... "	
 		start_minecraft
 		echo "Done."
-		exit 0
+		exit $EXIT_SUCCESS
 		;;
 	stop )
 		echo -n "Stopping minecraft... "
 		stop_minecraft
 		echo "Done."
-		exit 0
+		exit $EXIT_SUCCESS
 		;;
 	restart )
 		echo -n "Restarting minecraft..."
 		restart_minecraft
 		echo " Done."
-		exit 0
+		exit $EXIT_SUCCESS
 		;;
 	status )
 		# TODO: this can be put into a single if statement for clarity; if [[ $(check_is_running) ]]
 		check_is_running
 		if [[ $? = 0 ]]; then
 			echo "Server is running." >&2
-			exit 0
+			exit $EXIT_SUCCESS
 		fi
 		
 		echo "Server is NOT running." >&2
-		exit 1
+		exit $EXIT_SERVER_NOT_RUNNING
 		
 		;;
 	backup )
 	  echo "Backing up minecraft world data..."
 		backup_world
 		echo "Done."
-		exit 0
+		exit $EXIT_SUCCESS
 		;;
 	log )
 		check_server_log_exists
@@ -632,7 +669,7 @@ case $ACTION in
 		
 		tail_server_log
 		
-		exit 0
+		exit $EXIT_SUCCESS
 		;;
 	config )
 		# dump info about the config
@@ -640,50 +677,50 @@ case $ACTION in
 		case $CONFIG_SETTING in
 			serverpath )
 				echo $MINECRAFT_SERVER_PATH
-				exit 0
+				exit $EXIT_SUCCESS
 				;;
 			serverdir )
 				echo $MINECRAFT_SERVER_DIR_PATH
-				exit 0
+				exit $EXIT_SUCCESS
 				;;
 			pidfile )
 				echo $PID_FILE
-				exit 0
+				exit $EXIT_SUCCESS
 				;;
 			pid )
 				check_is_running
 				if [[ $? != 0 ]]; then
 					echo "Server is NOT running." >&2
-					exit 1
+					exit $EXIT_SERVER_NOT_RUNNING
 				fi
 				
 				echo `read_pid`
-				exit 0
+				exit $EXIT_SUCCESS
 				;;
 			pipe )
 				echo $COMMAND_PIPE
-				exit 0
+				exit $EXIT_SUCCESS
 				;;
 			configfile )
 				echo $CONFIG_PATH
-				exit 0
+				exit $EXIT_SUCCESS
 				;;
 			command )
 				echo $MINECRAFT_SERVER_CMD
-				exit 0
+				exit $EXIT_SUCCESS
 				;;
 			backupdir )
 				echo $BACKUP_DIRECTORY_PATH
-				exit 0
+				exit $EXIT_SUCCESS
 				;;
 			latestbackup )
 				# TODO: move this to a function to keep all this shit simple.
 				LATEST_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_NAME}"
 				
-				# if the link doesn't exist, then warn the user and exit with a 1
+				# if the link doesn't exist, then warn the user and exit with proper exit code
 				if [[ ! -L "$LATEST_BACKUP_PATH" ]]; then
 					echo "Latest backup not found. Either never created or not a link or something. ($LATEST_BACKUP_PATH)" >&2
-					exit 1
+					exit $EXIT_LATEST_BACKUP_NOT_FOUND
 				fi
 				
 				# read the link to the latest backup
@@ -692,41 +729,41 @@ case $ACTION in
 				# if the link to the latest backup is absolute, output that, otherwise, build the path and output that.
 				if [[ "$LATEST_BACKUP_LINK" =~ ^/ ]]; then
 					echo $LATEST_BACKUP_LINK
-					exit 0
+					exit $EXIT_SUCCESS
 				fi
 				
 				echo "${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_LINK}"				
-				exit 0
+				exit $EXIT_SUCCESS
 				;;
 			*)
 				echo "Unknown config setting: $CONFIG_SETTING"
-				exit 1
+				exit $EXIT_UNKNOWN_CONFIG_SETTING
 				;;
 		esac
 		;;
 	prop )
 		PROP=$1
 		read_server_property $PROP
-		exit 0
+		exit $EXIT_SUCCESS
 		;;
 	help )
 		print_usage
-		exit 0
+		exit $EXIT_SUCCESS
 		;;
 	command|cmd )
 		COMMAND="$@"
 		echo -n "sending: $COMMAND ... "
 		send_command "$COMMAND"
 		echo "Done."
-		exit 0
+		exit $EXIT_SUCCESS
 		;;
 	* )
 		echo "Invalid action: $ACTION" >&2
 		echo "" >&2
 		print_usage
-		exit 1
+		exit $EXIT_INVALID_ACTION
 esac
 
-exit 0
+exit $EXIT_SUCCESS
 
 
