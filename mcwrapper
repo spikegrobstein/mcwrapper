@@ -299,7 +299,7 @@ function send_command {
 	COMMAND=$1
 	echo "$COMMAND" > "$COMMAND_PIPE" 2>&1 >> /dev/null
 	
-	$ERR=$?
+	ERR=$?
 	# check if we were successful
 	if [[ $ERR != $EXIT_SUCCESS ]]; then
 	  echo "Error sending command: '${COMMAND}' (${ERR})" >&2
