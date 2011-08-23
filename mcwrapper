@@ -316,7 +316,7 @@ function check_is_running {
 	fi
 	
 	# check to see if we have a wrapper currently running
-	if [[ ! -d /proc/`read_pid` ]]; then
+	if [[ ! -z $PID && ! -d /proc/`read_pid` ]]; then
 		#echo "Server not running!" >&2
 		return $EXIT_SERVER_NOT_RUNNING
 	fi
