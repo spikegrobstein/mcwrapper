@@ -295,8 +295,16 @@ function send_command {
 		exit $SERVER_NOT_RUNNING
 	fi
 	
+	# echo the command into the command pipe to be picked up by the reader process:
 	COMMAND=$1
-	echo "$COMMAND" > "$COMMAND_PIPE"
+	echo "$COMMAND" > "$COMMAND_PIPE" 2>&1 >> /dev/null
+	
+	$ERR=$?
+	# check if we were successful
+	if [[ $ERR != $EXIT_SUCCESS ]]; then
+	  echo "Error sending command: '${COMMAND}' (${ERR})" >&2
+	  exit $ERROR_SENDING_COMMAND
+	fi
 }
 
 function create_pid {
