@@ -24,6 +24,7 @@ EXIT_INVALID_ACTION=4
 # server-running related failures
 EXIT_SERVER_NOT_RUNNING=5
 EXIT_SERVER_ALREADY_RUNNING=6
+EXIT_SERVER_DISAPPEARED=7
 
 # support file related codes:
 EXIT_MINECRAFT_SERVER_NOT_FOUND=10
@@ -253,8 +254,22 @@ function read_command {
 	# initialize INPUT to be empty string
 	INPUT=""
 	
+	# number of seconds between reads
+	# this is needed to make sure the server is still running
+	local READ_TIMEOUT=2
+	
 	while [[ "$INPUT" != 'stop' ]]; do
-    read INPUT
+    read -t "$READ_TIMEOUT" INPUT
+    
+    if [[ -z "$INPUT" ]]; then
+      check_is_running
+      
+      if [[ "$?" != "$EXIT_SUCCESS" ]]; then
+        exit $EXIT_SERVER_DISAPPEARED
+      fi
+      continue
+    fi
+    
   	echo $INPUT
 
   	# if the user said "stop" then exit after the command completes.
