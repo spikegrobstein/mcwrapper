@@ -17,11 +17,16 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="Description of the service"
 NAME=mcwrapper
-DAEMON=/usr/local/minecraft/mcwrapper/$NAME
-DAEMON_ARGS=""
-PIDFILE=/usr/local/minecraft/mcwrapper/$NAME.pid
+
+# mcwrapper's directory
+MCWRAPPER_HOME=/usr/local/minecraft/mcwrapper
+
+# where files live
+DAEMON=$MCWRAPPER_HOME/$NAME
+PIDFILE=$MCWRAPPER_HOME/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
+# run-as
 MINECRAFT_UID=minecraft
 MINECRAFT_GID=minecraft
 
