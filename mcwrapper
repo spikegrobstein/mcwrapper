@@ -31,6 +31,7 @@ EXIT_NO_SERVER_PROPERTIES=11
 EXIT_SERVER_LOG_NOT_FOUND=12
 
 EXIT_MAKE_FIFO_FAILED=20
+EXIT_SEND_COMMAND_FAILED=21
 
 # backup related codes:
 EXIT_CANNOT_CREATE_BACKUP_DIR=50
@@ -274,13 +275,13 @@ function send_command {
 	
 	# echo the command into the command pipe to be picked up by the reader process:
 	COMMAND=$1
-	echo "$COMMAND" > "$COMMAND_PIPE" 2>&1 >> /dev/null
+	(echo "$COMMAND" > "$COMMAND_PIPE") &> /dev/null
 	
 	ERR=$?
 	# check if we were successful
 	if [[ $ERR != $EXIT_SUCCESS ]]; then
 	  echo "Error sending command: '${COMMAND}' (${ERR})" >&2
-	  exit $ERROR_SENDING_COMMAND
+	  exit $EXIT_SEND_COMMAND_FAILED
 	fi
 }
 
