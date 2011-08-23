@@ -375,7 +375,7 @@ function start_minecraft {
 	cd $MINECRAFT_SERVER_DIR_PATH
 	read_command | $MINECRAFT_SERVER_CMD &> /dev/null &
 	
-	create_pid $!	
+	create_pid $$
 }
 
 # stops the minecraft server by sending it the 'stop' command via the FIFO
