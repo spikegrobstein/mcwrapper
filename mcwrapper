@@ -1,5 +1,13 @@
 #! /bin/bash
 
+# absolutely, under no circumstances, let mcwrapper be run as root!!!!
+if [[ `id -u` = 0 ]]; then
+  echo "You have started mcwrapper as root." >&2
+  echo "This is not recommended. Please run as an un-privilaged user." >&2
+  echo "" >&2
+  exit 99 # $EXIT_RUNNING_AS_ROOT
+fi
+
 #### Exit Codes
 
 # no error
@@ -34,6 +42,8 @@ EXIT_BACKUPS_DISABLED=55
 EXIT_LATEST_BACKUP_NOT_FOUND=56
 
 EXIT_BAD_COMPRESSION_TYPE=60
+
+EXIT_RUNNING_AS_ROOT=99
 
 #### End Exit Codes
 
