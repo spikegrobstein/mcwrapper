@@ -587,7 +587,7 @@ function cleanup_old_backups () {
   
   echo "Cleaning up old backups..."
   
-	OLD_BACKUPS=`ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail +"${BACKUPS_TO_KEEP}"`
+	OLD_BACKUPS=`ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail -n +"${BACKUPS_TO_KEEP}"`
 	
 	for old_backup in $OLD_BACKUPS; do
 	  echo "Removing $old_backup"
