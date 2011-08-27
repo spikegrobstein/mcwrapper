@@ -536,6 +536,11 @@ function run_installer () {
   echo "Downloading and installing Minecraft Server..."
   download_minecraft_server
   
+  # ok, so now the server is downloaded and copied to the right location.
+  
+  echo "Minecraft is downloaded and in place. You can now start it by running the following command:"
+  echo "$MCWRAPPER start"
+  
   exit 0
 }
 
