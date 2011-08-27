@@ -454,8 +454,8 @@ function sanity_check {
 	# make sure that there is a java binary installed in the PATH
 	which "$JAVA_BIN" &> /dev/null
 	if [[ $? != 0 ]]; then
-	 echo "The java binary is not found in your path." >&2
-	 echo "Please install the necessary package(s)." >&2
+	 echo "The java binary is not found." >&2
+	 echo "Please install the necessary package(s) or specify the JAVA_BIN configuration option." >&2
 	 exit $EXIT_NO_JAVA
 	fi
 	
