@@ -262,8 +262,8 @@ function read_server_property {
 }
 
 function read_command {
-	# read from the command pipe
-	exec < "$COMMAND_PIPE"
+	# read from the command pipe via FD7 (needed for read timeout)
+	exec 7<> "$COMMAND_PIPE"
 	
 	# initialize INPUT to be empty string
 	INPUT=""
@@ -273,9 +273,10 @@ function read_command {
 	local READ_TIMEOUT=2
 	
 	while [[ "$INPUT" != 'stop' ]]; do
-    read -t "$READ_TIMEOUT" INPUT
+    read -t "$READ_TIMEOUT" -u 7 INPUT
     
-    if [[ -z "$INPUT" ]]; then
+    # if it timed out or got no input, then exit if server isnt' running.
+    if [[ "$?" != 0 || -z "$INPUT" ]]; then
       check_is_running
       
       if [[ "$?" != "$EXIT_SUCCESS" ]]; then
