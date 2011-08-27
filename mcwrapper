@@ -547,20 +547,30 @@ function download_minecraft_server () {
   local MINECRAFT_SERVER_DOWNLOAD_PAGE="${MINECRAFT_SERVER_BASE_URL}/download.jsp"
   
   # parse the download page and read the minecraft_server.jar download URI
-  local MINECRAFT_SERVER_DOWNLOAD_URI=`curl "$MINECRAFT_SERVER_DOWNLOAD_PAGE" | grep -E -o 'href=".*?minecraft_server.jar.*"' | awk -F '"' '{ print $2; }'`
+  local MINECRAFT_SERVER_DOWNLOAD_URI=`curl --progress-bar "$MINECRAFT_SERVER_DOWNLOAD_PAGE" | grep -E -o 'href=".*?minecraft_server.jar.*"' | awk -F '"' '{ print $2; }'`
   
   # build the minecraft_server.jar download URL
   local MINECRAFT_SERVER_DOWNLOAD_URL="${MINECRAFT_SERVER_BASE_URL}/${MINECRAFT_SERVER_DOWNLOAD_URI}"
   
   local MINECRAFT_SERVER_TEMP_FILE="/tmp/minecraft_server.jar"
+  
+  # if the tempfile exists, delete it
+  if [[ -e "$MINECRAFT_SERVER_TEMP_FILE" ]]; then
+    rm "$MINECRAFT_SERVER_TEMP_FILE"
+  fi
     
   # download the server to the temp directory  
-  curl -L -o "$MINECRAFT_SERVER_TEMP_FILE" "$MINECRAFT_SERVER_DOWNLOAD_URL"
+  curl --progress-bar -L -o "$MINECRAFT_SERVER_TEMP_FILE" "$MINECRAFT_SERVER_DOWNLOAD_URL"
   
   # assuming that was successful, make sure the directories exist and move the binary to the right location
   local CURL_RETURN=$?
-  if [[ $CURL_RETURN != 0 ]]; then
+  if [[ "$CURL_RETURN" != "0" ]]; then
     echo "An error occurred ($CURL_RETURN) while downloading minecraft_server.jar from: $MINECRAFT_SERVER_DOWNLOAD_URL"
+    echo ""
+    exit $EXIT_DOWNLOAD_MINECRAFT_SERVER_FAILED
+  elif [[ ! -s "$MINECRAFT_SERVER_TEMP_FILE" ]]; then
+    echo "Failed downloading the minecraft server."
+    echo "This is usually caused by a server error on minecraft.net."
     echo ""
     exit $EXIT_DOWNLOAD_MINECRAFT_SERVER_FAILED
   fi
@@ -583,7 +593,7 @@ function backup_old_server () {
   # back up the old minecraft server (just in case)
   mv "$MINECRAFT_SERVER_PATH" "${MINECRAFT_SERVER_PATH}.old"
   
-  if [[ $? != 0 ]]; then
+  if [[ "$?" != "0" ]]; then
     echo "Failed backing up the old minecraft server!"
     echo ""
     exit $EXIT_CANNOT_BACKUP_OLD_MINECRAFT_SERVER
