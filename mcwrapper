@@ -49,6 +49,8 @@ EXIT_BAD_COMPRESSION_TYPE=60
 
 # installer related codes:
 EXIT_CANNOT_BACKUP_OLD_MINECRAFT_SERVER=70
+EXIT_DOWNLOAD_MINECRAFT_SERVER_FAILED=71
+EXIT_CREATE_MINECRAFT_SERVER_DIR_FAILED=72
 
 # misc other codes:
 EXIT_RUNNING_AS_ROOT=99
@@ -532,7 +534,39 @@ function run_installer () {
 # parse the minecraft.net download page and look for the download link for the server
 # then download that to the necessary place
 function download_minecraft_server () {
-  local MINECRAFT_SERVER_DOWNLOAD_PAGE="http://www.minecraft.net/download.jsp"
+  local MINECRAFT_SERVER_BASE_URL="http://www.minecraft.net"
+  local MINECRAFT_SERVER_DOWNLOAD_PAGE="${MINECRAFT_SERVER_BASE_URL}/download.jsp"
+  
+  # parse the download page and read the minecraft_server.jar download URI
+  local MINECRAFT_SERVER_DOWNLOAD_URI=`curl "$MINECRAFT_SERVER_DOWNLOAD_PAGE" | grep -E -o 'href=".*?minecraft_server.jar.*"' | awk -F '"' '{ print $2; }'`
+  
+  # build the minecraft_server.jar download URL
+  local MINECRAFT_SERVER_DOWNLOAD_URL="${MINECRAFT_SERVER_BASE_URL}/${MINECRAFT_SERVER_DOWNLOAD_URI}"
+  
+  local MINECRAFT_SERVER_TEMP_FILE="/tmp/minecraft_server.jar"
+    
+  # download the server to the temp directory  
+  curl -L -o "$MINECRAFT_SERVER_TEMP_FILE" "$MINECRAFT_SERVER_DOWNLOAD_URL"
+  
+  # assuming that was successful, make sure the directories exist and move the binary to the right location
+  local CURL_RETURN=$?
+  if [[ $CURL_RETURN != 0 ]]; then
+    echo "An error occurred ($CURL_RETURN) while downloading minecraft_server.jar from: $MINECRAFT_SERVER_DOWNLOAD_URL"
+    echo ""
+    exit $EXIT_DOWNLOAD_MINECRAFT_SERVER_FAILED
+  fi
+  
+  # make sure directories exit
+  mkdir -p $MINECRAFT_SERVER_DIR_PATH
+  if [[ $? != 0 ]]; then
+    echo "Failed creating the minecraft server directory ($MINECRAFT_SERVER_DIR_PATH)"
+    echo ""
+    exit $EXIT_CREATE_MINECRAFT_SERVER_DIR_FAILED
+  fi
+  
+  # move the minecraft server to the right place:
+  mv "$MINECRAFT_SERVER_TEMP_FILE" "$MINECRAFT_SERVER_PATH"
+  
 }
 
 # backs up an old minecraft_server.jar file before downloading a new one
