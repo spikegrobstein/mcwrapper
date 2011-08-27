@@ -226,7 +226,7 @@ function process_config {
 	# this may be overridden in the config, so if it's set already, don't set it.
 	if [[ -z "$MINECRAFT_SERVER_CMD" ]]; then
 		# command for starting minecraft_server.jar
-		MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER_PATH" nogui"
+		MINECRAFT_SERVER_CMD="$JAVA_BIN -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER_PATH" nogui"
 	fi
 	
 	# the path to the server.properties file
@@ -443,7 +443,7 @@ function sanity_check {
 	# TODO: add checks to make sure that PID_FILE and COMMAND_PIPE are writable
 	
 	# make sure that there is a java binary installed in the PATH
-	which java &> /dev/null
+	which "$JAVA_BIN" &> /dev/null
 	if [[ $? != 0 ]]; then
 	 echo "The java binary is not found in your path." >&2
 	 echo "Please install the necessary package(s)." >&2
