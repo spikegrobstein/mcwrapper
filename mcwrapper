@@ -745,12 +745,12 @@ function cleanup_old_backups () {
     return
   fi
   
-  echo "Cleaning up old backups..."
+  echo "Cleaning up old backups..." >&2
   
 	OLD_BACKUPS=`ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail -n +"${BACKUPS_TO_KEEP}"`
 	
 	for old_backup in $OLD_BACKUPS; do
-	  echo "Removing $old_backup"
+	  echo "Removing $old_backup" >&2
 		rm -rf "${BACKUP_DIRECTORY_PATH}/$old_backup"
 		if [[ $? != 0 ]]; then
 			#an error occurred but don't exit.
