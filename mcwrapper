@@ -456,13 +456,15 @@ function sanity_check {
 	if [[ $? != 0 ]]; then
 	 echo "The java binary is not found." >&2
 	 echo "Please install the necessary package(s) or specify the JAVA_BIN configuration option." >&2
+	 echo "" >&2
 	 exit $EXIT_NO_JAVA
 	fi
 	
 	# check to make sure that things that need to exist exist.
 	if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
 		# the minecraft server path does not exist.
-		echo "Minecraft server not found! ($MINECRAFT_SERVER_PATH)"
+		echo "Minecraft server not found! ($MINECRAFT_SERVER_PATH)" >&2
+		echo "" >&2
 		exit $EXIT_MINECRAFT_SERVER_NOT_FOUND
 	fi
 }
