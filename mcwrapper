@@ -59,6 +59,7 @@ EXIT_CANNOT_BACKUP_OLD_MINECRAFT_SERVER=70
 EXIT_DOWNLOAD_MINECRAFT_SERVER_FAILED=71
 EXIT_CREATE_MINECRAFT_SERVER_DIR_FAILED=72
 EXIT_CANNOT_MOVE_MINECRAFT_SERVER=73
+EXIT_EXISTING_MINECRAFT_SERVER_NOT_FOUND=74
 
 # misc other codes:
 EXIT_RUNNING_AS_ROOT=99
@@ -618,6 +619,22 @@ function backup_old_server () {
     echo ""
     exit $EXIT_CANNOT_BACKUP_OLD_MINECRAFT_SERVER
   fi
+}
+
+# basically the same as install without all of the confirmation levels
+# if an existing minecraft server is not found, then bail.
+function update_minecraft_server () {
+  if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
+    echo "Existing Minecraft Server not found! ($MINECRAFT_SERVER_PATH)"
+    echo "Either run \`$MCWRAPPER install\` or make sure you install minecraft_server.jar in the above location."
+    echo ""
+    exit $EXIT_EXISTING_MINECRAFT_SERVER_NOT_FOUND
+  fi
+  
+  backup_old_server
+  download_minecraft_server
+  
+  echo -n "Would you like to restart Minecraft Server? [Y/n]: "
 }
 
 ## End Installer portion.
