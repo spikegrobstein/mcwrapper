@@ -41,6 +41,8 @@ EXIT_SERVER_LOG_NOT_FOUND=12
 EXIT_MAKE_FIFO_FAILED=20
 EXIT_SEND_COMMAND_FAILED=21
 
+EXIT_NO_JAVA=30
+
 # backup related codes:
 EXIT_CANNOT_CREATE_BACKUP_DIR=50
 EXIT_CANNOT_BACKUP_WORLD_DATA=51
@@ -445,6 +447,14 @@ function tail_server_log {
 
 function sanity_check {
 	# TODO: add checks to make sure that PID_FILE and COMMAND_PIPE are writable
+	
+	# make sure that there is a java binary installed in the PATH
+	which java &> /dev/null
+	if [[ $? != 0 ]]; then
+	 echo "The java binary is not found in your path." >&2
+	 echo "Please install the necessary package(s)." >&2
+	 exit $EXIT_NO_JAVA
+	fi
 	
 	# check to make sure that things that need to exist exist.
 	if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
