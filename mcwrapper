@@ -89,6 +89,7 @@ function print_usage {
 	echo "    stop    -- stop a running server"
 	echo "    restart -- restart a running server (issues stop, waits for it to stop, then starts)"
 	echo "    status  -- whether the server is running or not"
+	echo "    check   -- runs basic sanity checks"
 	echo "    log     -- follows the server log as it's written to"
 	echo "    config  -- used to read configuration information about mcwrapper"
 	echo "               example: $MCWRAPPER_NAME config serverpath"
