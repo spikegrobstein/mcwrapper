@@ -99,6 +99,7 @@ function print_usage {
 	echo "    status  -- whether the server is running or not"
 	echo "    check   -- runs basic sanity checks"
 	echo "    install -- runs an installation wizard to walk you through setup"
+	echo "    update  -- update your Minecraft Server binary"
 	echo "    log     -- follows the server log as it's written to"
 	echo "    config  -- used to read configuration information about mcwrapper"
 	echo "               example: $MCWRAPPER_NAME config serverpath"
@@ -889,7 +890,11 @@ case $ACTION in
 	  
 	install )
 	  run_installer
-	  exit 0
+	  exit $EXIT_SUCCESS
+	  ;;
+	update )
+	  update_minecraft_server
+	  exit $EXIT_SUCCESS
 	  ;;
 	backup )
 	  echo "Backing up minecraft world data..."
