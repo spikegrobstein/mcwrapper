@@ -576,7 +576,7 @@ function download_minecraft_server () {
   fi
   
   # make sure directories exit
-  mkdir -p $MINECRAFT_SERVER_DIR_PATH
+  mkdir -p "$MINECRAFT_SERVER_DIR_PATH"
   if [[ $? != 0 ]]; then
     echo "Failed creating the minecraft server directory ($MINECRAFT_SERVER_DIR_PATH)"
     echo ""
