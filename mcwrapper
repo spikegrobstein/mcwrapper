@@ -703,6 +703,12 @@ case $ACTION in
 		exit $EXIT_SERVER_NOT_RUNNING
 		
 		;;
+	check )
+	  sanity_check
+	  if [[ $? == 0 ]]; then
+	    echo "Everything looks OK!"
+	  fi
+	  ;;
 	backup )
 	  echo "Backing up minecraft world data..."
 		backup_world
