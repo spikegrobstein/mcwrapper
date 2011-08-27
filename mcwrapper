@@ -694,7 +694,10 @@ process_config
 
 # check to make sure that we're in a sane configuration
 # function exits on error.
-sanity_check
+# not all actions require a pre-sanity check, though.
+if [[ "$ACTION" != 'install' ]]; then
+  sanity_check
+fi
 
 # must cd to minecraft server directory to make sure support files are created in the correct place.
 
