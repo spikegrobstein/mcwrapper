@@ -706,9 +706,12 @@ case $ACTION in
 		;;
 	check )
 	  sanity_check
-	  if [[ $? == 0 ]]; then
-	    echo "Everything looks OK!"
-	  fi
+
+    # sanity_check will exit with an exit code if it fails
+    # so, assuming it didn't exit, everything is ok.
+	  
+	  echo "Everything looks OK!"
+    exit $EXIT_SUCCESS
 	  ;;
 	backup )
 	  echo "Backing up minecraft world data..."
