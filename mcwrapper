@@ -167,6 +167,9 @@ function default_config {
 
 	fi
 	
+	# Java binary (uses one in PATH by default)
+	JAVA_BIN="java"
+	
 	# Java VM settings (increasing these never hurts)
 	MX_SIZE="1024M"
 	MS_SIZE="1024M"
