@@ -489,9 +489,43 @@ function run_installer () {
   echo "Before the Minecraft Server is installed, we must first confirm a few settings..."
   echo ""
   
+  # check for configuration
   local CURRENT_CONFIG_PATH=`get_config_path`
   
-  echo "mcwrapper config path: $CURRENT_CONFIG_PATH"
+  if [[ -z "$CURRENT_CONFIG_PATH" ]]; then
+    echo "Using default configuration."
+    echo "An example configuration is included in the mcwrapper package."
+    echo "See mcwrapper.conf-example for details."
+  else
+    echo "mcwrapper config path: $CURRENT_CONFIG_PATH"
+  fi
+  echo ""
+  
+  # show where minecraft_server.jar will be installed
+  
+  echo "Minecraft Server Path: $MINECRAFT_SERVER_PATH"
+  
+  if [[ -e "$MINECRAFT_SERVER_PATH" ]]; then
+    echo -n "Minecraft server already exists! Do you wish to overwrite? [y/N]: "
+    read OVERWRITE_SERVER
+    if [[ "$OVERWRITE_SERVER" != 'y' ]]; then
+      echo ""
+      echo "Not overwriting server. Thanks, bye!"
+      echo ""
+      exit $EXIT_SUCCESS
+    fi
+  fi
+  
+  echo -n "Is this where you wish to install the Minecraft Server? [Y/n]: "
+  read INSTALL_PATH_CORRECT
+  if [[ "$INSTALL_PATH_CORRECT" != 'y' && ! -z "$INSTALL_PATH_CORRECT" ]]; then
+    echo ""
+    echo "Please update your mcwrapper.conf and re-run this installer."
+    echo ""
+    exit $EXIT_SUCCESS
+  fi
+  
+  echo "Installing..."
   
   exit 0
 }
