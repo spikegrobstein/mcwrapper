@@ -749,7 +749,7 @@ case $ACTION in
 	  ;;
 	  
 	install )
-	  install_minecraft_server
+	  run_installer
 	  exit 0
 	  ;;
 	backup )
