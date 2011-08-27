@@ -624,10 +624,24 @@ function update_minecraft_server () {
     exit $EXIT_EXISTING_MINECRAFT_SERVER_NOT_FOUND
   fi
   
+  echo "Updating server..."
+  
   backup_old_server
   download_minecraft_server
   
-  echo -n "Would you like to restart Minecraft Server? [Y/n]: "
+  check_is_running
+  if [[ $? != 0 ]]; then
+    # server is not running, so just return
+    return
+  fi
+  
+  read -p "Would you like to restart Minecraft Server? [Y/n]: " INPUT
+  if [[ -z "$INPUT" || "$INPUT" == 'y' ]]; then
+    echo "Restarting minecraft server..."
+    restart_minecraft
+    echo "Done."
+  fi
+  
 }
 
 ## End Installer portion.
