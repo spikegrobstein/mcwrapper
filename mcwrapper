@@ -469,6 +469,31 @@ function clean_up {
 }
 
 ##########################################################################################
+## Installer portion: ============>>>>>>>>>>>>
+
+# runs through interactive installer
+# confirm configuration
+# download minecraft_server.jar
+# sanity check
+function run_installer () {
+  echo "Welcome to the mcwrapper installer."
+  echo "Before the Minecraft Server is installed, we must first confirm a few settings..."
+  echo ""
+  
+  local CURRENT_CONFIG_PATH=`get_config_path`
+  
+  echo "mcwrapper config path: $CURRENT_CONFIG_PATH"
+  
+  exit 0
+}
+
+# download the minecraft_server.jar file
+function download_minecraft_server () {
+  return 0
+}
+
+## End Installer portion.
+##########################################################################################
 ## MCBackup portion: ============>>>>>>>>>>>>
 
 
@@ -712,6 +737,11 @@ case $ACTION in
 	  
 	  echo "Everything looks OK!"
     exit $EXIT_SUCCESS
+	  ;;
+	  
+	install )
+	  install_minecraft_server
+	  exit 0
 	  ;;
 	backup )
 	  echo "Backing up minecraft world data..."
