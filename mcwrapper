@@ -343,8 +343,13 @@ function read_pid {
 		return $EXIT_SERVER_NOT_RUNNING
 	fi
 	
-	# TODO: detect errors reading the pid (not readable?) and return non-zero in one of those cases
-	cat "$PID_FILE"
+	local PID=`cat "$PID_FILE" 2>&1`
+	
+	if [[ $? != $EXIT_SUCCESS ]]; then
+	 return $EXIT_SERVER_NOT_RUNNING
+	fi
+	
+	echo $PID
 }
 
 function check_is_running {
