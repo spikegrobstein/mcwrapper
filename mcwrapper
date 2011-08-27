@@ -58,6 +58,7 @@ EXIT_BAD_COMPRESSION_TYPE=60
 EXIT_CANNOT_BACKUP_OLD_MINECRAFT_SERVER=70
 EXIT_DOWNLOAD_MINECRAFT_SERVER_FAILED=71
 EXIT_CREATE_MINECRAFT_SERVER_DIR_FAILED=72
+EXIT_CANNOT_MOVE_MINECRAFT_SERVER=73
 
 # misc other codes:
 EXIT_RUNNING_AS_ROOT=99
@@ -599,6 +600,12 @@ function download_minecraft_server () {
   # move the minecraft server to the right place:
   mv "$MINECRAFT_SERVER_TEMP_FILE" "$MINECRAFT_SERVER_PATH"
   
+  # check for errors when moving the minecraft_server.jar file
+  if [[ "$?" != 0 ]]; then
+    echo "An error occurred when moving minecraft_server.jar to the install directory."
+    echo ""
+    exit $EXIT_CANNOT_MOVE_MINECRAFT_SERVER
+  fi
 }
 
 # backs up an old minecraft_server.jar file before downloading a new one
