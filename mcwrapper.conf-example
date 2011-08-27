@@ -12,6 +12,11 @@
 # defaults to either minecraft_server.jar in same directory or one level up.
 # MINECRAFT_SERVER_PATH="/usr/local/minecraft/minecraft_server.jar"
 
+# the java binary.
+# by default, mcwrapper will use the 'java' binary in your path.
+# change this if you'd like to use a different java binary.
+JAVA_BIN='java'
+
 # Java VM settings (increasing these never hurts)
 # these are suggested settings from minecraft.net
 MX_SIZE="1024M"
