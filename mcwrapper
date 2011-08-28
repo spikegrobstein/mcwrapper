@@ -34,6 +34,8 @@ EXIT_SERVER_LOG_NOT_FOUND=12
 EXIT_MAKE_FIFO_FAILED=20
 EXIT_SEND_COMMAND_FAILED=21
 
+EXIT_NO_JAVA=30
+
 # backup related codes:
 EXIT_CANNOT_CREATE_BACKUP_DIR=50
 EXIT_CANNOT_BACKUP_WORLD_DATA=51
@@ -45,6 +47,14 @@ EXIT_LATEST_BACKUP_NOT_FOUND=56
 
 EXIT_BAD_COMPRESSION_TYPE=60
 
+# installer related codes:
+EXIT_CANNOT_BACKUP_OLD_MINECRAFT_SERVER=70
+EXIT_DOWNLOAD_MINECRAFT_SERVER_FAILED=71
+EXIT_CREATE_MINECRAFT_SERVER_DIR_FAILED=72
+EXIT_CANNOT_MOVE_MINECRAFT_SERVER=73
+EXIT_EXISTING_MINECRAFT_SERVER_NOT_FOUND=74
+
+# misc other codes:
 EXIT_RUNNING_AS_ROOT=99
 
 #### End Exit Codes
@@ -62,7 +72,7 @@ if [[ "$MCWRAPPER_DIR" =~ ^\.$ ]]; then
 # matches:
 #    ./foo/bar
 #    foo/bar
-elif [[ "$MCWRAPPER_DIR" =~ ^(\.\.?/)|(\[^/\]) ]]; then
+elif [[ "$MCWRAPPER_DIR" =~ "^(\.\.?/)|(\[^/\])" ]]; then
 	MCWRAPPER_DIR=`pwd`"/${MCWRAPPER_DIR}"
 fi
 
@@ -81,6 +91,9 @@ function print_usage {
 	echo "    stop    -- stop a running server"
 	echo "    restart -- restart a running server (issues stop, waits for it to stop, then starts)"
 	echo "    status  -- whether the server is running or not"
+	echo "    check   -- runs basic sanity checks"
+	echo "    install -- runs an installation wizard to walk you through setup"
+	echo "    update  -- update your Minecraft Server binary"
 	echo "    log     -- follows the server log as it's written to"
 	echo "    config  -- used to read configuration information about mcwrapper"
 	echo "               example: $MCWRAPPER config serverpath"
@@ -165,6 +178,9 @@ function default_config {
 
 	fi
 	
+	# Java binary (uses one in PATH by default)
+	JAVA_BIN="java"
+	
 	# Java VM settings (increasing these never hurts)
 	MX_SIZE="1024M"
 	MS_SIZE="1024M"
@@ -221,7 +237,7 @@ function process_config {
 	# this may be overridden in the config, so if it's set already, don't set it.
 	if [[ -z "$MINECRAFT_SERVER_CMD" ]]; then
 		# command for starting minecraft_server.jar
-		MINECRAFT_SERVER_CMD="java -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER_PATH" nogui"
+		MINECRAFT_SERVER_CMD="$JAVA_BIN -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER_PATH" nogui"
 	fi
 	
 	# the path to the server.properties file
@@ -248,8 +264,10 @@ function read_server_property {
 }
 
 function read_command {
-	# read from the command pipe
-	exec < "$COMMAND_PIPE"
+  sleep 1
+  
+	# read from the command pipe via FD7 (needed for read timeout)
+	exec 7<> "$COMMAND_PIPE"
 	
 	# initialize INPUT to be empty string
 	INPUT=""
@@ -259,9 +277,10 @@ function read_command {
 	local READ_TIMEOUT=2
 	
 	while [[ "$INPUT" != 'stop' ]]; do
-    read -t "$READ_TIMEOUT" INPUT
+    read -t "$READ_TIMEOUT" -u 7 INPUT
     
-    if [[ -z "$INPUT" ]]; then
+    # if it timed out or got no input, then exit if server isnt' running.
+    if [[ "$?" != 0 || -z "$INPUT" ]]; then
       check_is_running
       
       if [[ "$?" != "$EXIT_SUCCESS" ]]; then
@@ -318,8 +337,13 @@ function read_pid {
 		return $EXIT_SERVER_NOT_RUNNING
 	fi
 	
-	# TODO: detect errors reading the pid (not readable?) and return non-zero in one of those cases
-	cat "$PID_FILE"
+	local PID=`cat "$PID_FILE" 2>&1`
+	
+	if [[ $? != $EXIT_SUCCESS ]]; then
+	 return $EXIT_SERVER_NOT_RUNNING
+	fi
+	
+	echo $PID
 }
 
 function check_is_running {
@@ -341,11 +365,21 @@ function check_is_running {
 
 function set_up_pipe {
 	if [[ ! -p "$COMMAND_PIPE" ]]; then
+	  # if the file exists, but it's not a pipe, then we can't start.
+	  if [[ -e "$COMMAND_PIPE" ]]; then
+	    echo "Cannot create the pipe ($COMMAND_PIPE)" >&2
+	    echo "A file or directory already exists." >&2
+	    echo ""
+	    exit "$EXIT_MAKE_FIFO_FAILED"
+	  fi
+	  
 		mkfifo "$COMMAND_PIPE"
 		
-		if [[ $? != 0 ]]; then
+		local PIPE_STATUS=$?
+		
+		if [[ $PIPE_STATUS != 0 ]]; then
 			# if mkfifo failed, print error message, exit non-zero.
-			echo "Error creating the pipe: $COMMAND_PIPE ($?)." >&2
+			echo "Error creating the pipe: $COMMAND_PIPE ($PIPE_STATUS)." >&2
 			exit $EXIT_MAKE_FIFO_FAILED
 		fi
 	fi
@@ -375,7 +409,7 @@ function start_minecraft {
 	cd $MINECRAFT_SERVER_DIR_PATH
 	read_command | $MINECRAFT_SERVER_CMD &> /dev/null &
 	
-	create_pid $$
+	create_pid $!
 }
 
 # stops the minecraft server by sending it the 'stop' command via the FIFO
@@ -437,10 +471,20 @@ function tail_server_log {
 function sanity_check {
 	# TODO: add checks to make sure that PID_FILE and COMMAND_PIPE are writable
 	
+	# make sure that there is a java binary installed in the PATH
+	which "$JAVA_BIN" &> /dev/null
+	if [[ $? != 0 ]]; then
+	 echo "The java binary is not found." >&2
+	 echo "Please install the necessary package(s) or specify the JAVA_BIN configuration option." >&2
+	 echo "" >&2
+	 exit $EXIT_NO_JAVA
+	fi
+	
 	# check to make sure that things that need to exist exist.
 	if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
 		# the minecraft server path does not exist.
-		echo "Minecraft server not found! ($MINECRAFT_SERVER_PATH)"
+		echo "Minecraft server not found! ($MINECRAFT_SERVER_PATH)" >&2
+		echo "" >&2
 		exit $EXIT_MINECRAFT_SERVER_NOT_FOUND
 	fi
 }
@@ -452,6 +496,172 @@ function clean_up {
 	remove_pipe
 }
 
+##########################################################################################
+## Installer portion: ============>>>>>>>>>>>>
+
+# runs through interactive installer
+# confirm configuration
+# download minecraft_server.jar
+# sanity check
+function run_installer () {
+  echo "Welcome to the mcwrapper installer."
+  echo "Before the Minecraft Server is installed, we must first confirm a few settings..."
+  echo ""
+  
+  # check for configuration
+  local CURRENT_CONFIG_PATH=`get_config_path`
+  
+  if [[ -z "$CURRENT_CONFIG_PATH" ]]; then
+    echo "Using default configuration."
+    echo "An example configuration is included in the mcwrapper package."
+    echo "See mcwrapper.conf-example for details."
+  else
+    echo "mcwrapper config path: $CURRENT_CONFIG_PATH"
+  fi
+  echo ""
+  
+  # show where minecraft_server.jar will be installed
+  
+  echo "Minecraft Server Path: $MINECRAFT_SERVER_PATH"
+  
+  if [[ -e "$MINECRAFT_SERVER_PATH" ]]; then
+    echo -n "Minecraft server already exists! Do you wish to overwrite? [y/N]: "
+    read OVERWRITE_SERVER
+    if [[ "$OVERWRITE_SERVER" != 'y' ]]; then
+      echo ""
+      echo "Not overwriting server. Thanks, bye!"
+      echo ""
+      exit $EXIT_SUCCESS
+    fi
+    
+    backup_old_server
+  fi
+  
+  echo -n "Is this where you wish to install the Minecraft Server? [Y/n]: "
+  read INSTALL_PATH_CORRECT
+  if [[ "$INSTALL_PATH_CORRECT" != 'y' && ! -z "$INSTALL_PATH_CORRECT" ]]; then
+    echo ""
+    echo "Please update your mcwrapper.conf and re-run this installer."
+    echo ""
+    exit $EXIT_SUCCESS
+  fi
+  
+  echo "Downloading and installing Minecraft Server..."
+  download_minecraft_server
+  
+  # ok, so now the server is downloaded and copied to the right location.
+  
+  echo "Minecraft is downloaded and in place. You can now start it by running the following command:"
+  echo "$MCWRAPPER start"
+  
+  exit 0
+}
+
+# download the minecraft_server.jar file
+# parse the minecraft.net download page and look for the download link for the server
+# then download that to the necessary place
+function download_minecraft_server () {
+  local MINECRAFT_SERVER_BASE_URL="http://www.minecraft.net"
+  local MINECRAFT_SERVER_DOWNLOAD_PAGE="${MINECRAFT_SERVER_BASE_URL}/download.jsp"
+  
+  # parse the download page and read the minecraft_server.jar download URI
+  local MINECRAFT_SERVER_DOWNLOAD_URI=`curl --progress-bar "$MINECRAFT_SERVER_DOWNLOAD_PAGE" | grep -E -o 'href=".*?minecraft_server.jar.*"' | awk -F '"' '{ print $2; }'`
+  
+  # check if there was an error grabbing the download page
+  if [[ "$?" != "0" || -z "$MINECRAFT_SERVER_DOWNLOAD_URI" ]]; then
+    echo "There was an error locating the download link. www.minecraft.net down?"
+    echo ""
+    exit $EXIT_DOWNLOAD_MINECRAFT_SERVER_FAILED
+  fi
+  
+  # build the minecraft_server.jar download URL
+  local MINECRAFT_SERVER_DOWNLOAD_URL="${MINECRAFT_SERVER_BASE_URL}/${MINECRAFT_SERVER_DOWNLOAD_URI}"
+  
+  local MINECRAFT_SERVER_TEMP_FILE="/tmp/minecraft_server.jar"
+  
+  # if the tempfile exists, delete it
+  if [[ -e "$MINECRAFT_SERVER_TEMP_FILE" ]]; then
+    rm "$MINECRAFT_SERVER_TEMP_FILE"
+  fi
+    
+  # download the server to the temp directory  
+  curl --progress-bar -L -o "$MINECRAFT_SERVER_TEMP_FILE" "$MINECRAFT_SERVER_DOWNLOAD_URL"
+  
+  # assuming that was successful, make sure the directories exist and move the binary to the right location
+  local CURL_RETURN=$?
+  if [[ "$CURL_RETURN" != "0" ]]; then
+    echo "An error occurred ($CURL_RETURN) while downloading minecraft_server.jar from: $MINECRAFT_SERVER_DOWNLOAD_URL"
+    echo ""
+    exit $EXIT_DOWNLOAD_MINECRAFT_SERVER_FAILED
+  elif [[ ! -s "$MINECRAFT_SERVER_TEMP_FILE" ]]; then
+    echo "Failed downloading the minecraft server."
+    echo "This is usually caused by a server error on minecraft.net."
+    echo ""
+    exit $EXIT_DOWNLOAD_MINECRAFT_SERVER_FAILED
+  fi
+  
+  # make sure directories exit
+  mkdir -p "$MINECRAFT_SERVER_DIR_PATH"
+  if [[ $? != 0 ]]; then
+    echo "Failed creating the minecraft server directory ($MINECRAFT_SERVER_DIR_PATH)"
+    echo ""
+    exit $EXIT_CREATE_MINECRAFT_SERVER_DIR_FAILED
+  fi
+  
+  # move the minecraft server to the right place:
+  mv "$MINECRAFT_SERVER_TEMP_FILE" "$MINECRAFT_SERVER_PATH"
+  
+  # check for errors when moving the minecraft_server.jar file
+  if [[ "$?" != 0 ]]; then
+    echo "An error occurred when moving minecraft_server.jar to the install directory."
+    echo ""
+    exit $EXIT_CANNOT_MOVE_MINECRAFT_SERVER
+  fi
+}
+
+# backs up an old minecraft_server.jar file before downloading a new one
+function backup_old_server () {
+  # back up the old minecraft server (just in case)
+  mv "$MINECRAFT_SERVER_PATH" "${MINECRAFT_SERVER_PATH}.old"
+  
+  if [[ "$?" != "0" ]]; then
+    echo "Failed backing up the old minecraft server!"
+    echo ""
+    exit $EXIT_CANNOT_BACKUP_OLD_MINECRAFT_SERVER
+  fi
+}
+
+# basically the same as install without all of the confirmation levels
+# if an existing minecraft server is not found, then bail.
+function update_minecraft_server () {
+  if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
+    echo "Existing Minecraft Server not found! ($MINECRAFT_SERVER_PATH)"
+    echo "Either run \`$MCWRAPPER install\` or make sure you install minecraft_server.jar in the above location."
+    echo ""
+    exit $EXIT_EXISTING_MINECRAFT_SERVER_NOT_FOUND
+  fi
+  
+  echo "Updating server..."
+  
+  backup_old_server
+  download_minecraft_server
+  
+  check_is_running
+  if [[ $? != 0 ]]; then
+    # server is not running, so just return
+    return
+  fi
+  
+  read -p "Would you like to restart Minecraft Server? [Y/n]: " INPUT
+  if [[ -z "$INPUT" || "$INPUT" == 'y' ]]; then
+    echo -n "Restarting Minecraft Server..."
+    restart_minecraft
+    echo "Done."
+  fi
+  
+}
+
+## End Installer portion.
 ##########################################################################################
 ## MCBackup portion: ============>>>>>>>>>>>>
 
@@ -585,12 +795,12 @@ function cleanup_old_backups () {
     return
   fi
   
-  echo "Cleaning up old backups..."
+  echo "Cleaning up old backups..." >&2
   
-	OLD_BACKUPS=`ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail +"${BACKUPS_TO_KEEP}"`
+	OLD_BACKUPS=`ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail -n +"${BACKUPS_TO_KEEP}"`
 	
 	for old_backup in $OLD_BACKUPS; do
-	  echo "Removing $old_backup"
+	  echo "Removing $old_backup" >&2
 		rm -rf "${BACKUP_DIRECTORY_PATH}/$old_backup"
 		if [[ $? != 0 ]]; then
 			#an error occurred but don't exit.
@@ -653,7 +863,10 @@ process_config
 
 # check to make sure that we're in a sane configuration
 # function exits on error.
-sanity_check
+# not all actions require a pre-sanity check, though.
+if [[ "$ACTION" != 'install' ]]; then
+  sanity_check
+fi
 
 # must cd to minecraft server directory to make sure support files are created in the correct place.
 
@@ -688,6 +901,24 @@ case $ACTION in
 		exit $EXIT_SERVER_NOT_RUNNING
 		
 		;;
+	check )
+	  sanity_check
+
+    # sanity_check will exit with an exit code if it fails
+    # so, assuming it didn't exit, everything is ok.
+	  
+	  echo "Everything looks OK!"
+    exit $EXIT_SUCCESS
+	  ;;
+	  
+	install )
+	  run_installer
+	  exit $EXIT_SUCCESS
+	  ;;
+	update )
+	  update_minecraft_server
+	  exit $EXIT_SUCCESS
+	  ;;
 	backup )
 	  echo "Backing up minecraft world data..."
 		backup_world
