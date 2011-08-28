@@ -660,7 +660,7 @@ function update_minecraft_server () {
   
   read -p "Would you like to restart Minecraft Server? [Y/n]: " INPUT
   if [[ -z "$INPUT" || "$INPUT" == 'y' ]]; then
-    echo "Restarting minecraft server..."
+    echo -n "Restarting Minecraft Server..."
     restart_minecraft
     echo "Done."
   fi
