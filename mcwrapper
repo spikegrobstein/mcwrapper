@@ -72,7 +72,7 @@ if [[ "$MCWRAPPER_DIR" =~ ^\.$ ]]; then
 # matches:
 #    ./foo/bar
 #    foo/bar
-elif [[ "$MCWRAPPER_DIR" =~ ^(\.\.?/)|(\[^/\]) ]]; then
+elif [[ "$MCWRAPPER_DIR" =~ "^(\.\.?/)|(\[^/\])" ]]; then
 	MCWRAPPER_DIR=`pwd`"/${MCWRAPPER_DIR}"
 fi
 
