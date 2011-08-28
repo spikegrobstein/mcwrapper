@@ -264,6 +264,8 @@ function read_server_property {
 }
 
 function read_command {
+  sleep 1
+  
 	# read from the command pipe via FD7 (needed for read timeout)
 	exec 7<> "$COMMAND_PIPE"
 	
@@ -652,7 +654,7 @@ function update_minecraft_server () {
   
   read -p "Would you like to restart Minecraft Server? [Y/n]: " INPUT
   if [[ -z "$INPUT" || "$INPUT" == 'y' ]]; then
-    echo "Restarting minecraft server..."
+    echo -n "Restarting Minecraft Server..."
     restart_minecraft
     echo "Done."
   fi
