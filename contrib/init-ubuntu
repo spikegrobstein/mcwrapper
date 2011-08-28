@@ -19,7 +19,7 @@ DESC="Description of the service"
 NAME=mcwrapper
 
 # mcwrapper's directory
-MCWRAPPER_HOME=/usr/local/minecraft/mcwrapper
+MCWRAPPER_HOME=/mnt/hgfs/mcwrapper
 
 # where files live
 DAEMON=$MCWRAPPER_HOME/$NAME
@@ -27,8 +27,8 @@ PIDFILE=$MCWRAPPER_HOME/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
 # run-as
-MINECRAFT_UID=minecraft
-MINECRAFT_GID=minecraft
+MINECRAFT_UID=spike
+MINECRAFT_GID=spike
 
 # Exit if the package is not installed
 [ -x "$DAEMON" ] || exit 0
@@ -91,8 +91,9 @@ do_stop()
 	#rm -f $PIDFILE
 	#return "$RETVAL"
 
-        start-stop-daemon --stop --pidfile "$PIDFILE" --retry=TERM/KILL --oknodo || return 2
+  #start-stop-daemon --stop --pidfile "$PIDFILE" --retry=TERM/KILL --oknodo || return 2
 
+  sudo -u $MINECRAFT_UID "$DAEMON" stop
 }
 
 case "$1" in
@@ -113,7 +114,7 @@ case "$1" in
 	esac
 	;;
   status)
-	status_of_proc "$DAEMON" "$NAME" -- status && exit 0 || exit $?
+	sudo -u $MINECRAFT_UID $DAEMON status
 	;;
 #	"$DAEMON" status
 #	case "$?" in
