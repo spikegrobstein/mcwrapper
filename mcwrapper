@@ -199,21 +199,16 @@ function read_server_property {
 }
 
 function read_command {
-	# read from the command pipe
-	exec < "$COMMAND_PIPE"
-	
-	# initialize INPUT to be empty string
-	INPUT=""
-	
-	while [[ "$INPUT" != 'stop' ]]; do
-    read INPUT
-  	echo $INPUT
-
-  	# if the user said "stop" then exit after the command completes.
-  	if [[ "$INPUT" = "stop" ]]; then
-  		clean_up
-  		exit 0
-  	fi
+	while true
+	do
+		INPUT=$( cat $COMMAND_PIPE )
+		echo $INPUT
+		
+		# if the user said "stop" then exit after the command completes.
+		if [[ "$INPUT" = "stop" ]]; then
+			clean_up
+			exit 0
+		fi
 	done
 }
 
