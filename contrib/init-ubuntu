@@ -43,6 +43,30 @@ MINECRAFT_GID=spike
 # Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
 . /lib/lsb/init-functions
 
+# runs the daemon with the specified args
+# this is used everywhere except during startup
+exec_mcwrapper() {
+  local SUDO_OPTS=""
+  
+  # run-as user
+  if [ ! -z "$MINECRAFT_UID" ]; then
+    SUDO_OPTS="-u $MINECRAFT_UID"
+  fi
+  
+  # run-as group
+  if [ ! -z "$MINECRAFT_GID" ]; then
+    SUDO_OPTS="${SUDO_OPTS} -g $MINECRAFT_GID"
+  fi
+  
+  # if no sudo-opts are present, then let's run this without sudo
+  if [ -z "$SUDO_OPTS" ]; then
+    $DAEMON $*
+  else
+    sudo $SUDO_OPTS $DAEMON $*
+  fi
+  
+}
+
 #
 # Function that starts the daemon/service
 #
@@ -52,18 +76,12 @@ do_start()
 	#   0 if daemon has been started
 	#   1 if daemon was already running
 	#   2 if daemon could not be started
-	#start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
-	#	|| return 1
-	#start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- \
-	#	$DAEMON_ARGS \
-	#	|| return 2
+	
+	start-stop-daemon --start --pidfile "$PIDFILE" --exec "$DAEMON" --chuid $MINECRAFT_UID -- start || return 2
+
 	# Add code here, if necessary, that waits for the process to be ready
 	# to handle requests from services started subsequently which depend
 	# on this one.  As a last resort, sleep for some time.
-
-	start-stop-daemon --start --pidfile "$PIDFILE"  --exec "$DAEMON" --chuid $MINECRAFT_UID -- start || return 2
-
-	#$DAEMON start > /dev/null || return 2
 }
 
 #
@@ -90,55 +108,56 @@ do_stop()
 	# Many daemons don't delete their pidfiles when they exit.
 	#rm -f $PIDFILE
 	#return "$RETVAL"
-
+  
   #start-stop-daemon --stop --pidfile "$PIDFILE" --retry=TERM/KILL --oknodo || return 2
-
-  sudo -u $MINECRAFT_UID "$DAEMON" stop
+  exec_mcwrapper stop
 }
 
 case "$1" in
   start)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
-	do_start
-	case "$?" in
-		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
-	esac
-	;;
+  	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+  	
+  	do_start &> /dev/null
+  	
+  	case "$?" in
+  		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+  		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+  	esac
+  	
+  	;;
   stop)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
-	do_stop
-	case "$?" in
-		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
-	esac
-	;;
+  	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+  	
+  	do_stop &> /dev/null
+  	
+  	case "$?" in
+  		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+  		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+  	esac
+  	
+  	;;
+  restart)
+    
+    exec_mcwrapper restart &> /dev/null
+    
+    ;;
   status)
-	sudo -u $MINECRAFT_UID $DAEMON status
-	;;
-#	"$DAEMON" status
-#	case "$?" in
-#		0) log_daemon_msg "Minecraft is running." ;;
-#		*) log_daemon_msg "Minecraft is not running." ;;
-#	esac
- #      ;;
-  #reload|force-reload)
-	#
-	# If do_reload() is not implemented then leave this commented out
-	# and leave 'force-reload' as an alias for 'restart'.
-	#
-	#log_daemon_msg "Reloading $DESC" "$NAME"
-	#do_reload
-	#log_end_msg $?
-	#;;
+	  exec_mcwrapper status &> /dev/null
+	  
+    case "$?" in
+      0) log_daemon_msg "Minecraft is running." ;;
+      *) log_daemon_msg "Minecraft is not running." ;;
+    esac
+    
+	  ;;
+
   backup)
-	$DAEMON backup
-	;;
+	  exec_mcwrapper backup
+	  ;;
 
   *)
-	#echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
-	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
-	exit 3
+	  echo "Usage: $SCRIPTNAME {start|stop|status|restart|backup}" >&2
+	  exit 3
 	;;
 esac
 
