@@ -780,8 +780,7 @@ function cleanup_old_backups () {
 	
 	for old_backup in $OLD_BACKUPS; do
 	  echo "Removing $old_backup" >&2
-		rm -rf "${BACKUP_DIRECTORY_PATH}/$old_backup"
-		if [[ $? != 0 ]]; then
+		if ! rm -rf "${BACKUP_DIRECTORY_PATH}/$old_backup"; then
 			#an error occurred but don't exit.
 			echo "An error occurred when deleting a previous backup: ${old_backup}." >&2
 		fi
