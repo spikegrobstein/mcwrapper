@@ -604,10 +604,7 @@ function download_minecraft_server () {
   fi
   
   # move the minecraft server to the right place:
-  mv "$MINECRAFT_SERVER_TEMP_FILE" "$MINECRAFT_SERVER_PATH"
-  
-  # check for errors when moving the minecraft_server.jar file
-  if [[ "$?" != 0 ]]; then
+  if ! mv "$MINECRAFT_SERVER_TEMP_FILE" "$MINECRAFT_SERVER_PATH"; then
     echo "An error occurred when moving minecraft_server.jar to the install directory."
     echo ""
     exit $EXIT_CANNOT_MOVE_MINECRAFT_SERVER
@@ -616,10 +613,8 @@ function download_minecraft_server () {
 
 # backs up an old minecraft_server.jar file before downloading a new one
 function backup_old_server () {
-  # back up the old minecraft server (just in case)
-  mv "$MINECRAFT_SERVER_PATH" "${MINECRAFT_SERVER_PATH}.old"
-  
-  if [[ "$?" != "0" ]]; then
+  # back up the old minecraft server (just in case)  
+  if ! mv "$MINECRAFT_SERVER_PATH" "${MINECRAFT_SERVER_PATH}.old"; then
     echo "Failed backing up the old minecraft server!"
     echo ""
     exit $EXIT_CANNOT_BACKUP_OLD_MINECRAFT_SERVER
