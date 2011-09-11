@@ -636,8 +636,7 @@ function update_minecraft_server () {
   backup_old_server
   download_minecraft_server
   
-  check_is_running
-  if [[ $? != 0 ]]; then
+  if ! check_is_running; then
     # server is not running, so just return
     return
   fi
