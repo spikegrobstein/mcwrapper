@@ -280,7 +280,7 @@ function read_command {
     
     # if it timed out or got no input, then exit if server isnt' running.
     if [[ "$?" != 0 || -z "$INPUT" ]]; then      
-      if ! check_is_running; then
+      if ! minecraft_is_running; then
         exit $EXIT_SERVER_DISAPPEARED
       fi
       continue
@@ -297,7 +297,7 @@ function read_command {
 }
 
 function send_command {
-	if ! check_is_running; then
+	if ! minecraft_is_running; then
 		echo "Server is NOT running. Not sending command" >&2
 		exit $SERVER_NOT_RUNNING
 	fi
@@ -341,7 +341,10 @@ function read_pid {
 	echo $PID
 }
 
-function check_is_running {
+# checks if minecraft is running
+# returns 0 (success) if it IS running
+# returns $EXIT_SERVER_NOT_RUNNING if it's not running
+function minecraft_is_running {
 	PID=`read_pid`
 	
 	# if read_pid returned a non-zero status, then we're not running
@@ -390,7 +393,7 @@ function start_minecraft {
 	# write the PID file and start'er up!
 	# don't start if we're already running.
 		
-	if check_is_running; then
+	if minecraft_is_running; then
 		echo "Server is already running. Exiting..." >&2
 		exit $EXIT_SERVER_ALREADY_RUNNING
 	fi
@@ -427,8 +430,8 @@ function restart_minecraft {
 # waits for minecraft to stop
 # TODO: Make this timeout and make time configurable.
 function wait_for_minecraft_to_stop {
-	check_is_running
-	if check_is_running; then
+	minecraft_is_running
+	if minecraft_is_running; then
 		# if it's still running... sleep for 1 second and try again
 		echo -n "."
 		sleep 1
@@ -632,7 +635,7 @@ function update_minecraft_server () {
   backup_old_server
   download_minecraft_server
   
-  if ! check_is_running; then
+  if ! minecraft_is_running; then
     # server is not running, so just return
     return
   fi
@@ -802,14 +805,14 @@ function backup_world {
 	create_backup_directory
 	
 	# stop writing world if we're running
-	if [[ $(check_is_running) ]]; then
+	if [[ $(minecraft_is_running) ]]; then
 		stop_writing_world
 	fi
 	
 	do_backup
 	
 	# start writing world only if we're running
-	if [[ $(check_is_running) ]]; then
+	if [[ $(minecraft_is_running) ]]; then
 		start_writing_world
 	fi
 	
@@ -864,7 +867,7 @@ case $ACTION in
 		exit $EXIT_SUCCESS
 		;;
 	status )
-		if check_is_running; then
+		if minecraft_is_running; then
 			echo "Server is running." >&2
 			exit $EXIT_SUCCESS
 		fi
@@ -924,7 +927,7 @@ case $ACTION in
 				exit $EXIT_SUCCESS
 				;;
 			pid )
-				if check_is_running; then
+				if minecraft_is_running; then
 					echo "Server is NOT running." >&2
 					exit $EXIT_SERVER_NOT_RUNNING
 				fi
