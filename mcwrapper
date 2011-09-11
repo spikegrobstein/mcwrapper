@@ -687,9 +687,7 @@ function do_backup () {
 		exit $EXIT_CANNOT_BACKUP_WORLD_DATA
 	fi
 	
-	cp -R "${MINECRAFT_SERVER_DIR_PATH}/"*.{txt,properties} "$CURRENT_BACKUP_PATH/"
-	
-	if [[ $? != 0 ]]; then
+	if ! cp -R "${MINECRAFT_SERVER_DIR_PATH}/"*.{txt,properties} "$CURRENT_BACKUP_PATH/"; then
 		#an error occurred
 		echo "An error occurred when copying the configuration information" >&2
 		exit $EXIT_CANNOT_BACKUP_CONFIGS
