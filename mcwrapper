@@ -658,9 +658,7 @@ function update_minecraft_server () {
 # create the backup directory
 # if it exists, this effectively does nothing.
 function create_backup_directory () {
-	mkdir -p "$CURRENT_BACKUP_PATH"
-	
-	if [[ $? != 0 ]]; then
+	if ! mkdir -p "$CURRENT_BACKUP_PATH"; then
 		#an error occurred
 		echo "An error occurred when creating the backup directory." >&2
 		exit $EXIT_CANNOT_CREATE_BACKUP_DIR
