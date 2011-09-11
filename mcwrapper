@@ -399,11 +399,8 @@ function remove_pipe {
 function start_minecraft {
 	# write the PID file and start'er up!
 	# don't start if we're already running.
-	
-	# TODO: this can be put into a single if statement for clarity; if [[ $(check_is_running) ]]
-	check_is_running
-	
-	if [[ $? = 0 ]]; then
+		
+	if check_is_running; then
 		echo "Server is already running. Exiting..." >&2
 		exit $EXIT_SERVER_ALREADY_RUNNING
 	fi
