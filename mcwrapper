@@ -109,6 +109,7 @@ function print_usage {
 	echo "    prop    -- used to read server.properties configuration information"
 	echo "               best when used with external scripts"
 	echo "               example: $MCWRAPPER prop level-name"
+	echo "               if no property name is supplied, mcwrapper will print out all property keys from the file."
 	echo "    command -- execute a minecraft server command. As an alternative to writing to the FIFO. Also aliased as 'cmd'"
 	echo "Any other action is interpretted as a server command and is directed to the minecraft server"
 	echo "For README and other documentation, see: https://github.com/spikegrobstein/mcwrapper"
