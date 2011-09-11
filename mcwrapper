@@ -681,9 +681,7 @@ function do_backup () {
 	local LEVEL_NAME=`read_server_property level-name`
 	local WORLD_DATA_DIR="${MINECRAFT_SERVER_DIR_PATH}/${LEVEL_NAME}"
 	
-	cp -R "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH/"
-	
-	if [[ $? != 0 ]]; then
+	if ! cp -R "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH/"; then
 		#an error occurred
 		echo "An error occurred when copying the world data." >&2
 		exit $EXIT_CANNOT_BACKUP_WORLD_DATA
