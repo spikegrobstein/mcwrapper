@@ -279,10 +279,8 @@ function read_command {
     read -t "$READ_TIMEOUT" -u 7 INPUT
     
     # if it timed out or got no input, then exit if server isnt' running.
-    if [[ "$?" != 0 || -z "$INPUT" ]]; then
-      check_is_running
-      
-      if [[ "$?" != "$EXIT_SUCCESS" ]]; then
+    if [[ "$?" != 0 || -z "$INPUT" ]]; then      
+      if ! check_is_running; then
         exit $EXIT_SERVER_DISAPPEARED
       fi
       continue
@@ -299,9 +297,7 @@ function read_command {
 }
 
 function send_command {
-	check_is_running
-	
-	if [[ $? != 0 ]]; then
+	if ! check_is_running; then
 		echo "Server is NOT running. Not sending command" >&2
 		exit $SERVER_NOT_RUNNING
 	fi
@@ -868,9 +864,7 @@ case $ACTION in
 		exit $EXIT_SUCCESS
 		;;
 	status )
-		# TODO: this can be put into a single if statement for clarity; if [[ $(check_is_running) ]]
-		check_is_running
-		if [[ $? = 0 ]]; then
+		if check_is_running; then
 			echo "Server is running." >&2
 			exit $EXIT_SUCCESS
 		fi
@@ -930,8 +924,7 @@ case $ACTION in
 				exit $EXIT_SUCCESS
 				;;
 			pid )
-				check_is_running
-				if [[ $? != 0 ]]; then
+				if check_is_running; then
 					echo "Server is NOT running." >&2
 					exit $EXIT_SERVER_NOT_RUNNING
 				fi
