@@ -258,6 +258,12 @@ function read_server_property {
 	  echo "Cannot locate server.properties path. ($SERVER_PROPERTIES_PATH)" >&2
 	  exit $EXIT_NO_SERVER_PROPERTIES
 	fi
+	
+	# if no property is supplied, just dump the entire properties file's keys
+	if [[ -z "$PROP_NAME" ]]; then
+	  cat "$SERVER_PROPERTIES_PATH" | grep -v '^#' | awk -F '=' '{ print $1 }'
+	  return
+	fi
 		
 	cat "$SERVER_PROPERTIES_PATH" | grep "$PROP_NAME\=" | awk -F '=' '{ print $2 }'
 }
@@ -1002,7 +1008,7 @@ case $ACTION in
 		esac
 		;;
 	prop )
-		PROP=$1
+		PROP=$1		
 		read_server_property $PROP
 		exit $EXIT_SUCCESS
 		;;
