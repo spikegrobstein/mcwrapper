@@ -748,9 +748,7 @@ function create_symlink () {
 	# then we symlink the current backup to "latest" in backups directory
 	if [[ -L "$LATEST_BACKUP_PATH" ]]; then
 		# if the symlink already exists, delete it before creating it.
-		rm "$LATEST_BACKUP_PATH"
-		
-		if [[ $? != 0 ]]; then
+		if ! rm "$LATEST_BACKUP_PATH"; then
 			#an error occurred
 			echo "An error occurred when deleting the old symlink." >&2
 			exit $EXIT_FAILED_TO_DELETE_SYMLINK
@@ -762,9 +760,7 @@ function create_symlink () {
 	# backup directory without issue.
 	local NEW_BACKUP=`basename "$CURRENT_BACKUP_PATH"`
 	
-	ln -s "$NEW_BACKUP" "$LATEST_BACKUP_PATH"
-	
-	if [[ $? != 0 ]]; then
+	if ! ln -s "$NEW_BACKUP" "$LATEST_BACKUP_PATH"; then
 		#an error occurred
 		echo "An error occurred when creating the symlink." >&2
 		exit $EXIT_ERORR_CREATING_SYMLINK
