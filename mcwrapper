@@ -438,7 +438,7 @@ function restart_minecraft {
 # TODO: Make this timeout and make time configurable.
 function wait_for_minecraft_to_stop {
 	check_is_running
-	if [[ $? = 0 ]]; then
+	if check_is_running; then
 		# if it's still running... sleep for 1 second and try again
 		echo -n "."
 		sleep 1
@@ -569,7 +569,7 @@ function download_minecraft_server () {
   # parse the download page and read the minecraft_server.jar download URI
   local MINECRAFT_SERVER_DOWNLOAD_URI=`curl --progress-bar "$MINECRAFT_SERVER_DOWNLOAD_PAGE" | grep -E -o 'href=".*?minecraft_server.jar.*"' | awk -F '"' '{ print $2; }'`
   
-  # check if there was an error grabbing the download page
+  # check if there was an error grabbing the download page (either curl returns a bad value or we didn't find the URI)
   if [[ "$?" != "0" || -z "$MINECRAFT_SERVER_DOWNLOAD_URI" ]]; then
     echo "There was an error locating the download link. www.minecraft.net down?"
     echo ""
