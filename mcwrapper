@@ -1,6 +1,6 @@
 #! /bin/bash
 
-MCWRAPPER="$0"
+MCWRAPPER="$(readlink -f $0)"
 MCWRAPPER_DIR=`dirname "$MCWRAPPER"`
 MCWRAPPER_CONFIG_NAME="mcwrapper.conf"
 
