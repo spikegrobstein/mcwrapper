@@ -1,7 +1,9 @@
 #! /bin/bash
 
-MCWRAPPER="$0"
-MCWRAPPER_DIR=`dirname "$MCWRAPPER"`
+pushd "$(dirname "$0")" >/dev/null
+MCWRAPPER_DIR="$PWD"
+popd >/dev/null
+MCWRAPPER="$(basename "$0")"
 MCWRAPPER_CONFIG_NAME="mcwrapper.conf"
 
 # make sure that MCWRAPPER_DIR is an absolute path
