@@ -1,6 +1,20 @@
 #! /bin/bash
 
-MCWRAPPER="$0"
+# return the path to this script
+# based on what platform the OS is running on
+function path_to_mcwrapper() {
+  local UNAME=$(uname)
+  local READLINK="/usr/bin/readlink"
+  
+  # OSX (darwin) doesn't support the -f switch on readlink
+  if [[ $UNAME = 'darwin' ]]; then
+    $READLINK $0
+  else
+    readlink -f $0
+  fi
+}
+
+MCWRAPPER=$( path_to_mcwrapper )
 MCWRAPPER_DIR=`dirname "$MCWRAPPER"`
 MCWRAPPER_CONFIG_NAME="mcwrapper.conf"
 
