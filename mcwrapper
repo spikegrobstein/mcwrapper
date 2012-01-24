@@ -7,7 +7,7 @@ function path_to_mcwrapper() {
   local OSX_READLINK="/usr/bin/readlink" # be sure to use the system-provided readlink for predictable behavior
   
   # OSX (darwin) doesn't support the -f switch on readlink
-  if [[ $UNAME = 'darwin' ]]; then
+  if [[ $UNAME = 'Darwin' ]]; then
     $OSX_READLINK $0
   else
     readlink -f $0
