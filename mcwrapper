@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/bash -
 
 # initialize some variables about the location of mcwrapper and its support files.
 pushd "$(dirname "$0")" >/dev/null
