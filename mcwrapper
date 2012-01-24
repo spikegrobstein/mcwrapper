@@ -38,7 +38,7 @@ MINECRAFT_SERVER_NAME="minecraft_server.jar"
 MINECRAFT_SERVER_PROPERTIES_NAME="server.properties"
 
 function print_usage {
-  local MCWRAPPER_NAME=$( basename $MCWRAPPER )
+  local MCWRAPPER_NAME=$( basename $0 )
   
 	echo "USAGE:"
 	echo "    $MCWRAPPER_NAME <action> [ <action_options> ]"
