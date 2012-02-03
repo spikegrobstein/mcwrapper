@@ -293,11 +293,8 @@ function read_command {
     
     # if it timed out or got no input, then exit if server isnt' running.
     if [[ "$?" != 0 || -z "$INPUT" ]]; then
-      check_is_running
+      check_is_running || exit $EXIT_SERVER_DISAPPEARED
       
-      if [[ "$?" != "$EXIT_SUCCESS" ]]; then
-        exit $EXIT_SERVER_DISAPPEARED
-      fi
       continue
     fi
     
