@@ -319,7 +319,7 @@ function send_command {
 }
 
 function create_pid {
-	PID_VALUE=$1
+	local PID_VALUE=$1
 	echo $PID_VALUE > $PID_FILE
 }
 
