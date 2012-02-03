@@ -282,7 +282,7 @@ function read_command {
 	exec 7<> "$COMMAND_PIPE"
 	
 	# initialize INPUT to be empty string
-	INPUT=""
+	local INPUT=""
 	
 	# number of seconds between reads
 	# this is needed to make sure the server is still running
