@@ -157,6 +157,7 @@ function get_config_path {
 
 # configure self from config file
 function read_config {
+  # set the global config path:
 	CONFIG_PATH=`get_config_path`
 	
 	# if it's not found, don't do shit. stick with default values.
