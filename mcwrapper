@@ -1,12 +1,5 @@
 #! /bin/bash -
 
-# initialize some variables about the location of mcwrapper and its support files.
-pushd "$(dirname "$0")" >/dev/null
-MCWRAPPER_DIR="$PWD"
-popd >/dev/null
-MCWRAPPER="$(basename "$0")"
-MCWRAPPER_CONFIG_NAME="mcwrapper.conf"
-
 # absolutely, under no circumstances, let mcwrapper be run as root!!!!
 if [[ `id -u` = 0 ]]; then
   echo "You have started mcwrapper as root." >&2
@@ -14,6 +7,14 @@ if [[ `id -u` = 0 ]]; then
   echo "" >&2
   exit 99 # $EXIT_RUNNING_AS_ROOT
 fi
+
+# initialize some variables about the location of mcwrapper and its support files.
+pushd "$(dirname "$0")" >/dev/null
+MCWRAPPER_DIR="$PWD"
+popd >/dev/null
+MCWRAPPER="$(basename "$0")"
+
+MCWRAPPER_CONFIG_NAME="mcwrapper.conf"
 
 #### Exit Codes
 
@@ -66,18 +67,12 @@ EXIT_RUNNING_AS_ROOT=99
 
 #### End Exit Codes
 
-
-# make sure that MCWRAPPER_DIR is an absolute path
-# if the dir is '.' then set directory to current_directory 
-if [[ "$MCWRAPPER_DIR" =~ ^\.$ ]]; then
-	MCWRAPPER_DIR=`pwd`
-	
-# if the dir is relative, then build the path
-# matches:
-#    ./foo/bar
-#    foo/bar
-elif [[ "$MCWRAPPER_DIR" =~ "^(\.\.?/)|(\[^/\])" ]]; then
-	MCWRAPPER_DIR=`pwd`"/${MCWRAPPER_DIR}"
+# absolutely, under no circumstances, let mcwrapper be run as root!!!!
+if [[ `id -u` = 0 ]]; then
+  echo "You have started mcwrapper as root." >&2
+  echo "This is not recommended. Please run as an un-privilaged user." >&2
+  echo "" >&2
+  exit 99 # $EXIT_RUNNING_AS_ROOT
 fi
 
 # default filename of the minecraft server
@@ -284,6 +279,10 @@ function read_command {
 	
 	# initialize INPUT to be empty string
 	local INPUT=""
+	
+	# number of seconds between reads
+	# this is needed to make sure the server is still running
+	local READ_TIMEOUT=2
 	
 	# number of seconds between reads
 	# this is needed to make sure the server is still running
