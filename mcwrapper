@@ -886,9 +886,7 @@ case $ACTION in
 		exit $EXIT_SUCCESS
 		;;
 	status )
-		# TODO: this can be put into a single if statement for clarity; if [[ $(check_is_running) ]]
-		check_is_running
-		if [[ $? = 0 ]]; then
+		if check_is_running; then
 			echo "Server is running." >&2
 			exit $EXIT_SUCCESS
 		fi
