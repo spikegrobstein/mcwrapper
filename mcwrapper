@@ -427,7 +427,6 @@ function restart_minecraft {
 # waits for minecraft to stop
 # TODO: Make this timeout and make time configurable.
 function wait_for_minecraft_to_stop {
-	check_is_running
 	if check_is_running; then
 		# if it's still running... sleep for 1 second and try again
 		echo -n "."
