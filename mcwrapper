@@ -352,7 +352,6 @@ function check_is_running {
 	# check to see if we have a wrapper currently running
 	# send a 0 signal to process to see if it's running.
 	if ! kill -0 "$PID" &> /dev/null; then
-		echo "*** Server not running!" >&2
 		return $EXIT_SERVER_NOT_RUNNING
 	fi
 	
