@@ -5,7 +5,7 @@
 #  - ~/.mcwrapper.conf
 #  - /etc/mcwrapper.conf
 #
-# Configuration is actual Bash. You can use conditionals... not that would.
+# Configuration is actual Bash. You can use conditionals... not that you would.
 
 # path to the minecraft_server.jar
 # can be relative or absolute. if relative, it's relative to mcwrapper
