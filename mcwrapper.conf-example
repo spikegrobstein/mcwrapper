@@ -7,13 +7,14 @@
 #
 # Configuration is actual Bash. You can use conditionals... not that you would.
 
-# path to the minecraft_server.jar
-# can be relative or absolute. if relative, it's relative to mcwrapper
-# defaults to either minecraft_server.jar in same directory or one level up.
+## All non-absolute paths are relative to mcwrapper.
+
+# MINECRAFT_SERVER_PATH -- path to the minecraft_server.jar
+# default: either minecraft_server.jar in same directory or one level up.
 # MINECRAFT_SERVER_PATH="/usr/local/minecraft/minecraft_server.jar"
 
-# the java binary.
-# by default, mcwrapper will use the 'java' binary in your path.
+# JAVA_BIN -- the java binary.
+# default: 'java' binary in your path.
 # change this if you'd like to use a different java binary.
 JAVA_BIN='java'
 
@@ -22,12 +23,12 @@ JAVA_BIN='java'
 MX_SIZE="1024M"
 MS_SIZE="1024M"
 
-# what mcwrapper calls its pid file.
-# can be relative or absolute. if relative, it's relative to mcwrapper
+# PID_FILE -- where mcwrapper stores the Minecraft server pid.
+# default: mcwrapper.pid
 PID_FILE="mcwrapper.pid"
 
-# what mcwrapper calls its commandpipe
-# can be relative or absolute. if relative, it's relative to mcwrapper
+# COMMAND_PIPE -- the mcwrapper FIFO
+# default: command_input
 COMMAND_PIPE="command_input"
 
 # Backup configuration:
