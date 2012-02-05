@@ -310,7 +310,7 @@ function read_command {
 
 function send_command {
 	check_is_running \
-	  || { echo "Server is NOT running. Not sending command" >&2 ; exit $SERVER_NOT_RUNNING; }
+	  || { echo "Server is NOT running. Not sending command" >&2 ; exit $EXIT_SERVER_NOT_RUNNING; }
 	
 	# echo the command into the command pipe to be picked up by the reader process:
 	local COMMAND=$1
