@@ -1003,7 +1003,7 @@ case $ACTION in
 		read_server_property $PROP
 		exit $EXIT_SUCCESS
 		;;
-	help )
+	help|--help|-? )
 		print_usage
 		exit $EXIT_SUCCESS
 		;;
