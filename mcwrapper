@@ -8,6 +8,8 @@ if [[ `id -u` = 0 ]]; then
   exit 99 # $EXIT_RUNNING_AS_ROOT
 fi
 
+MCWRAPPER_VERSION="unstable-1.5"
+
 # initialize some variables about the location of mcwrapper and its support files.
 pushd "$(dirname "$0")" >/dev/null
 MCWRAPPER_DIR="$PWD"
@@ -88,6 +90,9 @@ function print_usage {
 	echo "    $MCWRAPPER_NAME <action> [ <action_options> ]"
 	echo ""
 	echo "Action can be one of:"
+	echo "    help    -- this usage screen"
+	echo "    version -- outputs mcwrapper's version number"
+	echo "    about   -- output information about mcwrapper"
 	echo "    start   -- start the server if it's not already running"
 	echo "    stop    -- stop a running server"
 	echo "    restart -- restart a running server (issues stop, waits for it to stop, then starts)"
@@ -115,6 +120,19 @@ function print_usage {
 	echo "Any other action is interpretted as a server command and is directed to the minecraft server"
 	echo "For README and other documentation, see: https://github.com/spikegrobstein/mcwrapper"
 	echo ""
+}
+
+function print_version {
+  echo "mcwrapper $MCWRAPPER_VERSION"
+}
+
+function print_about {
+  print_version
+  echo "https://github.com/spikegrobstein/mcwrapper"
+  echo "Finally, simplified management of your Minecraft server."
+  echo "Start, stop, monitor, backup."
+  echo "Run with no arguments to see usage."
+  echo ""
 }
 
 # figure out where the config file lives
@@ -866,6 +884,18 @@ fi
 # must cd to minecraft server directory to make sure support files are created in the correct place.
 
 case $ACTION in
+  help|--help|-? )
+		print_usage
+		exit $EXIT_SUCCESS
+		;;
+	version|--version )
+	  print_version
+	  exit $EXIT_SUCCESS
+	  ;;
+	about )
+	  print_about
+	  exit $EXIT_SUCCESS
+	  ;;
 	start )
 		echo -n "Starting minecraft... "	
 		start_minecraft
@@ -1001,10 +1031,6 @@ case $ACTION in
 	prop )
 		PROP=$1		
 		read_server_property $PROP
-		exit $EXIT_SUCCESS
-		;;
-	help|--help|-? )
-		print_usage
 		exit $EXIT_SUCCESS
 		;;
 	command|cmd )
