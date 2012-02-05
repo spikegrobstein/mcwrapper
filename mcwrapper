@@ -727,28 +727,33 @@ function do_backup () {
 
 
 #TODO: there's some duplicate code here... should probably fix it.
+# concept:
+# create a compress_backup( $type ) function
+# check for `type ${type}_backup` function, if it exists
+# call it; it should have a signature like: somekind_backup( $current_backup_path )
+# and return the path to the compressed backup
 function tgz_backup {
 	# cd to the backup directory
 	# create new tgz backup
-	cd "$BACKUP_DIRECTORY_PATH"
+	pushd "$BACKUP_DIRECTORY_PATH"
 	
 	local FILENAME=`basename "$CURRENT_BACKUP_PATH"`
 	ARCHIVE_FILENAME="${FILENAME}.tgz"
 	
 	tar cfz "$ARCHIVE_FILENAME" "$FILENAME"	
 	
-	cd -
+	popd
 }
 
 function zip_backup {
-	cd "$BACKUP_DIRECTORY_PATH"
+	pushd "$BACKUP_DIRECTORY_PATH"
 	
 	local FILENAME=`basename "$CURRENT_BACKUP_PATH"`
 	ARCHIVE_FILENAME="${FILENAME}.zip"
 	
 	zip -q -r "$ARCHIVE_FILENAME" "$FILENAME"
 	
-	cd -
+	popd
 }
 
 function create_symlink () {
