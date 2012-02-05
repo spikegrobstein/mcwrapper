@@ -284,10 +284,6 @@ function read_command {
 	# this is needed to make sure the server is still running
 	local READ_TIMEOUT=2
 	
-	# number of seconds between reads
-	# this is needed to make sure the server is still running
-	local READ_TIMEOUT=2
-	
 	while [[ "$INPUT" != 'stop' ]]; do
     read -t "$READ_TIMEOUT" -u 7 INPUT
     
