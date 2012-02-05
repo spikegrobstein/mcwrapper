@@ -570,7 +570,7 @@ function run_installer () {
 # then download that to the necessary place
 function download_minecraft_server () {
   local MINECRAFT_SERVER_BASE_URL="http://www.minecraft.net"
-  local MINECRAFT_SERVER_DOWNLOAD_PAGE="${MINECRAFT_SERVER_BASE_URL}/download.jsp"
+  local MINECRAFT_SERVER_DOWNLOAD_PAGE="${MINECRAFT_SERVER_BASE_URL}/download"
   
   # parse the download page and read the minecraft_server.jar download URI
   local MINECRAFT_SERVER_DOWNLOAD_URI=`curl --progress-bar "$MINECRAFT_SERVER_DOWNLOAD_PAGE" | grep -E -o 'href=".*?minecraft_server.jar.*"' | awk -F '"' '{ print $2; }'`
