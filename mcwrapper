@@ -568,6 +568,7 @@ function run_installer () {
 # download the minecraft_server.jar file
 # parse the minecraft.net download page and look for the download link for the server
 # then download that to the necessary place
+# if anything hard-fails, it prints an error message and exits.
 function download_minecraft_server () {
   local MINECRAFT_SERVER_BASE_URL="http://www.minecraft.net"
   local MINECRAFT_SERVER_DOWNLOAD_PAGE="${MINECRAFT_SERVER_BASE_URL}/download"
@@ -628,6 +629,7 @@ function download_minecraft_server () {
 }
 
 # backs up an old minecraft_server.jar file before downloading a new one
+# if something fails, it prints an error message and exits
 function backup_old_server () {
   # back up the old minecraft server (just in case)
   mv "$MINECRAFT_SERVER_PATH" "${MINECRAFT_SERVER_PATH}.old"
