@@ -135,6 +135,8 @@ function print_about {
 }
 
 # figure out where the config file lives
+# first check to see if it's set in the MCWRAPPER_CONFIG_PATH
+# then check: ./mcwrapper.conf, ~/.mcwrapper.conf, /etc/mcwrapper.conf
 function get_config_path {
 	
 	# if it's defined in an ENV var, then let's use that	
