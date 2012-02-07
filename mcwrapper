@@ -35,6 +35,7 @@ EXIT_INVALID_ACTION=4
 EXIT_SERVER_NOT_RUNNING=5
 EXIT_SERVER_ALREADY_RUNNING=6
 EXIT_SERVER_DISAPPEARED=7
+EXIT_SERVER_CANNOT_START=8
 
 # support file related codes:
 EXIT_MINECRAFT_SERVER_NOT_FOUND=10
@@ -430,6 +431,7 @@ function start_minecraft {
 	  echo "Could not reliably start Minecraft." >&2
 	  echo "Run the following command manually:" >&2
 	  echo $MINECRAFT_SERVER_CMD >&2
+	  exit $EXIT_SERVER_CANNOT_START
   fi
 }
 
