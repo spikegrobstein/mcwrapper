@@ -294,6 +294,7 @@ function read_command {
   sleep 1
   
 	# read from the command pipe via FD7 (needed for read timeout)
+	# no special reason to use 7, it's just sufficiently high that it probably won't collide with anything.
 	exec 7<> "$COMMAND_PIPE"
 	
 	# initialize INPUT to be empty string
