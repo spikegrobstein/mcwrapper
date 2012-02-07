@@ -416,11 +416,21 @@ function start_minecraft {
 	
 	set_up_pipe
 	
-	# now we `cd` to the minecraft_server directory and start the server in a background process
-	cd $MINECRAFT_SERVER_DIR_PATH
+	# now we go to the minecraft_server directory and start the server in a background process
+	pushd $MINECRAFT_SERVER_DIR_PATH &> /dev/null
 	read_command | $MINECRAFT_SERVER_CMD &> /dev/null &
 	
 	create_pid $!
+	
+	# sleep for one second to make sure that the process actually started properly.
+	sleep 1
+	
+	# verify that minecraft server actually started.
+	if ! check_is_running; then
+	  echo "Could not reliably start Minecraft." >&2
+	  echo "Run the following command manually:" >&2
+	  echo $MINECRAFT_SERVER_CMD >&2
+  fi
 }
 
 # stops the minecraft server by sending it the 'stop' command via the FIFO
