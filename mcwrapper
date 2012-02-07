@@ -418,6 +418,7 @@ function start_minecraft {
 	set_up_pipe
 	
 	# now we go to the minecraft_server directory and start the server in a background process
+	# need to go to the directory to make sure that the Minecraft server puts the files in the right place (it puts them in the CWD)
 	pushd $MINECRAFT_SERVER_DIR_PATH &> /dev/null
 	read_command | $MINECRAFT_SERVER_CMD &> /dev/null &
 	
@@ -428,9 +429,7 @@ function start_minecraft {
 	
 	# verify that minecraft server actually started.
 	if ! check_is_running; then
-	  echo "Could not reliably start Minecraft." >&2
-	  echo "Run the following command manually:" >&2
-	  echo $MINECRAFT_SERVER_CMD >&2
+	  echo "Could not start Minecraft Server." >&2
 	  exit $EXIT_SERVER_CANNOT_START
   fi
 }
