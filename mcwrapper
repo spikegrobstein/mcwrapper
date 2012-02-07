@@ -587,7 +587,7 @@ function download_minecraft_server () {
   local MINECRAFT_SERVER_DOWNLOAD_PAGE="${MINECRAFT_SERVER_BASE_URL}/download"
   
   # parse the download page and read the minecraft_server.jar download URI
-  local MINECRAFT_SERVER_DOWNLOAD_URI=`curl --progress-bar "$MINECRAFT_SERVER_DOWNLOAD_PAGE" | grep -E -o 'href=".*?minecraft_server.jar.*"' | awk -F '"' '{ print $2; }'`
+  local MINECRAFT_SERVER_DOWNLOAD_URI=`curl --progress-bar "$MINECRAFT_SERVER_DOWNLOAD_PAGE" | grep -E -o 'href="[^"]*?minecraft_server.jar.*"' | awk -F '"' '{ print $2; }'`
   
   # check if there was an error grabbing the download page (either curl returns a bad value or we didn't find the URI)
   if [[ "$?" != "0" || -z "$MINECRAFT_SERVER_DOWNLOAD_URI" ]]; then
@@ -597,7 +597,7 @@ function download_minecraft_server () {
   fi
   
   # build the minecraft_server.jar download URL
-  local MINECRAFT_SERVER_DOWNLOAD_URL="${MINECRAFT_SERVER_BASE_URL}/${MINECRAFT_SERVER_DOWNLOAD_URI}"
+  local MINECRAFT_SERVER_DOWNLOAD_URL="${MINECRAFT_SERVER_DOWNLOAD_URI}"
   
   local MINECRAFT_SERVER_TEMP_FILE="/tmp/minecraft_server.jar"
   
@@ -605,6 +605,8 @@ function download_minecraft_server () {
   if [[ -e "$MINECRAFT_SERVER_TEMP_FILE" ]]; then
     rm "$MINECRAFT_SERVER_TEMP_FILE"
   fi
+  
+  echo "Downloading Minecraft server from: $MINECRAFT_SERVER_DOWNLOAD_URL"
     
   # download the server to the temp directory  
   curl --progress-bar -L -o "$MINECRAFT_SERVER_TEMP_FILE" "$MINECRAFT_SERVER_DOWNLOAD_URL"
