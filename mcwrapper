@@ -874,6 +874,27 @@ function backup_world {
 	cleanup_old_backups
 }
 
+function path_to_latest_backup {
+	local LATEST_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_NAME}"
+	
+	# if the link doesn't exist, then warn the user and exit with proper exit code
+	if [[ ! -L "$LATEST_BACKUP_PATH" ]]; then
+		echo "Latest backup not found. Either never created or not a link or something. ($LATEST_BACKUP_PATH)" >&2
+		exit $EXIT_LATEST_BACKUP_NOT_FOUND
+	fi
+	
+	# read the link to the latest backup
+	local LATEST_BACKUP_LINK=`readlink "$LATEST_BACKUP_PATH"`
+	
+	# if the link to the latest backup is absolute, output that, otherwise, build the path and output that.
+	if [[ "$LATEST_BACKUP_LINK" =~ ^/ ]]; then
+		echo $LATEST_BACKUP_LINK
+		exit $EXIT_SUCCESS
+	fi
+	
+	echo "${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_LINK}"
+}
+
 ## End MCBackup portion.
 ##########################################################################################
 
@@ -1018,25 +1039,7 @@ case $ACTION in
 				exit $EXIT_SUCCESS
 				;;
 			latestbackup )
-				# TODO: move this to a function to keep all this shit simple.
-				LATEST_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_NAME}"
-				
-				# if the link doesn't exist, then warn the user and exit with proper exit code
-				if [[ ! -L "$LATEST_BACKUP_PATH" ]]; then
-					echo "Latest backup not found. Either never created or not a link or something. ($LATEST_BACKUP_PATH)" >&2
-					exit $EXIT_LATEST_BACKUP_NOT_FOUND
-				fi
-				
-				# read the link to the latest backup
-				LATEST_BACKUP_LINK=`readlink "$LATEST_BACKUP_PATH"`
-				
-				# if the link to the latest backup is absolute, output that, otherwise, build the path and output that.
-				if [[ "$LATEST_BACKUP_LINK" =~ ^/ ]]; then
-					echo $LATEST_BACKUP_LINK
-					exit $EXIT_SUCCESS
-				fi
-				
-				echo "${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_LINK}"				
+	      echo $(path_to_latest_backup)
 				exit $EXIT_SUCCESS
 				;;
 			backup-retention )
