@@ -105,14 +105,15 @@ function print_usage {
 	echo "    config  -- used to read configuration information about mcwrapper"
 	echo "               example: $MCWRAPPER_NAME config serverpath"
 	echo "               valid configuration parameters are:"
-	echo "                *  serverpath   -- absolute path to minecraft_server.jar"
-	echo "                *  serverdir    -- absolute path to server directory (containing minecraft_server.jar)"
-	echo "                *  pidfile      -- absolute path to mcwrapper pidfile"
-	echo "                *  pid          -- the pid of the currently running minecraft server process"
-	echo "                *  pipe         -- absolute path to the mcwrapper command pipe"
-	echo "                *  command      -- the command that will be used to launch the minecraft server"
-	echo "                *  backupdir    -- the path to the backup directory"
-	echo "                *  latestbackup -- the path to the latest backup if there is one"
+	echo "                *  serverpath       -- absolute path to minecraft_server.jar"
+	echo "                *  serverdir        -- absolute path to server directory (containing minecraft_server.jar)"
+	echo "                *  pidfile          -- absolute path to mcwrapper pidfile"
+	echo "                *  pid              -- the pid of the currently running minecraft server process"
+	echo "                *  pipe             -- absolute path to the mcwrapper command pipe"
+	echo "                *  command          -- the command that will be used to launch the minecraft server"
+	echo "                *  backupdir        -- the path to the backup directory"
+	echo "                *  latestbackup     -- the path to the latest backup if there is one"
+	echo "                *  backup-retention -- the number of backups to keep before deleting old ones"
 	echo "    prop    -- used to read server.properties configuration information"
 	echo "               best when used with external scripts"
 	echo "               example: $MCWRAPPER_NAME prop level-name"
@@ -1038,6 +1039,10 @@ case $ACTION in
 				echo "${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_LINK}"				
 				exit $EXIT_SUCCESS
 				;;
+			backup-retention )
+			  echo $BACKUPS_TO_KEEP
+			  exit $EXIT_STATUS
+			  ;;
 			*)
 				echo "Unknown config setting: $CONFIG_SETTING"
 				exit $EXIT_UNKNOWN_CONFIG_SETTING
