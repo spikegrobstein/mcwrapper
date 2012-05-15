@@ -1,4 +1,4 @@
-#! /bin/bash -x
+#! /bin/bash -
 
 # absolutely, under no circumstances, let mcwrapper be run as root!!!!
 if [[ `id -u` = 0 ]]; then
@@ -905,7 +905,7 @@ function path_to_latest_backup {
 }
 
 # given a path to a world backup, restore the current world with the contents
-# when doing this, back up the current world, if it exists 
+# when doing this, back up the current world, if it exists
 function restore_world {
   local RESTORE_FROM=$1
 
@@ -917,14 +917,21 @@ function restore_world {
   [[ -e "$RESTORE_FROM" && -d "$RESTORE_FROM" ]] \
     || { echo "Path does not appear to be a Minecraft world directory or does not exist." >&2; exit $EXIT_CANNOT_RESTORE_WORLD; }
     
-  # back-up current world data and enable infinite retention
+  # back-up current world data and temporarily enable infinite retention
+  # we don't want to inadvertently clobber any existing backups
   BACKUPS_TO_KEEP=-1
   backup_world
   
   local SERVER_IS_RUNNING=$(check_is_running && echo "RUNNING")
+  local SERVER_IS_RUNNING
   local WORLD_DIR_PATH=$(world_dir_path)
 
-  echo $SERVER_IS_RUNNING
+  if server_is_running; then
+    SERVER_IS_RUNNING="1"
+    stop_server
+  else
+    SERVER_IS_RUNNING="0"
+  fi
 
   # delete old world
   rm -rf "$WORLD_DIR_PATH"
@@ -933,8 +940,10 @@ function restore_world {
   cp -R "$RESTORE_FROM" "$WORLD_DIR_PATH"
   echo "$RESTORE_FROM" > "$WORLD_DIR_PATH/RESTORED_FROM"
   
-  # start server
-  start_minecraft
+  # start server if it was running when we started
+  if [[ "$SERVER_IS_RUNNING" = '1' ]]; then
+    start_minecraft
+  fi
 }
 
 ## End MCBackup portion.
