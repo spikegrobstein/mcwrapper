@@ -125,10 +125,6 @@ The name of the `latest` backup can be configured by editing that setting in `mc
 
 In the future I aim to create sysV init scripts for Linux (Ubuntu flavoured) and OSX launchd configs. I also plan on including Minecraft backup support to SnapBackup, my backup script (http://github.com/spikegrobstein/snapbackup).
 
-I also hope to create a configuration wizard for the most common configuration options as well as build a robust installer script to get you started.
-
-Also need to come up with a way to restore a backup of a minecraft world.
-
 ## About
 
 `mcwrapper` is written by Spike Grobstein <spikegrobstein@mac.com>    
