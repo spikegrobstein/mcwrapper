@@ -1,4 +1,4 @@
-#! /bin/bash -
+#! /bin/bash -x
 
 # absolutely, under no circumstances, let mcwrapper be run as root!!!!
 if [[ `id -u` = 0 ]]; then
@@ -55,6 +55,7 @@ EXIT_FAILED_TO_DELETE_SYMLINK=53
 EXIT_ERORR_CREATING_SYMLINK=54
 EXIT_BACKUPS_DISABLED=55
 EXIT_LATEST_BACKUP_NOT_FOUND=56
+EXIT_CANNOT_RESTORE_WORLD=57
 
 EXIT_BAD_COMPRESSION_TYPE=60
 
@@ -66,6 +67,7 @@ EXIT_CANNOT_MOVE_MINECRAFT_SERVER=73
 EXIT_EXISTING_MINECRAFT_SERVER_NOT_FOUND=74
 
 # misc other codes:
+EXIT_NOT_IMPLEMENTED=98
 EXIT_RUNNING_AS_ROOT=99
 
 #### End Exit Codes
@@ -895,6 +897,30 @@ function path_to_latest_backup {
 	echo "${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_LINK}"
 }
 
+# given a path to a world backup, restore the current world with the contents
+# when doing this, back up the current world, if it exists 
+function restore_world {
+  local RESTORE_FROM=$1
+  
+  # check to make sure world dir exists and is a dir
+  [[ -e "$RESTORE_FROM" && -d "$RESTORE_FROM" ]] \
+    || { echo "Path does not appear to be a Minecraft world directory or does not exist." >&2; exit $EXIT_CANNOT_RESTORE_WORLD; }
+    
+  # back-up current world data and enable infinite retention
+  BACKUPS_TO_KEEP=-1
+  backup_world
+  
+  local SERVER_IS_RUNNING=$(check_is_running && echo "RUNNING")
+  
+  echo $SERVER_IS_RUNNING
+  
+  # delete old world
+  
+  # copy world
+  
+  # start server
+}
+
 ## End MCBackup portion.
 ##########################################################################################
 
@@ -986,6 +1012,12 @@ case $ACTION in
 		echo "Done."
 		exit $EXIT_SUCCESS
 		;;
+	restore )
+	  RESTORE_FROM=$1;shift
+	  restore_world $RESTORE_FROM
+	  echo "Done."
+	  exit $EXIT_SUCCESS
+	  ;;
 	log )
 		check_server_log_exists
 		echo "Tailing from: ${MINECRAFT_SERVER_DIR_PATH}/server.log" >&2
