@@ -24,6 +24,12 @@ If you don't have git:
  
 The above will start up a Minecraft server instance using default settings. All support files related to mcwrapper will be stored in this new mcwrapper directory. Updating to the latest version is as easy as cd'ing into the mcwrapper directory and typing `git pull`
 
+If you're starting without a Minecraft server installed and want to get everything running quickly, once you have unpacked a tarball or cloned the `git` repository, run the following command:
+
+    ./mcwrapper install
+
+This will download the current version of `minecraft_server.jar` from Mojang and place it in the correct location. You can then run the `start` action to start it up.
+
 Basic usage is:
 
     ./mcwrapper <action> [ <action_params> ]
@@ -119,7 +125,22 @@ Assuming your `mcwrapper` lives in `/usr/local/minecraft/mcwrapper`, `backup` wi
  3. create a symlink to the latest backup at `/usr/local/minecraft/backups/latest`
  4. delete old backups. Defaults to keeping the latest 5.
  
-The name of the `latest` backup can be configured by editing that setting in `mcbackup`. You can also configure how many previous backups are kept. Again, see `mcwrapper.conf-example` for information on doing this.
+The name of the `latest` backup can be configured by editing that setting in `mcwrapper`. You can also configure how many previous backups are kept. Again, see `mcwrapper.conf-example` for information on doing this.
+
+## Restoring from a Minecraft backup
+
+If you ever find a need to restore from a previous world data backup, `mcwrapper` now using the `restore` action and passing a path (full or relative) to the backup you wish to restore:
+
+    ./mcwrapper restore backups/20111118123456
+
+The above example will perform the following actions:
+
+ 1. gracefully stop the Minecraft server if it's running.
+ 2. do a non-clobbering backup of the current world data. This means that regardless of what your backup retention settings are, it will not delete any while creating a backup of the current world data.
+ 3. copy the specified backup directory into the servers's world directory.
+ 4. start Minecraft server up if it was previously running.
+
+In addition to the above, a file is also created inside the world directory called `RESTORED_FROM` which contains the argument specified to the `restore` action.
     
 ## The Future (Todo List)
 
