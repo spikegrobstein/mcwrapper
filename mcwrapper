@@ -922,14 +922,19 @@ function restore_world {
   backup_world
   
   local SERVER_IS_RUNNING=$(check_is_running && echo "RUNNING")
-  
+  local WORLD_DIR_PATH=$(world_dir_path)
+
   echo $SERVER_IS_RUNNING
-  
+
   # delete old world
+  rm -rf "$WORLD_DIR_PATH"
   
   # copy world
+  cp -R "$RESTORE_FROM" "$WORLD_DIR_PATH"
+  echo "$RESTORE_FROM" > "$WORLD_DIR_PATH/RESTORED_FROM"
   
   # start server
+  start_minecraft
 }
 
 ## End MCBackup portion.
