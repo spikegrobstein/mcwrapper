@@ -716,10 +716,17 @@ function start_writing_world () {
 	send_command "save-on"
 }
 
+# get the path to the current world directory
+function world_dir_path () {
+  local LEVEL_NAME=`read_server_property level-name`
+  local WORLD_DATA_DIR="${MINECRAFT_SERVER_DIR_PATH}/${LEVEL_NAME}"
+
+  echo $WORLD_DATA_DIR
+}
+
 # copy the world data and configuration
 function do_backup () {
-	local LEVEL_NAME=`read_server_property level-name`
-	local WORLD_DATA_DIR="${MINECRAFT_SERVER_DIR_PATH}/${LEVEL_NAME}"
+  local WORLD_DATA_DIR=$(world_dir_path)
 	
 	cp -R "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH/"
 	
