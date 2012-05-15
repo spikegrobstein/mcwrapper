@@ -901,6 +901,10 @@ function path_to_latest_backup {
 # when doing this, back up the current world, if it exists 
 function restore_world {
   local RESTORE_FROM=$1
+
+  # check to make sure a RESTORE_FROM parameter is supplied
+  [[ -z "$RESTORE_FROM" ]] \
+    && { echo "USAGE: $0 restore <backup_name>" >&2; exit $EXIT_CANNOT_RESTORE_WORLD; }
   
   # check to make sure world dir exists and is a dir
   [[ -e "$RESTORE_FROM" && -d "$RESTORE_FROM" ]] \
