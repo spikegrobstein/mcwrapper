@@ -976,22 +976,9 @@ default_config
 read_config
 process_config
 
-# check to make sure that we're in a sane configuration
-# function exits on error.
-# not all actions require a pre-sanity check, though.
-case $ACTION in
-  install             ) ;;
-  about               ) ;;
-  help|--help|-?      ) ;;
-  version|--version   ) ;;
-  config              ) ;;
-    # do nothing
-  * )
-    # default behavior is to sanity check
-    sanity_check
-esac
-
-# must cd to minecraft server directory to make sure support files are created in the correct place.
+# before most actions are run, sanity_check is called
+# this ensures that things are configured properly before
+# performing any actions that require specific configuration
 
 case $ACTION in
   help|--help|-? )
@@ -1007,24 +994,28 @@ case $ACTION in
     exit $EXIT_SUCCESS
     ;;
   start )
+    sanity_check
     echo -n "Starting minecraft... "  
     start_minecraft
     echo "Done."
     exit $EXIT_SUCCESS
     ;;
   stop )
+    sanity_check
     echo -n "Stopping minecraft... "
     stop_minecraft
     echo "Done."
     exit $EXIT_SUCCESS
     ;;
   restart )
+    sanity_check
     echo -n "Restarting minecraft..."
     restart_minecraft
     echo " Done."
     exit $EXIT_SUCCESS
     ;;
   status )
+    sanity_check
     if check_is_running; then
       echo "Server is running." >&2
       exit $EXIT_SUCCESS
@@ -1049,22 +1040,26 @@ case $ACTION in
     exit $EXIT_SUCCESS
     ;;
   update )
+    sanity_check
     update_minecraft_server
     exit $EXIT_SUCCESS
     ;;
   backup )
+    sanity_check
     echo "Backing up minecraft world data..."
     backup_world
     echo "Done."
     exit $EXIT_SUCCESS
     ;;
   restore )
+    sanity_check
     RESTORE_FROM=$1;shift
     restore_world $RESTORE_FROM
     echo "Done."
     exit $EXIT_SUCCESS
     ;;
   log )
+    sanity_check
     check_server_log_exists
     echo "Tailing from: ${MINECRAFT_SERVER_DIR_PATH}/server.log" >&2
     echo "Press ^C to cancel." >&2
@@ -1131,11 +1126,13 @@ case $ACTION in
     esac
     ;;
   prop )
+    sanity_check
     PROP=$1    
     read_server_property $PROP
     exit $EXIT_SUCCESS
     ;;
   command|cmd )
+    sanity_check
     COMMAND="$@"
     echo -n "sending: $COMMAND ... "
     send_command "$COMMAND"
