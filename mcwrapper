@@ -11,9 +11,9 @@ fi
 MCWRAPPER_VERSION="unstable-1.5"
 
 # initialize some variables about the location of mcwrapper and its support files.
-pushd "$(dirname "$0")" >/dev/null
+pushd "$(dirname "$0")" &> /dev/null
 MCWRAPPER_DIR="$PWD"
-popd >/dev/null
+popd &> /dev/null
 MCWRAPPER="$(basename "$0")"
 
 MCWRAPPER_CONFIG_NAME="mcwrapper.conf"
@@ -254,9 +254,9 @@ function process_config {
   fi
   MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
 
-  pushd "$MINECRAFT_SERVER_DIR_PATH"
+  pushd "$MINECRAFT_SERVER_DIR_PATH" &> /dev/null
   MINECRAFT_SERVER_DIR=$(pwd)
-  popd
+  popd &> /dev/null
   
   # PID_FILE can be relative or absolute
   if [[ ! "$PID_FILE" =~ ^/ ]]; then
