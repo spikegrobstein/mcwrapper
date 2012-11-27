@@ -88,7 +88,7 @@ MINECRAFT_SERVER_PROPERTIES_NAME="server.properties"
 
 function print_usage {
   local MCWRAPPER_NAME=$( basename $0 )
-  
+
   echo "USAGE:"
   echo "    $MCWRAPPER_NAME <action> [ <action_options> ]"
   echo ""
@@ -148,34 +148,34 @@ function print_about {
 # first check to see if it's set in the MCWRAPPER_CONFIG_PATH
 # then check: ./mcwrapper.conf, ~/.mcwrapper.conf, /etc/mcwrapper.conf
 function get_config_path {
-  
+
   # if it's defined in an ENV var, then let's use that  
   if [[ ! -z "$MCWRAPPER_CONFIG_PATH" ]]; then
     echo $MCWRAPPER_CONFIG_PATH
     return
   fi
-  
+
   # check ./mcwrapper.conf
   local CURRENT_PATH="${MCWRAPPER_DIR}/${MCWRAPPER_CONFIG_NAME}"
   if [[ -e "$CURRENT_PATH" ]]; then
     echo $CURRENT_PATH
     return
   fi
-  
+
   # check ~/.mcwrapper.conf
   CURRENT_PATH=~/".${MCWRAPPER_CONFIG_NAME}"
   if [[ -e "$CURRENT_PATH" ]]; then
     echo $CURRENT_PATH
     return
   fi
-    
+
   # check /etc/mcwrapper.conf
   CURRENT_PATH="/etc/${MCWRAPPER_CONFIG_NAME}"
   if [[ -e "$CURRENT_PATH" ]]; then
     echo $CURRENT_PATH
     return
   fi
-  
+
   # if we can't find the config, it's no big deal. we'll just use defaults and not read it.
 }
 
@@ -183,12 +183,12 @@ function get_config_path {
 function read_config {
   # set the global config path:
   CONFIG_PATH=`get_config_path`
-  
+
   # if it's not found, don't do shit. stick with default values.
   if [[ -z "$CONFIG_PATH" || ! -e "$CONFIG_PATH" ]]; then
     return
   fi
-  
+
   # it was found, so we read it by sourcing it.
   . "$CONFIG_PATH"  
 }
@@ -203,16 +203,16 @@ function default_config {
     # the resulting value of MINECRAFT_SERVER_PATH will be the last place that it looked.
 
     MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/${MINECRAFT_SERVER_NAME}"
-    
+
     if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
       MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/../${MINECRAFT_SERVER_NAME}"
     fi
 
   fi
-  
+
   # Java binary (uses one in PATH by default)
   JAVA_BIN="java"
-  
+
   # Java VM settings (increasing these never hurts)
   MX_SIZE="1024M"
   MS_SIZE="1024M"
@@ -224,18 +224,18 @@ function default_config {
 
   # the directory of the minecraft_server.jar based off $MINECRAFT_SERVER_PATH
   MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
-  
+
   BACKUP_DIRECTORY_PATH="backups"
-  
+
   # what the name of the symlink is.
   LATEST_BACKUP_NAME="latest"
-  
+
   # how many backups to keep in the backups directory
   # (we automatically delete old backups)
   # set to -1 to retain ALL backups (never delete)
   # set to 0 to completely disable backups.
   BACKUPS_TO_KEEP=5
-  
+
   # set backup name to
   #   +%Y%m%d       -- just the datestamp; no time.
   #   +%Y%m%d%H%M%S -- full timestamp including hour, minute, second
@@ -247,7 +247,7 @@ function default_config {
 # for example $PID_FILE which can be relative or absolute.
 # if relative, we want to prepend the MCWRAPPER_DIR to it.
 function process_config {
-  
+
   # MINECRAFT_SERVER_PATH can be relative or absolute
   if [[ ! "$MINECRAFT_SERVER_PATH" =~ ^/ && ! "$MINECRAFT_SERVER_PATH" =~ "$MCWRAPPER_DIR" ]]; then
     MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/$MINECRAFT_SERVER_PATH"
@@ -257,29 +257,29 @@ function process_config {
   pushd "$MINECRAFT_SERVER_DIR_PATH" &> /dev/null
   MINECRAFT_SERVER_DIR=$(pwd)
   popd &> /dev/null
-  
+
   # PID_FILE can be relative or absolute
   if [[ ! "$PID_FILE" =~ ^/ ]]; then
     PID_FILE="${MCWRAPPER_DIR}/$PID_FILE"
   fi
-  
+
   # COMMAND_PIPE can be relative or absolute
   if [[ ! "$COMMAND_PIPE" =~ ^/ ]]; then
     COMMAND_PIPE="${MCWRAPPER_DIR}/$COMMAND_PIPE"
   fi
-  
+
   # set MINECRAFT_SERVER_CMD
   # this may be overridden in the config, so if it's set already, don't set it.
   if [[ -z "$MINECRAFT_SERVER_CMD" ]]; then
     # command for starting minecraft_server.jar
     MINECRAFT_SERVER_CMD="$JAVA_BIN -Xmx${MX_SIZE} -Xms${MS_SIZE} -jar "$MINECRAFT_SERVER_PATH" nogui"
   fi
-  
+
   # the path to the server.properties file
   if [[ -z "$SERVER_PROPERTIES_PATH" ]]; then
     SERVER_PROPERTIES_PATH=`dirname "$MINECRAFT_SERVER_PATH"`"/${MINECRAFT_SERVER_PROPERTIES_NAME}"
   fi
-  
+
   # BACKUP_DIRECTORY_PATH can be relative or absolute
   if [[ ! "$BACKUP_DIRECTORY_PATH" =~ ^/ ]]; then
     BACKUP_DIRECTORY_PATH="${MCWRAPPER_DIR}/${BACKUP_DIRECTORY_PATH}"
@@ -289,45 +289,45 @@ function process_config {
 function read_server_property {
   # takes 1 arg... the property name
   local PROP_NAME=$1;shift
-  
+
   if [[ ! -e "$SERVER_PROPERTIES_PATH" ]]; then
     echo "Cannot locate server.properties path. ($SERVER_PROPERTIES_PATH)" >&2
     exit $EXIT_NO_SERVER_PROPERTIES
   fi
-  
+
   # if no property is supplied, just dump the entire properties file's keys
   if [[ -z "$PROP_NAME" ]]; then
     cat "$SERVER_PROPERTIES_PATH" | grep -v '^#' | awk -F '=' '{ print $1 }'
     return
   fi
-    
+
   cat "$SERVER_PROPERTIES_PATH" | grep "$PROP_NAME\=" | awk -F '=' '{ print $2 }'
 }
 
 function read_command {
   sleep 1
-  
+
   # read from the command pipe via FD7 (needed for read timeout)
   # no special reason to use 7, it's just sufficiently high that it probably won't collide with anything.
   exec 7<> "$COMMAND_PIPE"
-  
+
   # initialize INPUT to be empty string
   local INPUT=""
-  
+
   # number of seconds between reads
   # this is needed to make sure the server is still running
   local READ_TIMEOUT=2
-  
+
   while [[ "$INPUT" != 'stop' ]]; do
     read -t "$READ_TIMEOUT" -u 7 INPUT
-    
+
     # if it timed out or got no input, then exit if server isnt' running.
     if [[ "$?" != 0 || -z "$INPUT" ]]; then
       check_is_running || exit $EXIT_SERVER_DISAPPEARED
-      
+
       continue
     fi
-    
+
     echo $INPUT
 
     # if the user said "stop" then exit after the command completes.
@@ -341,7 +341,7 @@ function read_command {
 function send_command {
   check_is_running \
     || { echo "Server is NOT running. Not sending command" >&2 ; exit $EXIT_SERVER_NOT_RUNNING; }
-  
+
   # echo the command into the command pipe to be picked up by the reader process:
   local COMMAND=$1
   (echo "$COMMAND" > "$COMMAND_PIPE") &> /dev/null \
@@ -365,30 +365,30 @@ function read_pid {
     #echo "Server not running!" >&2
     return $EXIT_SERVER_NOT_RUNNING
   fi
-  
+
   local PID=`cat "$PID_FILE" 2>&1`
-  
+
   if [[ $? != $EXIT_SUCCESS ]]; then
    return $EXIT_SERVER_NOT_RUNNING
   fi
-  
+
   echo $PID
 }
 
 function check_is_running {
   local PID=`read_pid`
-    
+
   # if read_pid returned a non-zero status, then we're not running
   if [[ $? != $EXIT_SUCCESS ]]; then
     return $EXIT_SERVER_NOT_RUNNING
   fi
-  
+
   # check to see if we have a wrapper currently running
   # send a 0 signal to process to see if it's running.
   if ! kill -0 "$PID" &> /dev/null; then
     return $EXIT_SERVER_NOT_RUNNING
   fi
-  
+
   return $EXIT_SUCCESS
 }
 
@@ -401,11 +401,11 @@ function set_up_pipe {
       echo ""
       exit "$EXIT_MAKE_FIFO_FAILED"
     fi
-    
+
     mkfifo "$COMMAND_PIPE"
-    
+
     local PIPE_STATUS=$?
-    
+
     if [[ $PIPE_STATUS != 0 ]]; then
       # if mkfifo failed, print error message, exit non-zero.
       echo "Error creating the pipe: $COMMAND_PIPE ($PIPE_STATUS)." >&2
@@ -427,19 +427,19 @@ function start_minecraft {
     echo "Server is already running. Exiting..." >&2
     exit $EXIT_SERVER_ALREADY_RUNNING
   fi
-  
+
   set_up_pipe
-  
+
   # now we go to the minecraft_server directory and start the server in a background process
   # need to go to the directory to make sure that the Minecraft server puts the files in the right place (it puts them in the CWD)
   pushd $MINECRAFT_SERVER_DIR_PATH &> /dev/null
   read_command | $MINECRAFT_SERVER_CMD &> /dev/null &
-  
+
   create_pid $!
-  
+
   # sleep for one second to make sure that the process actually started properly.
   sleep 1
-  
+
   # verify that minecraft server actually started.
   if ! check_is_running; then
     echo "Could not start Minecraft Server." >&2
@@ -457,7 +457,7 @@ function stop_minecraft {
     # TODO: check status of backup_world. Don't say "Done" if we didn't back anything up.
     echo "Done." >&2
   fi
-  
+
   send_command "stop"
 }
 
@@ -484,7 +484,7 @@ function server_log_path {
 
 function check_server_log_exists {
   local SERVER_LOG_PATH=`server_log_path`
-  
+
   # make sure that the log file exists before trying to tail it.
   if [[ ! -e "$SERVER_LOG_PATH" ]]; then
     echo "Server log not found! ($SERVER_LOG_PATH)" >&2
@@ -498,13 +498,13 @@ function check_server_log_exists {
 function tail_server_log {
   local SERVER_LOG_PATH=`server_log_path`
   check_server_log_exists
-  
+
   tail -F "$SERVER_LOG_PATH"
 }
 
 function sanity_check {
   # TODO: add checks to make sure that PID_FILE and COMMAND_PIPE are writable
-  
+
   # make sure that there is a java binary installed in the PATH
   which "$JAVA_BIN" &> /dev/null
   if [[ $? != 0 ]]; then
@@ -513,7 +513,7 @@ function sanity_check {
    echo "" >&2
    exit $EXIT_NO_JAVA
   fi
-  
+
   # check to make sure that things that need to exist exist.
   if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
     # the minecraft server path does not exist.
@@ -541,10 +541,10 @@ function run_installer () {
   echo "Welcome to the mcwrapper installer."
   echo "Before the Minecraft Server is installed, we must first confirm a few settings..."
   echo ""
-  
+
   # check for configuration
   local CURRENT_CONFIG_PATH=`get_config_path`
-  
+
   if [[ -z "$CURRENT_CONFIG_PATH" ]]; then
     echo "Using default configuration."
     echo "An example configuration is included in the mcwrapper package."
@@ -553,11 +553,11 @@ function run_installer () {
     echo "mcwrapper config path: $CURRENT_CONFIG_PATH"
   fi
   echo ""
-  
+
   # show where minecraft_server.jar will be installed
-  
+
   echo "Minecraft Server Path: $MINECRAFT_SERVER_PATH"
-  
+
   if [[ -e "$MINECRAFT_SERVER_PATH" ]]; then
     echo -n "Minecraft server already exists! Do you wish to overwrite? [y/N]: "
     read OVERWRITE_SERVER
@@ -567,10 +567,10 @@ function run_installer () {
       echo ""
       exit $EXIT_SUCCESS
     fi
-    
+
     backup_old_server
   fi
-  
+
   echo -n "Is this where you wish to install the Minecraft Server? [Y/n]: "
   read INSTALL_PATH_CORRECT
   if [[ "$INSTALL_PATH_CORRECT" != 'y' && ! -z "$INSTALL_PATH_CORRECT" ]]; then
@@ -579,15 +579,15 @@ function run_installer () {
     echo ""
     exit $EXIT_SUCCESS
   fi
-  
+
   echo "Downloading and installing Minecraft Server..."
   download_minecraft_server
-  
+
   # ok, so now the server is downloaded and copied to the right location.
-  
+
   echo "Minecraft is downloaded and in place. You can now start it by running the following command:"
   echo "$MCWRAPPER start"
-  
+
   exit 0
 }
 
@@ -621,12 +621,12 @@ function download_minecraft_server () {
   if [[ -e "$MINECRAFT_SERVER_TEMP_FILE" ]]; then
     rm "$MINECRAFT_SERVER_TEMP_FILE"
   fi
-  
+
   echo "Downloading Minecraft server from: $MINECRAFT_SERVER_DOWNLOAD_URL"
-    
+
   # download the server to the temp directory  
   curl --progress-bar -L -o "$MINECRAFT_SERVER_TEMP_FILE" "$MINECRAFT_SERVER_DOWNLOAD_URL"
-  
+
   # assuming that was successful, make sure the directories exist and move the binary to the right location
   local CURL_RETURN=$?
   if [[ "$CURL_RETURN" != "0" ]]; then
@@ -639,7 +639,7 @@ function download_minecraft_server () {
     echo ""
     exit $EXIT_DOWNLOAD_MINECRAFT_SERVER_FAILED
   fi
-  
+
   # make sure directories exit
   mkdir -p "$MINECRAFT_SERVER_DIR_PATH"
   if [[ $? != 0 ]]; then
@@ -647,10 +647,10 @@ function download_minecraft_server () {
     echo ""
     exit $EXIT_CREATE_MINECRAFT_SERVER_DIR_FAILED
   fi
-  
+
   # move the minecraft server to the right place:
   mv "$MINECRAFT_SERVER_TEMP_FILE" "$MINECRAFT_SERVER_PATH"
-  
+
   # check for errors when moving the minecraft_server.jar file
   if [[ "$?" != 0 ]]; then
     echo "An error occurred when moving minecraft_server.jar to the install directory."
@@ -664,7 +664,7 @@ function download_minecraft_server () {
 function backup_old_server () {
   # back up the old minecraft server (just in case)
   mv "$MINECRAFT_SERVER_PATH" "${MINECRAFT_SERVER_PATH}.old"
-  
+
   if [[ "$?" != "0" ]]; then
     echo "Failed backing up the old minecraft server!"
     echo ""
@@ -681,24 +681,24 @@ function update_minecraft_server () {
     echo ""
     exit $EXIT_EXISTING_MINECRAFT_SERVER_NOT_FOUND
   fi
-  
+
   echo "Updating server..."
-  
+
   backup_old_server
   download_minecraft_server
-  
+
   if ! check_is_running; then
     # server is not running, so just return
     return
   fi
-  
+
   read -p "Would you like to restart Minecraft Server? [Y/n]: " INPUT
   if [[ -z "$INPUT" || "$INPUT" == 'y' ]]; then
     echo -n "Restarting Minecraft Server..."
     restart_minecraft
     echo "Done."
   fi
-  
+
 }
 
 ## End Installer portion.
@@ -710,7 +710,7 @@ function update_minecraft_server () {
 # if it exists, this effectively does nothing.
 function create_backup_directory () {
   mkdir -p "$CURRENT_BACKUP_PATH"
-  
+
   if [[ $? != 0 ]]; then
     #an error occurred
     echo "An error occurred when creating the backup directory." >&2
@@ -740,23 +740,23 @@ function world_dir_path () {
 # copy the world data and configuration
 function do_backup () {
   local WORLD_DATA_DIR=$(world_dir_path)
-  
+
   cp -R "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH/"
-  
+
   if [[ $? != 0 ]]; then
     #an error occurred
     echo "An error occurred when copying the world data." >&2
     exit $EXIT_CANNOT_BACKUP_WORLD_DATA
   fi
-  
+
   cp -R "${MINECRAFT_SERVER_DIR_PATH}/"*.{txt,properties} "$CURRENT_BACKUP_PATH/"
-  
+
   if [[ $? != 0 ]]; then
     #an error occurred
     echo "An error occurred when copying the configuration information" >&2
     exit $EXIT_CANNOT_BACKUP_CONFIGS
   fi
-  
+
   if [[ ! -z "$COMPRESS_BACKUP" ]]; then
     # TODO: add support for bz2
     # TODO: make this code a little more readable without the secret, back alley variable updating.
@@ -772,10 +772,10 @@ function do_backup () {
         exit $EXIT_BAD_COMPRESSION_TYPE
         ;;
     esac
-    
+
     # after the backup is compressed, remove the uncompressed version
     rm -rf "$CURRENT_BACKUP_PATH"
-    
+
     # ARCHIVE_FILENAME gets set in the compressor ({tgz,zip}_backup) functions
     # we set CURRENT_BACKUP_PATH so the symlink gets pointed to the archive rather than the directory we just deleted
     CURRENT_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${ARCHIVE_FILENAME}"
@@ -793,23 +793,23 @@ function tgz_backup {
   # cd to the backup directory
   # create new tgz backup
   pushd "$BACKUP_DIRECTORY_PATH"
-  
+
   local FILENAME=`basename "$CURRENT_BACKUP_PATH"`
   ARCHIVE_FILENAME="${FILENAME}.tgz"
-  
+
   tar cfz "$ARCHIVE_FILENAME" "$FILENAME"  
-  
+
   popd
 }
 
 function zip_backup {
   pushd "$BACKUP_DIRECTORY_PATH"
-  
+
   local FILENAME=`basename "$CURRENT_BACKUP_PATH"`
   ARCHIVE_FILENAME="${FILENAME}.zip"
-  
+
   zip -q -r "$ARCHIVE_FILENAME" "$FILENAME"
-  
+
   popd
 }
 
@@ -818,21 +818,21 @@ function create_symlink () {
   if [[ -L "$LATEST_BACKUP_PATH" ]]; then
     # if the symlink already exists, delete it before creating it.
     rm "$LATEST_BACKUP_PATH"
-    
+
     if [[ $? != 0 ]]; then
       #an error occurred
       echo "An error occurred when deleting the old symlink." >&2
       exit $EXIT_FAILED_TO_DELETE_SYMLINK
     fi
   fi
-  
+
   # just the directory/filename of the current backup
   # this way, the symlink isn't an absolute path, so you can move the 
   # backup directory without issue.
   local NEW_BACKUP=`basename "$CURRENT_BACKUP_PATH"`
-  
+
   ln -s "$NEW_BACKUP" "$LATEST_BACKUP_PATH"
-  
+
   if [[ $? != 0 ]]; then
     #an error occurred
     echo "An error occurred when creating the symlink." >&2
@@ -846,11 +846,11 @@ function cleanup_old_backups () {
     # if we want infinite retention, then set BACKUPS_TO_KEEP to -1
     return
   fi
-  
+
   echo "Cleaning up old backups..." >&2
-  
+
   OLD_BACKUPS=`ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail -n +"${BACKUPS_TO_KEEP}"`
-  
+
   for old_backup in $OLD_BACKUPS; do
     echo "Removing $old_backup" >&2
     rm -rf "${BACKUP_DIRECTORY_PATH}/$old_backup"
@@ -870,50 +870,50 @@ function backup_world {
     echo "Backups are disabled. Not backing anything up."
     exit $EXIT_BACKUPS_DISABLED
   fi
-  
+
   # the path to the to-be-backed-up directory
   CURRENT_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/$CURRENT_BACKUP_NAME"
-  
+
   # the path to the symlink to the above.
   LATEST_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_NAME}"
-  
+
   create_backup_directory
-  
+
   # stop writing world if we're running
   if [[ $(check_is_running) ]]; then
     stop_writing_world
   fi
-  
+
   do_backup
-  
+
   # start writing world only if we're running
   if [[ $(check_is_running) ]]; then
     start_writing_world
   fi
-  
+
   create_symlink
-    
+
   cleanup_old_backups
 }
 
 function path_to_latest_backup {
   local LATEST_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_NAME}"
-  
+
   # if the link doesn't exist, then warn the user and exit with proper exit code
   if [[ ! -L "$LATEST_BACKUP_PATH" ]]; then
     echo "Latest backup not found. Either never created or not a link or something. ($LATEST_BACKUP_PATH)" >&2
     exit $EXIT_LATEST_BACKUP_NOT_FOUND
   fi
-  
+
   # read the link to the latest backup
   local LATEST_BACKUP_LINK=`readlink "$LATEST_BACKUP_PATH"`
-  
+
   # if the link to the latest backup is absolute, output that, otherwise, build the path and output that.
   if [[ "$LATEST_BACKUP_LINK" =~ ^/ ]]; then
     echo $LATEST_BACKUP_LINK
     exit $EXIT_SUCCESS
   fi
-  
+
   echo "${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_LINK}"
 }
 
@@ -925,16 +925,16 @@ function restore_world {
   # check to make sure a RESTORE_FROM parameter is supplied
   [[ -z "$RESTORE_FROM" ]] \
     && { echo "USAGE: $0 restore <backup_name>" >&2; exit $EXIT_CANNOT_RESTORE_WORLD; }
-  
+
   # check to make sure world dir exists and is a dir
   [[ -e "$RESTORE_FROM" && -d "$RESTORE_FROM" ]] \
     || { echo "Path does not appear to be a Minecraft world directory or does not exist." >&2; exit $EXIT_CANNOT_RESTORE_WORLD; }
-    
+
   # back-up current world data and temporarily enable infinite retention
   # we don't want to inadvertently clobber any existing backups
   BACKUPS_TO_KEEP=-1
   backup_world
-  
+
   local SERVER_IS_RUNNING=$(check_is_running && echo "RUNNING")
   local SERVER_IS_RUNNING
   local WORLD_DIR_PATH=$(world_dir_path)
@@ -948,11 +948,11 @@ function restore_world {
 
   # delete old world
   rm -rf "$WORLD_DIR_PATH"
-  
+
   # copy world
   cp -R "$RESTORE_FROM" "$WORLD_DIR_PATH"
   echo "$RESTORE_FROM" > "$WORLD_DIR_PATH/RESTORED_FROM"
-  
+
   # start server if it was running when we started
   if [[ "$SERVER_IS_RUNNING" = '1' ]]; then
     start_minecraft
@@ -1021,21 +1021,21 @@ case $ACTION in
       echo "Server is running." >&2
       exit $EXIT_SUCCESS
     fi
-    
+
     echo "Server is NOT running." >&2
     exit $EXIT_SERVER_NOT_RUNNING
-    
+
     ;;
   check )
     sanity_check
 
     # sanity_check will exit with an exit code if it fails
     # so, assuming it didn't exit, everything is ok.
-    
+
     echo "Everything looks OK!"
     exit $EXIT_SUCCESS
     ;;
-    
+
   install )
     run_installer
     exit $EXIT_SUCCESS
@@ -1061,9 +1061,9 @@ case $ACTION in
     echo "Tailing from: ${MINECRAFT_SERVER_DIR_PATH}/server.log" >&2
     echo "Press ^C to cancel." >&2
     echo "-------------------------------------------------------------------------------------------" >&2
-    
+
     tail_server_log
-    
+
     exit $EXIT_SUCCESS
     ;;
   config )
@@ -1088,7 +1088,7 @@ case $ACTION in
           echo "Server is NOT running." >&2
           exit $EXIT_SERVER_NOT_RUNNING
         fi
-        
+
         echo `read_pid`
         exit $EXIT_SUCCESS
         ;;
