@@ -979,9 +979,17 @@ process_config
 # check to make sure that we're in a sane configuration
 # function exits on error.
 # not all actions require a pre-sanity check, though.
-if [[ "$ACTION" != 'install' ]]; then
-  sanity_check
-fi
+case $ACTION in
+  install             ) ;;
+  about               ) ;;
+  help|--help|-?      ) ;;
+  version|--version   ) ;;
+  config              ) ;;
+    # do nothing
+  * )
+    # default behavior is to sanity check
+    sanity_check
+esac
 
 # must cd to minecraft server directory to make sure support files are created in the correct place.
 
