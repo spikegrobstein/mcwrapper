@@ -981,7 +981,7 @@ process_config
 # performing any actions that require specific configuration
 
 case $ACTION in
-  help|--help|-? )
+  help|--help|-?|-h )
     print_usage
     exit $EXIT_SUCCESS
     ;;
