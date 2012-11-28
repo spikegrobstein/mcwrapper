@@ -21,22 +21,23 @@ This should show your currently installed version.
 
 ## Quickstart
 
+If you don't have `minecraft_server.jar` installed on your machine:
 
-**quickstart instructions**
+    mkdir minecraft_server
+    cd minecraft_server
+    mcwrapper install
+    
+Follow the instructions (press enter when prompted). This will download the current version
+of `minecraft_server.jar` from Mojang and place it in the correct location.
 
+To start Minecraft Server, `cd` into the directory with `minecraft_server.jar` and execute:
+
+    mcwrapper start
 
 The above will start up a Minecraft server instance using default settings. All support files
-related to mcwrapper will be stored in this new mcwrapper directory. Updating to the latest
-version is as easy as cd'ing into the mcwrapper directory and typing `git pull`
+related to mcwrapper will be stored in the `minecraft_server.jar` directory.
 
-If you're starting without a Minecraft server installed and want to get everything running
-quickly, once you have unpacked a tarball or cloned the `git` repository, run the
-following command:
-
-    mcwrapper install
-
-This will download the current version of `minecraft_server.jar` from Mojang and place it in
-the correct location. You can then run the `start` action to start it up.
+## Usage
 
 Basic usage is:
 
