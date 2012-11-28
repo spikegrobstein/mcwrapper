@@ -599,7 +599,7 @@ function download_minecraft_server () {
   local MINECRAFT_SERVER_BASE_URL="http://www.minecraft.net"
   local MINECRAFT_SERVER_DOWNLOAD_PAGE="${MINECRAFT_SERVER_BASE_URL}/download"
 
-  which curl \
+  which curl >/dev/null \
     || { echo "curl does not appear to be installed. This is required to download the Minecraft server" >&2; exit $EXIT_NO_CURL; }
 
   # parse the download page and read the minecraft_server.jar download URI
