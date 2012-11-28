@@ -156,7 +156,7 @@ function get_config_path {
   fi
 
   # check ./mcwrapper.conf
-  local CURRENT_PATH="${MCWRAPPER_DIR}/${MCWRAPPER_CONFIG_NAME}"
+  local CURRENT_PATH="${MINECRAFT_SERVER_DIR_PATH}/${MCWRAPPER_CONFIG_NAME}"
   if [[ -e "$CURRENT_PATH" ]]; then
     echo $CURRENT_PATH
     return
@@ -205,14 +205,6 @@ function default_config {
     MINECRAFT_SERVER_PATH="./${MINECRAFT_SERVER_NAME}"
 
     if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
-      MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/${MINECRAFT_SERVER_NAME}"
-    fi
-
-    if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
-      MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/../${MINECRAFT_SERVER_NAME}"
-    fi
-
-    if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
       unset MINECRAFT_SERVER_PATH
     fi
 
@@ -252,11 +244,9 @@ function default_config {
 # for example $PID_FILE which can be relative or absolute.
 # if relative, we want to prepend the MINECRAFT_SERVER_DIR_PATH to it.
 function process_config {
-
-  # MINECRAFT_SERVER_PATH can be relative or absolute
-  # if [[ ! "$MINECRAFT_SERVER_PATH" =~ ^/ && ! "$MINECRAFT_SERVER_PATH" =~ "$MCWRAPPER_DIR" ]]; then
-    # MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/$MINECRAFT_SERVER_PATH"
-  # fi
+  if [[ -z "$MINECRAFT_SERVER_PATH" ]]; then
+    return 1
+  fi
 
   # the directory of the minecraft_server.jar based off $MINECRAFT_SERVER_PATH
   MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
