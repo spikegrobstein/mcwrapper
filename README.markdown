@@ -33,60 +33,54 @@ If you're starting without a Minecraft server installed and want to get everythi
 quickly, once you have unpacked a tarball or cloned the `git` repository, run the
 following command:
 
-    ./mcwrapper install
+    mcwrapper install
 
 This will download the current version of `minecraft_server.jar` from Mojang and place it in
 the correct location. You can then run the `start` action to start it up.
 
 Basic usage is:
 
-    ./mcwrapper <action> [ <action_params> ]
+    mcwrapper <action> [ <action_params> ]
 
 Use the help action to see a full breakdown of usage:
 
-    ./mcwrapper help
+    mcwrapper help
 
 See the Configuration section below for instructions on modifying the default configuration.
 
-### Commands
+### Actions
 
 As seen above, you can start the server by running the following:
 
-    ./mcwrapper start
+    mcwrapper start
 
 The Minecraft server will be started in the background. You can then execute arbitrary commands
 to the server using the `command` action. The `command` action is also aliased as `cmd`:
 
-    ./mcwrapper cmd op spizzike
-    ./mcwrapper cmd say hi
-    ./mcwrapper cmd save-all
-    ./mcwrapper cmd save-off
-    ./mcwrapper cmd save-on
+    mcwrapper cmd op spizzike
+    mcwrapper cmd say hi
+    mcwrapper cmd save-all
+    mcwrapper cmd save-off
+    mcwrapper cmd save-on
 
 If you'd like to stop the server, issue the following command:
 
-    ./mcwrapper stop
+    mcwrapper stop
 
 You can also find out whether the server is running:
 
-    ./mcwrapper status
+    mcwrapper status
 
 The status action will return 0 if the server is running or 1 if it's stopped.
 
 There is also support for reading information about the running configuration for cases where
 an external script may want to interact with Minecraft or `mcwrapper`. Example:
 
-    ./mcwrapper config serverpath
+    mcwrapper config serverpath
 
 The above will output the path to the `minecraft_server.jar` file that it will wrap. All
 config commands can be run whether `mcwrapper` is running a server or not. A bug currently
 exists where if `mcwrapper` cannot locate the `minecraft_server.jar`, no commands will work.
-
-### Convenience Scripts
-
-`mcwrapper` comes with a set of convenience scripts for the commandline-impared user. These
-scripts can be run by double-clicking them in OSX or Linux and will execute the specified
-command. The scripts should not be moved outside of that directory or they will not work.
 
 ## Configuration
 
@@ -133,7 +127,7 @@ a save, then disable writing world data to disk during a backup.
 `mcwrapper` contains a backup action for just this purpose. To back up your current world data
 directory, run the following command:
 
-    ./mcwrapper backup
+    mcwrapper backup
 
 `mcwrapper` will read your `server.properties` file to learn the location of your world data
 and, after flushing anything in memory, creates a timestamped directory in the minecraft server
@@ -162,7 +156,7 @@ information on doing this.
 If you ever find a need to restore from a previous world data backup, `mcwrapper` now using the
 `restore` action and passing a path (full or relative) to the backup you wish to restore:
 
-    ./mcwrapper restore backups/20111118123456
+    mcwrapper restore backups/20111118123456
 
 The above example will perform the following actions:
 
