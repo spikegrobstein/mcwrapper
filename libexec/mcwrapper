@@ -190,22 +190,30 @@ function read_config {
   fi
 
   # it was found, so we read it by sourcing it.
-  . "$CONFIG_PATH"  
+  . "$CONFIG_PATH"
 }
 
 function default_config {
   # path to the minecraft_server.jar
-  # if this is not defined in the existing environment, define here.
+  # if this is not defined in the existing environment, try to guess where it is
   if [[ -z "$MINECRAFT_SERVER_PATH" ]]; then
 
     # check in the current directory first, then check one level up for minecraft.
     # if it's not actually where it thinks it is, it'll break when it tries to do something.
     # the resulting value of MINECRAFT_SERVER_PATH will be the last place that it looked.
 
-    MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/${MINECRAFT_SERVER_NAME}"
+    MINECRAFT_SERVER_PATH="./${MINECRAFT_SERVER_NAME}"
+
+    if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
+      MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/${MINECRAFT_SERVER_NAME}"
+    fi
 
     if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
       MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/../${MINECRAFT_SERVER_NAME}"
+    fi
+
+    if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
+      unset MINECRAFT_SERVER_PATH
     fi
 
   fi
@@ -221,9 +229,6 @@ function default_config {
   # if relative, they're relative to the mcwrapper executable
   PID_FILE="mcwrapper.pid"
   COMMAND_PIPE="command_input"
-
-  # the directory of the minecraft_server.jar based off $MINECRAFT_SERVER_PATH
-  MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
 
   BACKUP_DIRECTORY_PATH="backups"
 
@@ -245,13 +250,15 @@ function default_config {
 # run this to process a loaded config
 # some variables require some modification before they can be used
 # for example $PID_FILE which can be relative or absolute.
-# if relative, we want to prepend the MCWRAPPER_DIR to it.
+# if relative, we want to prepend the MINECRAFT_SERVER_DIR_PATH to it.
 function process_config {
 
   # MINECRAFT_SERVER_PATH can be relative or absolute
-  if [[ ! "$MINECRAFT_SERVER_PATH" =~ ^/ && ! "$MINECRAFT_SERVER_PATH" =~ "$MCWRAPPER_DIR" ]]; then
-    MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/$MINECRAFT_SERVER_PATH"
-  fi
+  # if [[ ! "$MINECRAFT_SERVER_PATH" =~ ^/ && ! "$MINECRAFT_SERVER_PATH" =~ "$MCWRAPPER_DIR" ]]; then
+    # MINECRAFT_SERVER_PATH="${MCWRAPPER_DIR}/$MINECRAFT_SERVER_PATH"
+  # fi
+
+  # the directory of the minecraft_server.jar based off $MINECRAFT_SERVER_PATH
   MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
 
   pushd "$MINECRAFT_SERVER_DIR_PATH" &> /dev/null
@@ -260,12 +267,12 @@ function process_config {
 
   # PID_FILE can be relative or absolute
   if [[ ! "$PID_FILE" =~ ^/ ]]; then
-    PID_FILE="${MCWRAPPER_DIR}/$PID_FILE"
+    PID_FILE="${MINECRAFT_SERVER_DIR_PATH}/$PID_FILE"
   fi
 
   # COMMAND_PIPE can be relative or absolute
   if [[ ! "$COMMAND_PIPE" =~ ^/ ]]; then
-    COMMAND_PIPE="${MCWRAPPER_DIR}/$COMMAND_PIPE"
+    COMMAND_PIPE="${MINECRAFT_SERVER_DIR_PATH}/$COMMAND_PIPE"
   fi
 
   # set MINECRAFT_SERVER_CMD
@@ -282,7 +289,7 @@ function process_config {
 
   # BACKUP_DIRECTORY_PATH can be relative or absolute
   if [[ ! "$BACKUP_DIRECTORY_PATH" =~ ^/ ]]; then
-    BACKUP_DIRECTORY_PATH="${MCWRAPPER_DIR}/${BACKUP_DIRECTORY_PATH}"
+    BACKUP_DIRECTORY_PATH="${MINECRAFT_SERVER_DIR_PATH}/${BACKUP_DIRECTORY_PATH}"
   fi
 }
 
