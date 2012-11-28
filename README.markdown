@@ -80,23 +80,15 @@ creating an `mcwrapper.config` file.
 
 ### config
 
-#### serverpath
-
-#### serverdir
-
-#### pidfile
-
-#### pid
-
-#### pipe
-
-#### command
-
-#### backupdir
-
-#### latestbackup
-
-#### backup-retention
+ * serverpath
+ * serverdir
+ * pidfile
+ * pid
+ * pipe
+ * command
+ * backupdir
+ * latestbackup
+ * backup-retention
 
 ### prop
 
