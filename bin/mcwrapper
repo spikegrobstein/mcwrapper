@@ -2,7 +2,7 @@
 
 # simple wrapper for executing mcwrapper.
 
-mcwrapper_path = File.dirname(__FILE__) . '/../lib/mcwrapper.sh'
+mcwrapper_path = File.dirname(__FILE__) + '/../lib/libexec/mcwrapper'
 
 exec mcwrapper_path, *ARGV
 
