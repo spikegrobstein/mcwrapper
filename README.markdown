@@ -6,24 +6,24 @@ and also do safe, automatic world data backups.
 
 *I'm MC Wrapper and I'm here to say that I wanna wrap up minecraft so everything'll be okay.*
 
+## Install
+
+`mcwrapper` can now be installed via RubyGems.org. To install, simply run the following command:
+
+    gem install mcwrapper
+
+This will install a new executable in your RubyGems installation's `bin` folder. To verify
+that it installed properly, you can run:
+
+    mcwrapper --version
+
+This should show your currently installed version.
+
 ## Quickstart
 
-Getting up and running with `mcwrapper` is easier than ever. Provided you have git installed:
 
- 1. cd into the directory with `minecraft_server.jar` in it.
- 2. git clone git://github.com/spikegrobstein/mcwrapper.git
- 3. cd mcwrapper
- 4. ./mcwrapper start
+**quickstart instructions**
 
-If you don't have git:
-
- 1. download a zip or tarball of the latest version of mcwrapper from
- https://github.com/spikegrobstein/mcwrapper
- 2. unzip/untar it
- 3. rename resulting directory to 'mcwrapper'
- 4. copy resulting 'mcwrapper' directory into the same directory as `minecraft_server.jar`.
- 5. cd into the 'mcwrapper' directory
- 6. ./mcwrapper start
 
 The above will start up a Minecraft server instance using default settings. All support files
 related to mcwrapper will be stored in this new mcwrapper directory. Updating to the latest
