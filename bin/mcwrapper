@@ -1,8 +1,8 @@
 #! /usr/bin/env ruby
 
-require File.dirname(__FILE__) + '/../lib/mcwrapper'
+$: << File.dirname(__FILE__) + '/../lib'
+require 'mcwrapper'
 
 # simple wrapper for executing mcwrapper.
-puts "version: #{ Mcwrapper::VERSION }"
 exec Mcwrapper::MCWRAPPER, *ARGV
 
