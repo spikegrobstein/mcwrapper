@@ -551,8 +551,11 @@ function run_installer () {
   fi
   echo ""
 
-  # show where minecraft_server.jar will be installed
+  if [[ -z "$MINECRAFT_SERVER_PATH" ]]; then
+    MINECRAFT_SERVER_PATH="./${MINECRAFT_SERVER_NAME}"
+  fi
 
+  # show where minecraft_server.jar will be installed
   echo "Minecraft Server Path: $MINECRAFT_SERVER_PATH"
 
   if [[ -e "$MINECRAFT_SERVER_PATH" ]]; then
