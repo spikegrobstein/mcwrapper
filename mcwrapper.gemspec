@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = Mcwrapper::VERSION
   gem.authors       = ["Spike Grobstein"]
   gem.email         = ["me@spike.cx"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{Control your Minecraft server. start/stop and live backups.}
+  gem.summary       = %q{Control your Minecraft server. start/stop and live backups.}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($/)
