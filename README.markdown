@@ -47,9 +47,61 @@ Use the help action to see a full breakdown of usage:
 
     mcwrapper help
 
-See the Configuration section below for instructions on modifying the default configuration.
+See the Configuration section below for instructions on modifying the default configuration and
+creating an `mcwrapper.config` file.
 
-### Actions
+## Actions
+
+### help
+
+### version
+
+### about
+
+### start
+
+### stop
+
+### restart
+
+### status
+
+### check
+
+### install
+
+### update
+
+### log
+
+### backup
+
+### restore
+
+### config
+
+#### serverpath
+
+#### serverdir
+
+#### pidfile
+
+#### pid
+
+#### pipe
+
+#### command
+
+#### backupdir
+
+#### latestbackup
+
+#### backup-retention
+
+### prop
+
+### command
+
 
 As seen above, you can start the server by running the following:
 
