@@ -2,3 +2,4 @@ mcwrapper.conf
 mcwrapper.pid
 command_pipe
 backups
+pkg
