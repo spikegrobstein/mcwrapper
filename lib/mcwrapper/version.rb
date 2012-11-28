@@ -1,3 +1,3 @@
 module Mcwrapper
-  VERSION = "0.0.1"
+  VERSION = `#{ MCWRAPPER } --version`.split(/\s/).last
 end
