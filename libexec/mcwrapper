@@ -75,6 +75,7 @@ MINECRAFT_SERVER_NAME="minecraft_server.jar"
 # filename of the minecraft server.properties file
 MINECRAFT_SERVER_PROPERTIES_NAME="server.properties"
 
+# STDERR echo function for error output
 function errcho {
   echo $@ >&2
 }
