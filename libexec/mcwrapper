@@ -39,6 +39,9 @@ EXIT_SEND_COMMAND_FAILED=21
 
 EXIT_NO_JAVA=30
 
+EXIT_GENCONFIG_EXISTS=40
+EXIT_GENCONFIG_ERROR=41
+
 # backup related codes:
 EXIT_CANNOT_CREATE_BACKUP_DIR=50
 EXIT_CANNOT_BACKUP_WORLD_DATA=51
@@ -285,10 +288,17 @@ function process_config {
 
 # copy the mcwrapper.conf-example file to the current directory
 function copy_example_configuration {
-  cp "${MCWRAPPER_DIR}/../mcwrapper.conf-example" "./mcwrapper.conf" \
-    || { errcho "Error copying mcwrapper.conf" >&2; exit 1; }
+  local GENCONFIG_PATH="./mcwrapper.conf"
 
-  echo "Copied example configuration to ./mcwrapper.conf"
+  if [[ -e "$GENCONFIG_PATH" ]]; then
+    errcho "$GENCONFIG_PATH already exists. Doing nothing."
+    exit $EXIT_GENCONFIG_EXISTS
+  fi
+
+  cp "${MCWRAPPER_DIR}/../mcwrapper.conf-example" "$GENCONFIG_PATH" \
+    || { errcho "Error copying $GENCONFIG_PATH"; exit $EXIT_GENCONFIG_ERROR; }
+
+  echo "Copied example configuration to $GENCONFIG_PATH"
 }
 
 function read_server_property {
