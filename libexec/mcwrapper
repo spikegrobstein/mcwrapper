@@ -936,7 +936,6 @@ function restore_world {
   BACKUPS_TO_KEEP=-1
   backup_world
 
-  local SERVER_IS_RUNNING=$(check_is_running && echo "RUNNING")
   local SERVER_IS_RUNNING
   local WORLD_DIR_PATH=$(world_dir_path)
 
