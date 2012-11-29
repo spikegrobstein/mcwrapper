@@ -64,12 +64,16 @@ EXIT_RUNNING_AS_ROOT=99
 
 #### End Exit Codes
 
+function errcho {
+  echo $@ >&2
+}
+
 # absolutely, under no circumstances, let mcwrapper be run as root!!!!
 if [[ `id -u` = 0 ]]; then
-  echo "You have started mcwrapper as root." >&2
-  echo "This is not recommended. Please run as an un-privilaged user." >&2
-  echo "" >&2
-  exit 99 # $EXIT_RUNNING_AS_ROOT
+  errcho "You have started mcwrapper as root."
+  errcho "This is not recommended. Please run as an un-privilaged user."
+  errcho ""
+  exit $EXIT_RUNNING_AS_ROOT
 fi
 
 # default filename of the minecraft server
@@ -77,6 +81,7 @@ MINECRAFT_SERVER_NAME="minecraft_server.jar"
 
 # filename of the minecraft server.properties file
 MINECRAFT_SERVER_PROPERTIES_NAME="server.properties"
+
 
 function print_usage {
   local MCWRAPPER_NAME=$( basename $0 )
