@@ -288,7 +288,7 @@ function process_config {
 
 # copy the mcwrapper.conf-example file to the current directory
 function copy_example_configuration {
-  local GENCONFIG_PATH="./mcwrapper.conf"
+  local GENCONFIG_PATH="./${MCWRAPPER_CONFIG_NAME}"
 
   if [[ -e "$GENCONFIG_PATH" ]]; then
     errcho "$GENCONFIG_PATH already exists. Doing nothing."
