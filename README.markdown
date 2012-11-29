@@ -217,7 +217,8 @@ via using `export` directly or by putting in your `.bashrc` or `.bash_profile`.
 
 The `mcwrapper.conf` file and other configuration is not required as it has sensible defaults
 and will try to find the location of `minecraft_server.jar` on its own (starting with the
-current directory).
+current directory). An example `mcwrapper.conf-example` file is located in the distribution which
+contains documentation and examples of all configuration options.
 
 ## Details
 
