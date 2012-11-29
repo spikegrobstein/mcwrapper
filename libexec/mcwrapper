@@ -389,6 +389,7 @@ function check_is_running {
   return $EXIT_SUCCESS
 }
 
+# ensure that the FIFO exists
 function set_up_pipe {
   if [[ ! -p "$COMMAND_PIPE" ]]; then
     # if the file exists, but it's not a pipe, then we can't start.
@@ -411,6 +412,7 @@ function set_up_pipe {
   fi
 }
 
+# remove the FIFO
 function remove_pipe {
   if [[ -p "$COMMAND_PIPE" ]]; then
     rm "$COMMAND_PIPE"
