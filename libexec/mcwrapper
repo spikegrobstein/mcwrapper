@@ -2,14 +2,6 @@
 
 MCWRAPPER_VERSION="1.6.0d"
 
-# absolutely, under no circumstances, let mcwrapper be run as root!!!!
-if [[ `id -u` = 0 ]]; then
-  echo "You have started mcwrapper as root." >&2
-  echo "This is not recommended. Please run as an un-privilaged user." >&2
-  echo "" >&2
-  exit 99 # $EXIT_RUNNING_AS_ROOT
-fi
-
 # initialize some variables about the location of mcwrapper and its support files.
 pushd "$(dirname "$0")" &> /dev/null
 MCWRAPPER_DIR="$PWD"
