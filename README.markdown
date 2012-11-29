@@ -50,156 +50,11 @@ Use the help action to see a full breakdown of usage:
 See the Configuration section below for instructions on modifying the default configuration and
 creating an `mcwrapper.config` file.
 
-### Actions
+## Actions
 
-#### help
+See the wiki page for actions for detailed information:
 
-Also aliased as `--help`, `-h`, and `-?`.
-
-Prints the help screen which includes information about all the built-in commands. Calling
-`mcwrapper` without any arguments does the same thing.
-
-#### version
-
-Also aliased as `--version`.
-
-Prints the version of `mcwrapper`.
-
-#### about
-
-Prints information about the program and the author and where to get additional information.
-
-#### start
-
-Starts the Minecraft server if it has not already been started and return to the prompt
-immediately. Returns a zero status on success and non-zero if an error occurs. The Minecraft
-server process is run in the background as the current user.
-
-See the `status` command for documentation on how to tell if Minecraft is already running.
-
-#### stop
-
-Stops the Minecraft server if it's running.
-
-#### restart
-
-Restarts the Minecraft server by stopping it, then starting it again.
-
-#### status
-
-Checks whether the Minecraft server is running. Returns a zero status code if it's running,
-and a non-zero if it's not running.
-
-#### check
-
-Does a sanity check and ensures that `mcwrapper` is configured properly. If the
-`minecraft_server.jar` isn't found or some other configuration parameter is improperly
-set, it will let you know.
-
-`check` will return a zero status if everything is ok or a non-zero in the result of an error.
-
-#### install
-
-Used to install the Minecraft server from minecraft.net. It will install to the location defined
-by the configuration. If `MINECRAFT_SERVER_PATH` is not set, it defaults to the current
-directory.
-
-#### update
-
-Update the currently installed `minecraft_server.jar`. If the server is currently running,
-`mcwrapper` will stop it, install the new version, renaming the current version to
-`minecraft_server.jar.old` and start the new server up.
-
-#### log
-
-Tail the Minecraft server log in real-time. Press ^C to stop it.
-
-#### backup
-
-Backup your world data safely without interruption to anyone connected to the server.
-
-What `backup` does is disable world-data writing, copy and compress the current world data
-to the backup directory, then re-enables world-data writing.
-
-#### restore
-
-Restore world data from a previous backup. This cannot be done without interruption to the
-users, so when running `restore`, any connected clients will be disconnected.
-
-#### config
-
-The `config` action is used for fetching configuration options for `mcwrapper`. All results
-are printed to STDOUT and are designed for use with external scripts.
-
-Usage:
-
-    mcwrapper config <param>
-
-The following are `config` parameters that can be read:
-
-##### serverpath
-
-The value of the `MINECRAFT_SERVER_PATH` configuration parameter. This is the path to the
-`minecraft_server.jar`.
-
-##### serverdir
-
-The value of the `MINECRAFT_SERVER_DIR` configuration parameter. This is the path to the
-directory that contains `minecraft_server.jar`.
-
-##### pidfile
-
-The path to the .pid file for `mcwrapper`.
-
-##### pid
-
-The pid for the currently running `mcwrapper` instance. If it's not running, it will
-return an error with a non-zero status.
-
-##### pipe
-
-The path to the `command_input` FIFO.
-
-##### command
-
-The command that will be used to launch the Minecraft Server.
-
-##### backupdir
-
-The path to the directory for world backups.
-
-##### latestbackup
-
-The path to the latest backup.
-
-##### backup-retention
-
-The number of backups to retain after doing a backup.
-
-#### prop
-
-Used to read properties from the `server.properties` file that is used by the Minecraft
-server. This is a convenience action to simplify reading configuration parameters by
-external scripts.
-
-Usage:
-
-    mcwrapper prop <prop_name>
-
-Example to read the TCP port that the server is running on:
-
-    mcwrapper prop server-port
-
-#### command
-
-Aliased as `cmd`.
-
-Used for running commands on the minecraft server. This can be used to send chat messages
-to players, give players inventory items or kick players.
-
-Example to send a chat message:
-
-    mcwrapper cmd say hi everybody
+https://github.com/spikegrobstein/mcwrapper/wiki/Actions
 
 ## Configuration
 
@@ -219,6 +74,10 @@ The `mcwrapper.conf` file and other configuration is not required as it has sens
 and will try to find the location of `minecraft_server.jar` on its own (starting with the
 current directory). An example `mcwrapper.conf-example` file is located in the distribution which
 contains documentation and examples of all configuration options.
+
+See the Configuration wiki page for detailed information:
+
+https://github.com/spikegrobstein/mcwrapper/wiki/Configuration
 
 ## Details
 
@@ -282,6 +141,10 @@ following:
 The name of the `latest` backup can be configured by editing that setting in `mcwrapper`. You
 can also configure how many previous backups are kept. Again, see `mcwrapper.conf-example` for
 information on doing this.
+
+For an example of doing automated backups via `cron` see the wiki:
+
+https://github.com/spikegrobstein/mcwrapper/wiki/Automated-Backups
 
 ## Restoring from a Minecraft backup
 
