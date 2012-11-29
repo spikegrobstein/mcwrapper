@@ -2,14 +2,6 @@
 
 MCWRAPPER_VERSION="1.6.0d"
 
-# initialize some variables about the location of mcwrapper and its support files.
-pushd "$(dirname "$0")" &> /dev/null
-MCWRAPPER_DIR="$PWD"
-popd &> /dev/null
-MCWRAPPER="$(basename "$0")"
-
-MCWRAPPER_CONFIG_NAME="mcwrapper.conf"
-
 #### Exit Codes
 
 # no error
@@ -67,6 +59,22 @@ EXIT_RUNNING_AS_ROOT=99
 
 #### End Exit Codes
 
+## basic constants to be used through the app
+#
+# initialize some variables about the location of mcwrapper and its support files.
+pushd "$(dirname "$0")" &> /dev/null
+MCWRAPPER_DIR="$PWD"
+popd &> /dev/null
+MCWRAPPER="$(basename "$0")"
+
+MCWRAPPER_CONFIG_NAME="mcwrapper.conf"
+
+# default filename of the minecraft server
+MINECRAFT_SERVER_NAME="minecraft_server.jar"
+
+# filename of the minecraft server.properties file
+MINECRAFT_SERVER_PROPERTIES_NAME="server.properties"
+
 function errcho {
   echo $@ >&2
 }
@@ -78,13 +86,6 @@ if [[ `id -u` = 0 ]]; then
   errcho ""
   exit $EXIT_RUNNING_AS_ROOT
 fi
-
-# default filename of the minecraft server
-MINECRAFT_SERVER_NAME="minecraft_server.jar"
-
-# filename of the minecraft server.properties file
-MINECRAFT_SERVER_PROPERTIES_NAME="server.properties"
-
 
 function print_usage {
   local MCWRAPPER_NAME=$( basename $0 )
