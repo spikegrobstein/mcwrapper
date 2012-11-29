@@ -90,41 +90,44 @@ function print_usage {
   echo "    $MCWRAPPER_NAME <action> [ <action_options> ]"
   echo ""
   echo "Action can be one of:"
-  echo "    help    -- this usage screen"
-  echo "    version -- outputs mcwrapper's version number"
-  echo "    about   -- output information about mcwrapper"
-  echo "    start   -- start the server if it's not already running"
-  echo "    stop    -- stop a running server"
-  echo "    restart -- restart a running server (issues stop, waits for it to stop, then starts)"
-  echo "    status  -- whether the server is running or not"
-  echo "    check   -- runs basic sanity checks"
-  echo "    install -- runs an installation wizard to walk you through setup"
-  echo "    update  -- update your Minecraft Server binary"
-  echo "    log     -- follows the server log as it's written to"
-  echo "    backup  -- safe backup of your Minecraft world data"
-  echo "    restore -- restore a specified backup. Takes the path to the backup as an argument"
-  echo "               restoring from a backup will cause a hard restart of the server and"
-  echo "               all users will be disconnected. A non-destructive backup of current world"
-  echo "               data will be created."
-  echo "               example: $MCWRAPPER_NAME restore /usr/local/minecraft/backups/20121118235500"
-  echo "    config  -- used to read configuration information about mcwrapper"
-  echo "               example: $MCWRAPPER_NAME config serverpath"
-  echo "               valid configuration parameters are:"
-  echo "                *  serverpath       -- absolute path to minecraft_server.jar"
-  echo "                *  serverdir        -- absolute path to server directory (containing minecraft_server.jar)"
-  echo "                *  pidfile          -- absolute path to mcwrapper pidfile"
-  echo "                *  pid              -- the pid of the currently running minecraft server process"
-  echo "                *  pipe             -- absolute path to the mcwrapper command pipe"
-  echo "                *  command          -- the command that will be used to launch the minecraft server"
-  echo "                *  backupdir        -- the path to the backup directory"
-  echo "                *  latestbackup     -- the path to the latest backup if there is one"
-  echo "                *  backup-retention -- the number of backups to keep before deleting old ones"
-  echo "    prop    -- used to read server.properties configuration information"
-  echo "               best when used with external scripts"
-  echo "               example: $MCWRAPPER_NAME prop level-name"
-  echo "               if no property name is supplied, mcwrapper will print out all property keys from the file."
-  echo "    command -- execute a minecraft server command. As an alternative to writing to the FIFO. Also aliased as 'cmd'"
-  echo "For README and other documentation, see: https://github.com/spikegrobstein/mcwrapper"
+  echo "    help      -- this usage screen"
+  echo "    version   -- outputs mcwrapper's version number"
+  echo "    about     -- output information about mcwrapper"
+  echo "    start     -- start the server if it's not already running"
+  echo "    stop      -- stop a running server"
+  echo "    restart   -- restart a running server (issues stop, waits for it to stop, then starts)"
+  echo "    status    -- whether the server is running or not"
+  echo "    check     -- runs basic sanity checks"
+  echo "    install   -- runs an installation wizard to walk you through setup"
+  echo "    update    -- update your Minecraft Server binary"
+  echo "    log       -- follows the server log as it's written to"
+  echo "    backup    -- safe backup of your Minecraft world data"
+  echo "    restore   -- restore a specified backup. Takes the path to the backup as an argument"
+  echo "                 restoring from a backup will cause a hard restart of the server and"
+  echo "                 all users will be disconnected. A non-destructive backup of current world"
+  echo "                 data will be created."
+  echo "                 example: $MCWRAPPER_NAME restore /usr/local/minecraft/backups/20121118235500"
+  echo "    genconfig -- copy the default config file to \$MINECRAFT_SERVER_PATH"
+  echo "    config    -- used to read configuration information about mcwrapper"
+  echo "                 example: $MCWRAPPER_NAME config serverpath"
+  echo "                 valid configuration parameters are:"
+  echo "                  *  serverpath       -- absolute path to minecraft_server.jar"
+  echo "                  *  serverdir        -- absolute path to server directory (containing minecraft_server.jar)"
+  echo "                  *  pidfile          -- absolute path to mcwrapper pidfile"
+  echo "                  *  pid              -- the pid of the currently running minecraft server process"
+  echo "                  *  pipe             -- absolute path to the mcwrapper command pipe"
+  echo "                  *  command          -- the command that will be used to launch the minecraft server"
+  echo "                  *  backupdir        -- the path to the backup directory"
+  echo "                  *  latestbackup     -- the path to the latest backup if there is one"
+  echo "                  *  backup-retention -- the number of backups to keep before deleting old ones"
+  echo "    prop      -- used to read server.properties configuration information"
+  echo "                 best when used with external scripts"
+  echo "                 example: $MCWRAPPER_NAME prop level-name"
+  echo "                 if no property name is supplied, mcwrapper will print out all property keys from the file."
+  echo "    command   -- execute a minecraft server command. As an alternative to writing to the FIFO. Also aliased as 'cmd'"
+  echo ""
+  echo "For README and source code, see: https://github.com/spikegrobstein/mcwrapper"
+  echo "For additional documentation, see: https://github.com/spikegrobstein/mcwrapper/wiki"
   echo ""
 }
 
@@ -278,6 +281,14 @@ function process_config {
   if [[ ! "$BACKUP_DIRECTORY_PATH" =~ ^/ ]]; then
     BACKUP_DIRECTORY_PATH="${MINECRAFT_SERVER_DIR_PATH}/${BACKUP_DIRECTORY_PATH}"
   fi
+}
+
+# copy the mcwrapper.conf-example file to the current directory
+function copy_example_configuration {
+  cp "${MCWRAPPER_DIR}/../mcwrapper.conf-example" "./mcwrapper.conf" \
+    || { errcho "Error copying mcwrapper.conf" >&2; exit 1; }
+
+  echo "Copied example configuration to ./mcwrapper.conf"
 }
 
 function read_server_property {
@@ -1070,6 +1081,11 @@ case $ACTION in
     echo "-------------------------------------------------------------------------------------------" >&2
 
     tail_server_log
+
+    exit $EXIT_SUCCESS
+    ;;
+  genconfig )
+    copy_example_configuration
 
     exit $EXIT_SUCCESS
     ;;
