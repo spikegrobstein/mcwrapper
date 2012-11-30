@@ -4,5 +4,5 @@ $: << File.dirname(__FILE__) + '/../lib'
 require 'mcwrapper'
 
 # simple wrapper for executing mcwrapper.
-exec Mcwrapper::MCWRAPPER, *ARGV
+exec MCWrapper::MCWRAPPER, *ARGV
 

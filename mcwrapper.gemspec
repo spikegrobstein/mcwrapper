@@ -5,7 +5,7 @@ require 'mcwrapper'
 
 Gem::Specification.new do |gem|
   gem.name          = "mcwrapper"
-  gem.version       = Mcwrapper::VERSION
+  gem.version       = MCWrapper::VERSION
   gem.authors       = ["Spike Grobstein"]
   gem.email         = ["me@spike.cx"]
   gem.description   = %q{Control your Minecraft server. start/stop and live backups.}
