@@ -1,7 +1,7 @@
 # Example configuration for mcwrapper: mcwrapper.conf
 # this file can live in any of the following places (in order of priority):
 #  - the value of MCWRAPPER_CONFIG_PATH env variable
-#  - same directory as mcwrapper as "mcwrapper.conf"
+#  - the current working directory as "mcwrapper.conf"
 #  - ~/.mcwrapper.conf
 #  - /etc/mcwrapper.conf
 #
