@@ -1,6 +1,6 @@
 #! /bin/bash -
 
-MCWRAPPER_VERSION="1.6.0d"
+MCWRAPPER_VERSION="1.6.0"
 
 #### Exit Codes
 
