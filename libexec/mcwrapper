@@ -1,5 +1,11 @@
 #! /bin/bash -
 
+## MCWrapper
+#  A utility for manging a Minecraft Server installation
+#  Start, stop and safely back up your world data without service interruption.
+#  https://github.com/spikegrobstein/mcwrapper
+##
+
 MCWRAPPER_VERSION="1.6.0"
 
 #### Exit Codes
