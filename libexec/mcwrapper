@@ -826,25 +826,25 @@ function do_backup () {
 function tgz_backup {
   # cd to the backup directory
   # create new tgz backup
-  pushd "$BACKUP_DIRECTORY_PATH"
+  pushd "$BACKUP_DIRECTORY_PATH" &> /dev/null
 
   local FILENAME=`basename "$CURRENT_BACKUP_PATH"`
   ARCHIVE_FILENAME="${FILENAME}.tgz"
 
   tar cfz "$ARCHIVE_FILENAME" "$FILENAME"  
 
-  popd
+  popd &> /dev/null
 }
 
 function zip_backup {
-  pushd "$BACKUP_DIRECTORY_PATH"
+  pushd "$BACKUP_DIRECTORY_PATH" &> /dev/null
 
   local FILENAME=`basename "$CURRENT_BACKUP_PATH"`
   ARCHIVE_FILENAME="${FILENAME}.zip"
 
   zip -q -r "$ARCHIVE_FILENAME" "$FILENAME"
 
-  popd
+  popd &> /dev/null
 }
 
 function create_symlink () {
