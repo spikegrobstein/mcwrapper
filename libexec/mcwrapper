@@ -975,7 +975,7 @@ function restore_world {
 
   if check_is_running; then
     SERVER_IS_RUNNING="1"
-    stop_server
+    stop_minecraft
   else
     SERVER_IS_RUNNING="0"
   fi
