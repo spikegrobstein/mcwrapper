@@ -6,7 +6,7 @@
 #  https://github.com/spikegrobstein/mcwrapper
 ##
 
-MCWRAPPER_VERSION="1.6.1"
+MCWRAPPER_VERSION="1.6.2"
 
 #### Exit Codes
 
@@ -972,7 +972,7 @@ function restore_world {
   local SERVER_IS_RUNNING
   local WORLD_DIR_PATH=$(world_dir_path)
 
-  if server_is_running; then
+  if check_is_running; then
     SERVER_IS_RUNNING="1"
     stop_server
   else
