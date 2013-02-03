@@ -957,6 +957,7 @@ function restore_world {
   local RESTORE_FROM=$1
 
   # check to make sure a RESTORE_FROM parameter is supplied
+  # TODO: fix the output of this usage to show how mcwrapper was called
   [[ -z "$RESTORE_FROM" ]] \
     && { echo "USAGE: $0 restore <backup_name>" >&2; exit $EXIT_CANNOT_RESTORE_WORLD; }
 
