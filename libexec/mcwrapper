@@ -775,6 +775,17 @@ function world_dir_path () {
 function do_backup () {
   local WORLD_DATA_DIR=$(world_dir_path)
 
+  if [[ ! -e "$WORLD_DATA_DIR" ]]; then
+    # check $DOING_RESTORE global variable (set inside restore_world function)
+    if [[ ! -z "$DOING_RESTORE" ]]; then
+      echo "Skipping backup because world data directory does not exist." >&2
+      return 1
+    else
+      echo "World data directory does not exist. Cannot backup." >&2
+      exit $EXIT_CANNOT_BACKUP_WORLD_DATA
+    fi
+  fi
+
   cp -R "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH/"
 
   if [[ $? != 0 ]]; then
@@ -954,7 +965,9 @@ function path_to_latest_backup {
 # given a path to a world backup, restore the current world with the contents
 # when doing this, back up the current world, if it exists
 function restore_world {
+  DOING_RESTORE=1
   local RESTORE_FROM=$1
+  local RESTORE_FROM_WORLD="${RESTORE_FROM}/world"
 
   # check to make sure a RESTORE_FROM parameter is supplied
   # TODO: fix the output of this usage to show how mcwrapper was called
@@ -962,8 +975,8 @@ function restore_world {
     && { echo "USAGE: $0 restore <backup_name>" >&2; exit $EXIT_CANNOT_RESTORE_WORLD; }
 
   # check to make sure world dir exists and is a dir
-  [[ -e "$RESTORE_FROM" && -d "$RESTORE_FROM" ]] \
-    || { echo "Path does not appear to be a Minecraft world directory or does not exist." >&2; exit $EXIT_CANNOT_RESTORE_WORLD; }
+  [[ -e "$RESTORE_FROM" && -d "$RESTORE_FROM" && -d "${RESTORE_FROM}/world" ]] \
+    || { echo "Path does not appear to be a Minecraft world backup directory or does not exist." >&2; exit $EXIT_CANNOT_RESTORE_WORLD; }
 
   # back-up current world data and temporarily enable infinite retention
   # we don't want to inadvertently clobber any existing backups
@@ -984,13 +997,16 @@ function restore_world {
   rm -rf "$WORLD_DIR_PATH"
 
   # copy world
-  cp -R "$RESTORE_FROM" "$WORLD_DIR_PATH"
-  echo "$RESTORE_FROM" > "$WORLD_DIR_PATH/RESTORED_FROM"
+  cp -R "$RESTORE_FROM_WORLD" "$WORLD_DIR_PATH" \
+    || { echo "Error restoring world file." >&2 ; exit $EXIT_CANNOT_RESTORE_WORLD; }
+  echo "$RESTORE_FROM_WORLD" > "$WORLD_DIR_PATH/RESTORED_FROM"
 
   # start server if it was running when we started
   if [[ "$SERVER_IS_RUNNING" = '1' ]]; then
     start_minecraft
   fi
+
+  unset DOING_RESTORE
 }
 
 ## End MCBackup portion.
