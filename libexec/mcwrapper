@@ -913,7 +913,15 @@ function backup_world {
     # set BACKUPS_TO_KEEP to "0" to disable backups entirely.
     echo ""
     echo "Backups are disabled. Not backing anything up."
-    exit $EXIT_BACKUPS_DISABLED
+
+    # if we're doing a restore, then just return a non-zero,
+    # otherwise exit with an exit code.
+    if [[ -z "$DOING_RESTORE" ]]; then
+      # not doing backup
+      exit $EXIT_BACKUPS_DISABLED
+    else
+      return 1
+    fi
   fi
 
   # the path to the to-be-backed-up directory
