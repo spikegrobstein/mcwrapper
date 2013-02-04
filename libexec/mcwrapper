@@ -786,7 +786,8 @@ function do_backup () {
     fi
   fi
 
-  cp -R "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH/"
+  # copy the current world directory into 'world' directory in current backup
+  cp -R "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH/world"
 
   if [[ $? != 0 ]]; then
     #an error occurred
