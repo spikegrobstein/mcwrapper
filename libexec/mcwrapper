@@ -6,7 +6,7 @@
 #  https://github.com/spikegrobstein/mcwrapper
 ##
 
-MCWRAPPER_VERSION="1.6.4"
+MCWRAPPER_VERSION="1.6.5"
 
 #### Exit Codes
 
@@ -705,7 +705,7 @@ function get_server_download_uri () {
   # filter down to only the linux server download link
   # extract the .jar URL
   curl -s "$MINECRAFT_DOWNLOAD_PAGE" \
-    | grep -o -E '<a .+?>' \
+    | grep -o -E '<a [^>]+>' \
     | grep -E 'data-platform=.linux' \
     | grep -E 'data-dist=.server' \
     | grep -o -E 'https:.+?jar'
