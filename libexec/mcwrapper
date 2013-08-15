@@ -6,7 +6,7 @@
 #  https://github.com/spikegrobstein/mcwrapper
 ##
 
-MCWRAPPER_VERSION="1.6.3"
+MCWRAPPER_VERSION="1.6.4"
 
 #### Exit Codes
 
@@ -577,6 +577,7 @@ function run_installer () {
   # check for configuration
   local CURRENT_CONFIG_PATH=`get_config_path`
 
+  # check for default configuration
   if [[ -z "$CURRENT_CONFIG_PATH" ]]; then
     echo "Using default configuration."
     echo "An example configuration is included in the mcwrapper package."
@@ -586,6 +587,7 @@ function run_installer () {
   fi
   echo ""
 
+  # sanity check for minecraft server paths
   if [[ -z "$MINECRAFT_SERVER_PATH" ]]; then
     MINECRAFT_SERVER_PATH="./${MINECRAFT_SERVER_NAME}"
     MINECRAFT_SERVER_DIR_PATH="./"
@@ -637,7 +639,7 @@ function download_minecraft_server () {
     || { echo "curl does not appear to be installed. This is required to download the Minecraft server" >&2; exit $EXIT_NO_CURL; }
 
   # parse the download page and read the minecraft_server.jar download URI
-  local MINECRAFT_SERVER_DOWNLOAD_URI="https://s3.amazonaws.com/MinecraftDownload/launcher/minecraft_server.jar"
+  local MINECRAFT_SERVER_DOWNLOAD_URI=$( get_server_download_uri )
 
   # check if there was an error grabbing the download page (either curl returns a bad value or we didn't find the URI)
   if [[ "$?" != "0" || -z "$MINECRAFT_SERVER_DOWNLOAD_URI" ]]; then
@@ -691,6 +693,22 @@ function download_minecraft_server () {
     echo ""
     exit $EXIT_CANNOT_MOVE_MINECRAFT_SERVER
   fi
+}
+
+# pull html from the minecraft.net download page and parse it
+# extract the linux minecraft_server download URI
+function get_server_download_uri () {
+  local MINECRAFT_DOWNLOAD_PAGE="http://minecraft.net/download"
+
+  # fetch the page
+  # pull all the links off it
+  # filter down to only the linux server download link
+  # extract the .jar URL
+  curl -s "$MINECRAFT_DOWNLOAD_PAGE" \
+    | grep -o -E '<a .+?>' \
+    | grep -E 'data-platform=.linux' \
+    | grep -E 'data-dist=.server' \
+    | grep -o -E 'https:.+?jar'
 }
 
 # backs up an old minecraft_server.jar file before downloading a new one
