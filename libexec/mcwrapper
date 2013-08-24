@@ -6,7 +6,7 @@
 #  https://github.com/spikegrobstein/mcwrapper
 ##
 
-MCWRAPPER_VERSION="1.6.5"
+MCWRAPPER_VERSION="1.6.6"
 
 #### Exit Codes
 
