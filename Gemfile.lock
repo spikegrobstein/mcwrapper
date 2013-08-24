@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    mcwrapper (1.6.2)
+    mcwrapper (1.6.7pre)
 
 GEM
   remote: https://rubygems.org/

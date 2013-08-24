@@ -6,7 +6,7 @@
 #  https://github.com/spikegrobstein/mcwrapper
 ##
 
-MCWRAPPER_VERSION="1.6.6"
+MCWRAPPER_VERSION="1.6.7pre"
 
 #### Exit Codes
 
@@ -452,29 +452,43 @@ function remove_pipe {
 
 # write the PID file and start'er up!
 # don't start if we're already running.
+# if FOREGROUND is defined, then start in foreground
+# otherwise, ensure that pipe is created and start in background
 function start_minecraft {
   if check_is_running; then
     echo "Server is already running. Exiting..." >&2
     exit $EXIT_SERVER_ALREADY_RUNNING
   fi
 
-  set_up_pipe
-
   # now we go to the minecraft_server directory and start the server in a background process
   # need to go to the directory to make sure that the Minecraft server puts the files in the right place (it puts them in the CWD)
   pushd $MINECRAFT_SERVER_DIR_PATH &> /dev/null
-  read_command | $MINECRAFT_SERVER_CMD &> /dev/null &
 
-  create_pid $!
+  if [[ -z "$FOREGROUND" ]]; then
+    set_up_pipe
+    start_minecraft_in_background
 
-  # sleep for one second to make sure that the process actually started properly.
-  sleep 1
+    create_pid $!
 
-  # verify that minecraft server actually started.
-  if ! check_is_running; then
-    echo "Could not start Minecraft Server." >&2
-    exit $EXIT_SERVER_CANNOT_START
+    # sleep for one second to make sure that the process actually started properly.
+    sleep 1
+
+    # verify that minecraft server actually started.
+    if ! check_is_running; then
+      echo "Could not start Minecraft Server." >&2
+      exit $EXIT_SERVER_CANNOT_START
+    fi
+  else
+    start_minecraft_in_foreground
   fi
+}
+
+function start_minecraft_in_background {
+  read_command | $MINECRAFT_SERVER_CMD &> /dev/null &
+}
+
+function start_minecraft_in_foreground {
+  $MINECRAFT_SERVER_CMD
 }
 
 # stops the minecraft server by sending it the 'stop' command via the FIFO
@@ -1077,10 +1091,17 @@ case $ACTION in
     ;;
   start )
     sanity_check
-    echo -n "Starting minecraft... "  
+    echo -n "Starting minecraft... "
     start_minecraft
     echo "Done."
     exit $EXIT_SUCCESS
+    ;;
+  start-foreground )
+    sanity_check
+    echo "Starting minecraft in the foreground..."
+    FOREGROUND=1
+    start_minecraft
+    exit $?
     ;;
   stop )
     sanity_check
