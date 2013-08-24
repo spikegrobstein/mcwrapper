@@ -95,7 +95,7 @@ if [[ -z "$ALLOW_ROOT" && `id -u` = 0 ]]; then
   errcho "If you *must* run as root, you can execute: ALLOW_ROOT=1 mcwrapper start"
   errcho ""
   exit $EXIT_RUNNING_AS_ROOT
-elif [[ ! -z "$ALLOW_ROOT" ]]; then
+elif [[ ! -z "$ALLOW_ROOT" && `id -u` = 0 ]]; then
   errcho "Warning: Running as root."
 fi
 
