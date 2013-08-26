@@ -165,7 +165,7 @@ function print_about {
 # then check: ./mcwrapper.conf, ~/.mcwrapper.conf, /etc/mcwrapper.conf
 function get_config_path {
 
-  # if it's defined in an ENV var, then let's use that  
+  # if it's defined in an ENV var, then let's use that
   if [[ ! -z "$MCWRAPPER_CONFIG_PATH" ]]; then
     echo $MCWRAPPER_CONFIG_PATH
     return
@@ -198,7 +198,7 @@ function get_config_path {
 # configure self from config file
 function read_config {
   # set the global config path:
-  CONFIG_PATH=`get_config_path`
+  local CONFIG_PATH=`get_config_path`
 
   # if it's not found, don't do shit. stick with default values.
   if [[ -z "$CONFIG_PATH" || ! -e "$CONFIG_PATH" ]]; then
@@ -1060,6 +1060,7 @@ function restore_world {
 
 ## begin meat of program:
 
+# if there are no args, then print usage and exit
 if [[ $# -eq 0 ]]; then
   print_usage
   exit $EXIT_SUCCESS
@@ -1208,7 +1209,7 @@ case $ACTION in
         exit $EXIT_SUCCESS
         ;;
       configfile )
-        echo $CONFIG_PATH
+        echo $(get_config_path)
         exit $EXIT_SUCCESS
         ;;
       command )
