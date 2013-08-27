@@ -407,22 +407,27 @@ function read_pid {
   echo $PID
 }
 
-function check_is_running {
-  local PID=`read_pid`
+# this function can be overridden by defining it in mcwrapper.conf
+# the interface of the function is that it should return 0 if it's running or non-zero if it's not
 
-  # if read_pid returned a non-zero status, then we're not running
-  if [[ $? != $EXIT_SUCCESS ]]; then
-    return $EXIT_SERVER_NOT_RUNNING
-  fi
+if ! type check_is_running &> /dev/null; then
+  function check_is_running {
+    local PID=`read_pid`
 
-  # check to see if we have a wrapper currently running
-  # send a 0 signal to process to see if it's running.
-  if ! kill -0 "$PID" &> /dev/null; then
-    return $EXIT_SERVER_NOT_RUNNING
-  fi
+    # if read_pid returned a non-zero status, then we're not running
+    if [[ $? != $EXIT_SUCCESS ]]; then
+      return $EXIT_SERVER_NOT_RUNNING
+    fi
 
-  return $EXIT_SUCCESS
-}
+    # check to see if we have a wrapper currently running
+    # send a 0 signal to process to see if it's running.
+    if ! kill -0 "$PID" &> /dev/null; then
+      return $EXIT_SERVER_NOT_RUNNING
+    fi
+
+    return $EXIT_SUCCESS
+  }
+fi
 
 # ensure that the FIFO exists
 function set_up_pipe {
