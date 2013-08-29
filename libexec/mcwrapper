@@ -819,7 +819,7 @@ function world_dir_path () {
 
 # copy the world data and configuration
 function do_backup () {
-  local WORLD_DATA_DIR=$(world_dir_path)
+  local WORLD_DATA_DIR=$1
 
   if [[ ! -e "$WORLD_DATA_DIR" ]]; then
     # check $DOING_RESTORE global variable (set inside restore_world function)
@@ -984,7 +984,7 @@ function backup_world {
     stop_writing_world
   fi
 
-  do_backup
+  do_backup $(world_dir_path)
 
   # start writing world only if we're running
   if [[ $(check_is_running) ]]; then
