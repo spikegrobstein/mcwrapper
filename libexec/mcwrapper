@@ -89,13 +89,13 @@ function errcho {
 # absolutely, under no circumstances, let mcwrapper be run as root!!!!
 # well, unless they set ALLOW_ROOT=1, then it's ok.
 # this can be desireable under specific circumstances, so may as well have a workaround.
-if [[ -z "$ALLOW_ROOT" && `id -u` = 0 ]]; then
+if [[ -z "$ALLOW_ROOT" && $(id -u) = 0 ]]; then
   errcho "You have started mcwrapper as root."
   errcho "This is not recommended. Please run as an un-privilaged user."
   errcho "If you *must* run as root, you can execute: ALLOW_ROOT=1 mcwrapper start"
   errcho ""
   exit $EXIT_RUNNING_AS_ROOT
-elif [[ ! -z "$ALLOW_ROOT" && `id -u` = 0 ]]; then
+elif [[ ! -z "$ALLOW_ROOT" && $(id -u) = 0 ]]; then
   errcho "Warning: Running as root."
 fi
 
@@ -254,7 +254,7 @@ function default_config {
   # set backup name to
   #   +%Y%m%d       -- just the datestamp; no time.
   #   +%Y%m%d%H%M%S -- full timestamp including hour, minute, second
-  CURRENT_BACKUP_NAME=`date +%Y%m%d%H%M%S`
+  CURRENT_BACKUP_NAME=$(date +%Y%m%d%H%M%S)
 }
 
 # run this to process a loaded config
@@ -267,7 +267,7 @@ function process_config {
   fi
 
   # the directory of the minecraft_server.jar based off $MINECRAFT_SERVER_PATH
-  MINECRAFT_SERVER_DIR_PATH=`dirname $MINECRAFT_SERVER_PATH`
+  MINECRAFT_SERVER_DIR_PATH=$(dirname $MINECRAFT_SERVER_PATH)
 
   pushd "$MINECRAFT_SERVER_DIR_PATH" &> /dev/null
   MINECRAFT_SERVER_DIR=$(pwd)
@@ -294,7 +294,7 @@ function process_config {
 
   # the path to the server.properties file
   if [[ -z "$SERVER_PROPERTIES_PATH" ]]; then
-    SERVER_PROPERTIES_PATH=`dirname "$MINECRAFT_SERVER_PATH"`"/${MINECRAFT_SERVER_PROPERTIES_NAME}"
+    SERVER_PROPERTIES_PATH=$(dirname "$MINECRAFT_SERVER_PATH")"/${MINECRAFT_SERVER_PROPERTIES_NAME}"
   fi
 
   # BACKUP_DIRECTORY_PATH can be relative or absolute
@@ -398,7 +398,7 @@ function read_pid {
     return $EXIT_SERVER_NOT_RUNNING
   fi
 
-  local PID=`cat "$PID_FILE" 2>&1`
+  local PID=$(cat "$PID_FILE" 2>&1)
 
   if [[ $? != $EXIT_SUCCESS ]]; then
    return $EXIT_SERVER_NOT_RUNNING
@@ -410,7 +410,7 @@ function read_pid {
 # this function can be overridden by defining it in mcwrapper.conf
 # the interface of the function is that it should return 0 if it's running or non-zero if it's not
 function check_is_running {
-  local PID=`read_pid`
+  local PID=$(read_pid)
 
   # if read_pid returned a non-zero status, then we're not running
   if [[ $? != $EXIT_SUCCESS ]]; then
@@ -605,7 +605,7 @@ function run_installer () {
   echo ""
 
   # check for configuration
-  local CURRENT_CONFIG_PATH=`get_config_path`
+  local CURRENT_CONFIG_PATH=$(get_config_path)
 
   # check for default configuration
   if [[ -z "$CURRENT_CONFIG_PATH" ]]; then
@@ -813,7 +813,7 @@ function start_writing_world () {
 
 # get the path to the current world directory
 function world_dir_path () {
-  local LEVEL_NAME=`read_server_property level-name`
+  local LEVEL_NAME=$(read_server_property level-name)
   local WORLD_DATA_DIR="${MINECRAFT_SERVER_DIR_PATH}/${LEVEL_NAME}"
 
   echo $WORLD_DATA_DIR
@@ -888,7 +888,7 @@ function tgz_backup {
   # create new tgz backup
   pushd "$BACKUP_DIRECTORY_PATH" &> /dev/null
 
-  local FILENAME=`basename "$CURRENT_BACKUP_PATH"`
+  local FILENAME=$(basename "$CURRENT_BACKUP_PATH")
   ARCHIVE_FILENAME="${FILENAME}.tgz"
 
   tar cfz "$ARCHIVE_FILENAME" "$FILENAME"  
@@ -899,7 +899,7 @@ function tgz_backup {
 function zip_backup {
   pushd "$BACKUP_DIRECTORY_PATH" &> /dev/null
 
-  local FILENAME=`basename "$CURRENT_BACKUP_PATH"`
+  local FILENAME=$(basename "$CURRENT_BACKUP_PATH")
   ARCHIVE_FILENAME="${FILENAME}.zip"
 
   zip -q -r "$ARCHIVE_FILENAME" "$FILENAME"
@@ -923,7 +923,7 @@ function create_symlink () {
   # just the directory/filename of the current backup
   # this way, the symlink isn't an absolute path, so you can move the 
   # backup directory without issue.
-  local NEW_BACKUP=`basename "$CURRENT_BACKUP_PATH"`
+  local NEW_BACKUP=$(basename "$CURRENT_BACKUP_PATH")
 
   ln -s "$NEW_BACKUP" "$LATEST_BACKUP_PATH"
 
@@ -943,7 +943,7 @@ function cleanup_old_backups () {
 
   echo "Cleaning up old backups..." >&2
 
-  OLD_BACKUPS=`ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail -n +"${BACKUPS_TO_KEEP}"`
+  OLD_BACKUPS=$(ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail -n +"${BACKUPS_TO_KEEP}")
 
   for old_backup in $OLD_BACKUPS; do
     echo "Removing $old_backup" >&2
@@ -1008,7 +1008,7 @@ function path_to_latest_backup {
   fi
 
   # read the link to the latest backup
-  local LATEST_BACKUP_LINK=`readlink "$LATEST_BACKUP_PATH"`
+  local LATEST_BACKUP_LINK=$(readlink "$LATEST_BACKUP_PATH")
 
   # if the link to the latest backup is absolute, output that, otherwise, build the path and output that.
   if [[ "$LATEST_BACKUP_LINK" =~ ^/ ]]; then
@@ -1212,7 +1212,7 @@ case $ACTION in
           exit $EXIT_SERVER_NOT_RUNNING
         fi
 
-        echo `read_pid`
+        echo $(read_pid)
         exit $EXIT_SUCCESS
         ;;
       pipe )
