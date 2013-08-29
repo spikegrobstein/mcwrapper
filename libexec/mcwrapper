@@ -418,14 +418,17 @@ function check_is_running {
   fi
 
   # check to see if we have a wrapper currently running
-  is_minecraft_running || return $EXIT_SERVER_NOT_RUNNING
+  is_minecraft_running $PID || return $EXIT_SERVER_NOT_RUNNING
 
   return $EXIT_SUCCESS
 }
 
 # can be overridden for custom check
+# is passed the PID/ID of the running instance (read from the pidfile)
 # returns 0 if it's running or non-zero if it's not
 function is_minecraft_running {
+  local PID=$1
+
   # send a 0 signal to process to see if it's running.
   kill -0 "$PID" &> /dev/null
 }
