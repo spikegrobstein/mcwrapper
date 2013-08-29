@@ -1045,215 +1045,216 @@ function restore_world {
 ##########################################################################################
 
 ## begin meat of program:
-
-# if there are no args, then print usage and exit
-if [[ $# -eq 0 ]]; then
-  print_usage
-  exit $EXIT_SUCCESS
-fi
-
-ACTION=$1;shift
-
-# selfconfigure
-default_config
-read_config
-process_config
-
-# absolutely, under no circumstances, let mcwrapper be run as root!!!!
-# well, unless they set ALLOW_ROOT=1, then it's ok.
-# this can be desireable under specific circumstances, so may as well have a workaround.
-if [[ -z "$ALLOW_ROOT" && $(id -u) = 0 ]]; then
-  warn "You have started mcwrapper as root."
-  warn "This is not recommended. Please run as an un-privilaged user."
-  warn "If you *must* run as root, you can execute: ALLOW_ROOT=1 mcwrapper start"
-  warn ""
-  exit $EXIT_RUNNING_AS_ROOT
-elif [[ ! -z "$ALLOW_ROOT" && $(id -u) = 0 ]]; then
-  warn "Warning: Running as root."
-fi
-
-# before most actions are run, sanity_check is called
-# this ensures that things are configured properly before
-# performing any actions that require specific configuration
-
-case $ACTION in
-  help|--help|-?|-h )
+if [ "$BASH_SOURCE" == "$0" ]; then
+  # if there are no args, then print usage and exit
+  if [[ $# -eq 0 ]]; then
     print_usage
     exit $EXIT_SUCCESS
-    ;;
-  version|--version )
-    print_version
-    exit $EXIT_SUCCESS
-    ;;
-  about )
-    print_about
-    exit $EXIT_SUCCESS
-    ;;
-  start )
-    sanity_check
-    echo -n "Starting minecraft... "
-    start_minecraft
-    echo "Done."
-    exit $EXIT_SUCCESS
-    ;;
-  start-foreground )
-    sanity_check
-    echo "Starting minecraft in the foreground..."
-    FOREGROUND=1
-    start_minecraft
-    exit $?
-    ;;
-  stop )
-    sanity_check
-    echo -n "Stopping minecraft... "
-    stop_minecraft
-    echo "Done."
-    exit $EXIT_SUCCESS
-    ;;
-  restart )
-    sanity_check
-    echo -n "Restarting minecraft..."
-    restart_minecraft
-    echo " Done."
-    exit $EXIT_SUCCESS
-    ;;
-  status )
-    sanity_check
-    if check_is_running; then
-      warn "Server is running."
-      exit $EXIT_SUCCESS
-    fi
+  fi
 
-    warn "Server is NOT running."
-    exit $EXIT_SERVER_NOT_RUNNING
+  ACTION=$1;shift
 
-    ;;
-  check )
-    sanity_check
+  # selfconfigure
+  default_config
+  read_config
+  process_config
 
-    # sanity_check will exit with an exit code if it fails
-    # so, assuming it didn't exit, everything is ok.
-
-    echo "Everything looks OK!"
-    exit $EXIT_SUCCESS
-    ;;
-
-  install )
-    run_installer
-    exit $EXIT_SUCCESS
-    ;;
-  update )
-    sanity_check
-    update_minecraft_server
-    exit $EXIT_SUCCESS
-    ;;
-  backup )
-    sanity_check
-    echo "Backing up minecraft world data..."
-    backup_world
-    echo "Done."
-    exit $EXIT_SUCCESS
-    ;;
-  restore )
-    sanity_check
-    RESTORE_FROM=$1;shift
-    restore_world $RESTORE_FROM
-    echo "Done."
-    exit $EXIT_SUCCESS
-    ;;
-  log )
-    sanity_check
-    check_server_log_exists
-    warn "Tailing from: ${MINECRAFT_SERVER_DIR_PATH}/server.log"
-    warn "Press ^C to cancel."
-    warn "-------------------------------------------------------------------------------------------"
-
-    tail_server_log
-
-    exit $EXIT_SUCCESS
-    ;;
-  genconfig )
-    copy_example_configuration
-
-    exit $EXIT_SUCCESS
-    ;;
-  config )
-    # dump info about the config
-    CONFIG_SETTING=$1
-    case $CONFIG_SETTING in
-      serverpath )
-        echo $MINECRAFT_SERVER_PATH
-        exit $EXIT_SUCCESS
-        ;;
-      serverdir )
-        echo $MINECRAFT_SERVER_DIR_PATH
-        exit $EXIT_SUCCESS
-        ;;
-      pidfile )
-        echo $PID_FILE
-        exit $EXIT_SUCCESS
-        ;;
-      pid )
-        check_is_running
-        if [[ $? != 0 ]]; then
-          warn "Server is NOT running."
-          exit $EXIT_SERVER_NOT_RUNNING
-        fi
-
-        echo $(read_pid)
-        exit $EXIT_SUCCESS
-        ;;
-      pipe )
-        echo $COMMAND_PIPE
-        exit $EXIT_SUCCESS
-        ;;
-      configfile )
-        echo $(get_config_path)
-        exit $EXIT_SUCCESS
-        ;;
-      command )
-        echo $MINECRAFT_SERVER_CMD
-        exit $EXIT_SUCCESS
-        ;;
-      backupdir )
-        echo $BACKUP_DIRECTORY_PATH
-        exit $EXIT_SUCCESS
-        ;;
-      latestbackup )
-        echo $(path_to_latest_backup)
-        exit $EXIT_SUCCESS
-        ;;
-      backup-retention )
-        echo $BACKUPS_TO_KEEP
-        exit $EXIT_STATUS
-        ;;
-      *)
-        echo "Unknown config setting: $CONFIG_SETTING"
-        exit $EXIT_UNKNOWN_CONFIG_SETTING
-        ;;
-    esac
-    ;;
-  prop )
-    sanity_check
-    PROP=$1    
-    read_server_property $PROP
-    exit $EXIT_SUCCESS
-    ;;
-  command|cmd )
-    sanity_check
-    COMMAND="$@"
-    echo -n "sending: $COMMAND ... "
-    send_command "$COMMAND"
-    echo "Done."
-    exit $EXIT_SUCCESS
-    ;;
-  * )
-    warn "Invalid action: $ACTION"
+  # absolutely, under no circumstances, let mcwrapper be run as root!!!!
+  # well, unless they set ALLOW_ROOT=1, then it's ok.
+  # this can be desireable under specific circumstances, so may as well have a workaround.
+  if [[ -z "$ALLOW_ROOT" && $(id -u) = 0 ]]; then
+    warn "You have started mcwrapper as root."
+    warn "This is not recommended. Please run as an un-privilaged user."
+    warn "If you *must* run as root, you can execute: ALLOW_ROOT=1 mcwrapper start"
     warn ""
-    print_usage
-    exit $EXIT_INVALID_ACTION
-esac
+    exit $EXIT_RUNNING_AS_ROOT
+  elif [[ ! -z "$ALLOW_ROOT" && $(id -u) = 0 ]]; then
+    warn "Warning: Running as root."
+  fi
 
-exit $EXIT_SUCCESS
+  # before most actions are run, sanity_check is called
+  # this ensures that things are configured properly before
+  # performing any actions that require specific configuration
 
+  case $ACTION in
+    help|--help|-?|-h )
+      print_usage
+      exit $EXIT_SUCCESS
+      ;;
+    version|--version )
+      print_version
+      exit $EXIT_SUCCESS
+      ;;
+    about )
+      print_about
+      exit $EXIT_SUCCESS
+      ;;
+    start )
+      sanity_check
+      echo -n "Starting minecraft... "
+      start_minecraft
+      echo "Done."
+      exit $EXIT_SUCCESS
+      ;;
+    start-foreground )
+      sanity_check
+      echo "Starting minecraft in the foreground..."
+      FOREGROUND=1
+      start_minecraft
+      exit $?
+      ;;
+    stop )
+      sanity_check
+      echo -n "Stopping minecraft... "
+      stop_minecraft
+      echo "Done."
+      exit $EXIT_SUCCESS
+      ;;
+    restart )
+      sanity_check
+      echo -n "Restarting minecraft..."
+      restart_minecraft
+      echo " Done."
+      exit $EXIT_SUCCESS
+      ;;
+    status )
+      sanity_check
+      if check_is_running; then
+        warn "Server is running."
+        exit $EXIT_SUCCESS
+      fi
+
+      warn "Server is NOT running."
+      exit $EXIT_SERVER_NOT_RUNNING
+
+      ;;
+    check )
+      sanity_check
+
+      # sanity_check will exit with an exit code if it fails
+      # so, assuming it didn't exit, everything is ok.
+
+      echo "Everything looks OK!"
+      exit $EXIT_SUCCESS
+      ;;
+
+    install )
+      run_installer
+      exit $EXIT_SUCCESS
+      ;;
+    update )
+      sanity_check
+      update_minecraft_server
+      exit $EXIT_SUCCESS
+      ;;
+    backup )
+      sanity_check
+      echo "Backing up minecraft world data..."
+      backup_world
+      echo "Done."
+      exit $EXIT_SUCCESS
+      ;;
+    restore )
+      sanity_check
+      RESTORE_FROM=$1;shift
+      restore_world $RESTORE_FROM
+      echo "Done."
+      exit $EXIT_SUCCESS
+      ;;
+    log )
+      sanity_check
+      check_server_log_exists
+      warn "Tailing from: ${MINECRAFT_SERVER_DIR_PATH}/server.log"
+      warn "Press ^C to cancel."
+      warn "-------------------------------------------------------------------------------------------"
+
+      tail_server_log
+
+      exit $EXIT_SUCCESS
+      ;;
+    genconfig )
+      copy_example_configuration
+
+      exit $EXIT_SUCCESS
+      ;;
+    config )
+      # dump info about the config
+      CONFIG_SETTING=$1
+      case $CONFIG_SETTING in
+        serverpath )
+          echo $MINECRAFT_SERVER_PATH
+          exit $EXIT_SUCCESS
+          ;;
+        serverdir )
+          echo $MINECRAFT_SERVER_DIR_PATH
+          exit $EXIT_SUCCESS
+          ;;
+        pidfile )
+          echo $PID_FILE
+          exit $EXIT_SUCCESS
+          ;;
+        pid )
+          check_is_running
+          if [[ $? != 0 ]]; then
+            warn "Server is NOT running."
+            exit $EXIT_SERVER_NOT_RUNNING
+          fi
+
+          echo $(read_pid)
+          exit $EXIT_SUCCESS
+          ;;
+        pipe )
+          echo $COMMAND_PIPE
+          exit $EXIT_SUCCESS
+          ;;
+        configfile )
+          echo $(get_config_path)
+          exit $EXIT_SUCCESS
+          ;;
+        command )
+          echo $MINECRAFT_SERVER_CMD
+          exit $EXIT_SUCCESS
+          ;;
+        backupdir )
+          echo $BACKUP_DIRECTORY_PATH
+          exit $EXIT_SUCCESS
+          ;;
+        latestbackup )
+          echo $(path_to_latest_backup)
+          exit $EXIT_SUCCESS
+          ;;
+        backup-retention )
+          echo $BACKUPS_TO_KEEP
+          exit $EXIT_STATUS
+          ;;
+        *)
+          echo "Unknown config setting: $CONFIG_SETTING"
+          exit $EXIT_UNKNOWN_CONFIG_SETTING
+          ;;
+      esac
+      ;;
+    prop )
+      sanity_check
+      PROP=$1    
+      read_server_property $PROP
+      exit $EXIT_SUCCESS
+      ;;
+    command|cmd )
+      sanity_check
+      COMMAND="$@"
+      echo -n "sending: $COMMAND ... "
+      send_command "$COMMAND"
+      echo "Done."
+      exit $EXIT_SUCCESS
+      ;;
+    * )
+      warn "Invalid action: $ACTION"
+      warn ""
+      print_usage
+      exit $EXIT_INVALID_ACTION
+  esac
+
+  exit $EXIT_SUCCESS
+
+fi
 
