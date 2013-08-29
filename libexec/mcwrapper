@@ -83,7 +83,7 @@ MINECRAFT_SERVER_PROPERTIES_NAME="server.properties"
 
 # STDERR echo function for error output
 function warn {
-  warn $@
+  echo $@ >&2
 }
 
 function print_usage {
