@@ -82,6 +82,17 @@ function warn {
   echo $@ >&2
 }
 
+# Given a message and optional exit code
+# spit out a warning on STDERR and exit with the given code
+# if the exit code is omitted, exit with a 1 status.
+function die {
+  local MSG=$1;shift
+  local EXIT_CODE=${1-1};shift
+
+  warn $MSG
+  exit $EXIT_CODE
+}
+
 function print_usage {
   local MCWRAPPER_NAME=$( basename $0 )
 
