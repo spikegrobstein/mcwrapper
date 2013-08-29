@@ -418,12 +418,16 @@ function check_is_running {
   fi
 
   # check to see if we have a wrapper currently running
-  # send a 0 signal to process to see if it's running.
-  if ! kill -0 "$PID" &> /dev/null; then
-    return $EXIT_SERVER_NOT_RUNNING
-  fi
+  is_minecraft_running || return $EXIT_SERVER_NOT_RUNNING
 
   return $EXIT_SUCCESS
+}
+
+# can be overridden for custom check
+# returns 0 if it's running or non-zero if it's not
+function is_minecraft_running {
+  # send a 0 signal to process to see if it's running.
+  kill -0 "$PID" &> /dev/null
 }
 
 # ensure that the FIFO exists
