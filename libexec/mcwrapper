@@ -466,9 +466,7 @@ function start_minecraft {
 
   if [[ -z "$FOREGROUND" ]]; then
     set_up_pipe
-    start_minecraft_in_background
-
-    create_pid $!
+    create_pid $(start_minecraft_in_background)
 
     # sleep for one second to make sure that the process actually started properly.
     sleep 1
@@ -484,9 +482,11 @@ function start_minecraft {
 }
 
 # can be overridden
-# start minecraft in the background
+# responsible for starting the minecraft server process in the background
+# returns the PID of the process
 function start_minecraft_in_background {
   read_command | $MINECRAFT_SERVER_CMD &> /dev/null &
+  echo $!
 }
 
 function start_minecraft_in_foreground {
