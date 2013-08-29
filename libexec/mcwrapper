@@ -981,20 +981,13 @@ function backup_world {
 
   create_backup_directory
 
-  # stop writing world if we're running
-  if [[ $(check_is_running) ]]; then
-    stop_writing_world
-  fi
+  check_is_running && stop_writing_world
 
   do_backup $(world_dir_path)
 
-  # start writing world only if we're running
-  if [[ $(check_is_running) ]]; then
-    start_writing_world
-  fi
+  check_is_running && start_writing_world
 
   create_symlink
-
   cleanup_old_backups
 }
 
