@@ -534,8 +534,10 @@ function server_log_path {
   echo "${MINECRAFT_SERVER_DIR_PATH}/server.log"
 }
 
+# check if server log exists. if not, exit hard.
+# TODO: make into generic function for hard exiting if files don't exist. check_file_exist $type (eg: 'Server log'), $path, $callback?
 function check_server_log_exists {
-  local SERVER_LOG_PATH=`server_log_path`
+  local SERVER_LOG_PATH=$(server_log_path)
 
   # make sure that the log file exists before trying to tail it.
   if [[ ! -e "$SERVER_LOG_PATH" ]]; then
@@ -548,7 +550,7 @@ function check_server_log_exists {
 # tail and follow the server.log
 # ^C to stop
 function tail_server_log {
-  local SERVER_LOG_PATH=`server_log_path`
+  local SERVER_LOG_PATH=$(server_log_path)
   check_server_log_exists
 
   tail -F "$SERVER_LOG_PATH"
@@ -556,6 +558,7 @@ function tail_server_log {
 
 function sanity_check {
   # TODO: add checks to make sure that PID_FILE and COMMAND_PIPE are writable
+  # TODO: make check for root user in here.
 
   # make sure that there is a java binary installed in the PATH
   which "$JAVA_BIN" &> /dev/null
