@@ -557,7 +557,7 @@ function sanity_check {
   # TODO: make check for root user in here.
 
   # make sure that there is a java binary installed in the PATH
-  if which "$JAVA_BIN" &> /dev/null; then
+  if ! which "$JAVA_BIN" &> /dev/null; then
    warn "The java binary is not found."
    warn "Please install the necessary package(s) or specify the JAVA_BIN configuration option."
    warn ""
