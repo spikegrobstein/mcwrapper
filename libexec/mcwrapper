@@ -73,13 +73,9 @@ MCWRAPPER_DIR="$PWD"
 popd &> /dev/null
 MCWRAPPER="$(basename "$0")"
 
-MCWRAPPER_CONFIG_NAME="mcwrapper.conf"
-
-# default filename of the minecraft server
-MINECRAFT_SERVER_NAME="minecraft_server.jar"
-
-# filename of the minecraft server.properties file
-MINECRAFT_SERVER_PROPERTIES_NAME="server.properties"
+# The name of the mcwrapper config file
+# only changeable if done via env variable when launching mcwrapper
+MCWRAPPER_CONFIG_NAME=${MCWRAPPER_CONFIG_NAME-mcwrapper.conf}
 
 # STDERR echo function for error output
 function warn {
@@ -199,6 +195,12 @@ function read_config {
 # set up the default global variables that should be pre-populated
 # read_config and process_config will potentially override or add to these.
 function default_config {
+  # default filename of the minecraft server
+  MINECRAFT_SERVER_NAME="minecraft_server.jar"
+
+  # filename of the minecraft server.properties file
+  MINECRAFT_SERVER_PROPERTIES_NAME="server.properties"
+
   # path to the minecraft_server.jar
   # if this is not defined in the existing environment, try to guess where it is
   if [[ -z "$MINECRAFT_SERVER_PATH" ]]; then
