@@ -377,7 +377,7 @@ function send_command {
   # echo the command into the command pipe to be picked up by the reader process:
   local COMMAND=$1
   (echo "$COMMAND" > "$COMMAND_PIPE") &> /dev/null \
-   || { echo "Error sending command: '${COMMAND}' (${?})" >&2 ; exit $EXIT_SEND_COMMAND_FAILED; }
+    || { echo "Error sending command: '${COMMAND}' (${?})" >&2 ; exit $EXIT_SEND_COMMAND_FAILED; }
 }
 
 function create_pid {
