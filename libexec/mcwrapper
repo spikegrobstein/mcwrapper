@@ -82,22 +82,9 @@ MINECRAFT_SERVER_NAME="minecraft_server.jar"
 MINECRAFT_SERVER_PROPERTIES_NAME="server.properties"
 
 # STDERR echo function for error output
-function errcho {
-  echo $@ >&2
+function warn {
+  warn $@
 }
-
-# absolutely, under no circumstances, let mcwrapper be run as root!!!!
-# well, unless they set ALLOW_ROOT=1, then it's ok.
-# this can be desireable under specific circumstances, so may as well have a workaround.
-if [[ -z "$ALLOW_ROOT" && $(id -u) = 0 ]]; then
-  errcho "You have started mcwrapper as root."
-  errcho "This is not recommended. Please run as an un-privilaged user."
-  errcho "If you *must* run as root, you can execute: ALLOW_ROOT=1 mcwrapper start"
-  errcho ""
-  exit $EXIT_RUNNING_AS_ROOT
-elif [[ ! -z "$ALLOW_ROOT" && $(id -u) = 0 ]]; then
-  errcho "Warning: Running as root."
-fi
 
 function print_usage {
   local MCWRAPPER_NAME=$( basename $0 )
@@ -308,12 +295,12 @@ function copy_example_configuration {
   local GENCONFIG_PATH="./${MCWRAPPER_CONFIG_NAME}"
 
   if [[ -e "$GENCONFIG_PATH" ]]; then
-    errcho "$GENCONFIG_PATH already exists. Doing nothing."
+    warn "$GENCONFIG_PATH already exists. Doing nothing."
     exit $EXIT_GENCONFIG_EXISTS
   fi
 
   cp "${MCWRAPPER_DIR}/../mcwrapper.conf-example" "$GENCONFIG_PATH" \
-    || { errcho "Error copying $GENCONFIG_PATH"; exit $EXIT_GENCONFIG_ERROR; }
+    || { warn "Error copying $GENCONFIG_PATH"; exit $EXIT_GENCONFIG_ERROR; }
 
   echo "Copied example configuration to $GENCONFIG_PATH"
 }
@@ -323,7 +310,7 @@ function read_server_property {
   local PROP_NAME=$1;shift
 
   if [[ ! -e "$SERVER_PROPERTIES_PATH" ]]; then
-    echo "Cannot locate server.properties path. ($SERVER_PROPERTIES_PATH)" >&2
+    warn "Cannot locate server.properties path. ($SERVER_PROPERTIES_PATH)"
     exit $EXIT_NO_SERVER_PROPERTIES
   fi
 
@@ -372,12 +359,12 @@ function read_command {
 
 function send_command {
   check_is_running \
-    || { echo "Server is NOT running. Not sending command" >&2 ; exit $EXIT_SERVER_NOT_RUNNING; }
+    || { warn "Server is NOT running. Not sending command" ; exit $EXIT_SERVER_NOT_RUNNING; }
 
   # echo the command into the command pipe to be picked up by the reader process:
   local COMMAND=$1
   (echo "$COMMAND" > "$COMMAND_PIPE") &> /dev/null \
-    || { echo "Error sending command: '${COMMAND}' (${?})" >&2 ; exit $EXIT_SEND_COMMAND_FAILED; }
+    || { warn "Error sending command: '${COMMAND}' (${?})" ; exit $EXIT_SEND_COMMAND_FAILED; }
 }
 
 function create_pid {
@@ -394,7 +381,7 @@ function remove_pid {
 # returns 1 if the pidfile does not exist or if there was an error reading it.
 function read_pid {
   if [[ ! -e "$PID_FILE" ]]; then
-    #echo "Server not running!" >&2
+    #warn "Server not running!"
     return $EXIT_SERVER_NOT_RUNNING
   fi
 
@@ -438,8 +425,8 @@ function set_up_pipe {
   if [[ ! -p "$COMMAND_PIPE" ]]; then
     # if the file exists, but it's not a pipe, then we can't start.
     if [[ -e "$COMMAND_PIPE" ]]; then
-      echo "Cannot create the pipe ($COMMAND_PIPE)" >&2
-      echo "A file or directory already exists." >&2
+      warn "Cannot create the pipe ($COMMAND_PIPE)"
+      warn "A file or directory already exists."
       echo ""
       exit "$EXIT_MAKE_FIFO_FAILED"
     fi
@@ -450,7 +437,7 @@ function set_up_pipe {
 
     if [[ $PIPE_STATUS != 0 ]]; then
       # if mkfifo failed, print error message, exit non-zero.
-      echo "Error creating the pipe: $COMMAND_PIPE ($PIPE_STATUS)." >&2
+      warn "Error creating the pipe: $COMMAND_PIPE ($PIPE_STATUS)."
       exit $EXIT_MAKE_FIFO_FAILED
     fi
   fi
@@ -469,7 +456,7 @@ function remove_pipe {
 # otherwise, ensure that pipe is created and start in background
 function start_minecraft {
   if check_is_running; then
-    echo "Server is already running. Exiting..." >&2
+    warn "Server is already running. Exiting..."
     exit $EXIT_SERVER_ALREADY_RUNNING
   fi
 
@@ -488,7 +475,7 @@ function start_minecraft {
 
     # verify that minecraft server actually started.
     if ! check_is_running; then
-      echo "Could not start Minecraft Server." >&2
+      warn "Could not start Minecraft Server."
       exit $EXIT_SERVER_CANNOT_START
     fi
   else
@@ -511,10 +498,10 @@ function stop_minecraft {
   # if $BACKUP_ON_EXIT is non-zero length, then backup the world before exiting.
   if [[ ! -z "$BACKUP_ON_EXIT" ]]; then
     echo ""
-    echo -n "Backing up world data before exiting..." >&2
+    warn -n "Backing up world data before exiting..."
     ( backup_world )
     # TODO: check status of backup_world. Don't say "Done" if we didn't back anything up.
-    echo "Done." >&2
+    warn "Done."
   fi
 
   send_command "stop"
@@ -548,7 +535,7 @@ function check_server_log_exists {
 
   # make sure that the log file exists before trying to tail it.
   if [[ ! -e "$SERVER_LOG_PATH" ]]; then
-    echo "Server log not found! ($SERVER_LOG_PATH)" >&2
+    warn "Server log not found! ($SERVER_LOG_PATH)"
     echo ""
     exit $EXIT_SERVER_LOG_NOT_FOUND
   fi
@@ -570,24 +557,24 @@ function sanity_check {
   # make sure that there is a java binary installed in the PATH
   which "$JAVA_BIN" &> /dev/null
   if [[ $? != 0 ]]; then
-   echo "The java binary is not found." >&2
-   echo "Please install the necessary package(s) or specify the JAVA_BIN configuration option." >&2
-   echo "" >&2
+   warn "The java binary is not found."
+   warn "Please install the necessary package(s) or specify the JAVA_BIN configuration option."
+   warn ""
    exit $EXIT_NO_JAVA
   fi
 
   # check to make sure that things that need to exist exist.
   if [[ ! -e "$MINECRAFT_SERVER_PATH" ]]; then
     # the minecraft server path does not exist.
-    echo "Minecraft server not found!" >&2
+    warn "Minecraft server not found!"
     
     if [[ -z "$MINECRAFT_SERVER_PATH" ]]; then
-      echo "Default location: ./${MINECRAFT_SERVER_NAME}" >&2
-      echo "Or set MINECRAFT_SERVER_NAME" >&2
+      warn "Default location: ./${MINECRAFT_SERVER_NAME}"
+      warn "Or set MINECRAFT_SERVER_NAME"
     else
-      echo "(MINECRAFT_SERVER_PATH=$MINECRAFT_SERVER_PATH)" >&2
+      warn "(MINECRAFT_SERVER_PATH=$MINECRAFT_SERVER_PATH)"
     fi
-    echo "" >&2
+    warn ""
     exit $EXIT_MINECRAFT_SERVER_NOT_FOUND
   fi
 }
@@ -673,7 +660,7 @@ function run_installer () {
 function download_minecraft_server () {
 
   which curl >/dev/null \
-    || { echo "curl does not appear to be installed. This is required to download the Minecraft server" >&2; exit $EXIT_NO_CURL; }
+    || { warn "curl does not appear to be installed. This is required to download the Minecraft server"; exit $EXIT_NO_CURL; }
 
   # parse the download page and read the minecraft_server.jar download URI
   local MINECRAFT_SERVER_DOWNLOAD_URI=$( get_server_download_uri )
@@ -802,7 +789,7 @@ function create_backup_directory () {
 
   if [[ $? != 0 ]]; then
     #an error occurred
-    echo "An error occurred when creating the backup directory." >&2
+    warn "An error occurred when creating the backup directory."
     exit $EXIT_CANNOT_CREATE_BACKUP_DIR
   fi
 }
@@ -833,10 +820,10 @@ function do_backup () {
   if [[ ! -e "$WORLD_DATA_DIR" ]]; then
     # check $DOING_RESTORE global variable (set inside restore_world function)
     if [[ ! -z "$DOING_RESTORE" ]]; then
-      echo "Skipping backup because world data directory does not exist." >&2
+      warn "Skipping backup because world data directory does not exist."
       return 1
     else
-      echo "World data directory does not exist. Cannot backup." >&2
+      warn "World data directory does not exist. Cannot backup."
       exit $EXIT_CANNOT_BACKUP_WORLD_DATA
     fi
   fi
@@ -846,7 +833,7 @@ function do_backup () {
 
   if [[ $? != 0 ]]; then
     #an error occurred
-    echo "An error occurred when copying the world data." >&2
+    warn "An error occurred when copying the world data."
     exit $EXIT_CANNOT_BACKUP_WORLD_DATA
   fi
 
@@ -854,7 +841,7 @@ function do_backup () {
 
   if [[ $? != 0 ]]; then
     #an error occurred
-    echo "An error occurred when copying the configuration information" >&2
+    warn "An error occurred when copying the configuration information"
     exit $EXIT_CANNOT_BACKUP_CONFIGS
   fi
 
@@ -922,7 +909,7 @@ function create_symlink () {
 
     if [[ $? != 0 ]]; then
       #an error occurred
-      echo "An error occurred when deleting the old symlink." >&2
+      warn "An error occurred when deleting the old symlink."
       exit $EXIT_FAILED_TO_DELETE_SYMLINK
     fi
   fi
@@ -936,7 +923,7 @@ function create_symlink () {
 
   if [[ $? != 0 ]]; then
     #an error occurred
-    echo "An error occurred when creating the symlink." >&2
+    warn "An error occurred when creating the symlink."
     exit $EXIT_ERORR_CREATING_SYMLINK
   fi
 }
@@ -948,16 +935,16 @@ function cleanup_old_backups () {
     return
   fi
 
-  echo "Cleaning up old backups..." >&2
+  warn "Cleaning up old backups..."
 
   OLD_BACKUPS=$(ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail -n +"${BACKUPS_TO_KEEP}")
 
   for old_backup in $OLD_BACKUPS; do
-    echo "Removing $old_backup" >&2
+    warn "Removing $old_backup"
     rm -rf "${BACKUP_DIRECTORY_PATH}/$old_backup"
     if [[ $? != 0 ]]; then
       #an error occurred but don't exit.
-      echo "An error occurred when deleting a previous backup: ${old_backup}." >&2
+      warn "An error occurred when deleting a previous backup: ${old_backup}."
     fi
   done
 }
@@ -1003,7 +990,7 @@ function path_to_latest_backup {
 
   # if the link doesn't exist, then warn the user and exit with proper exit code
   if [[ ! -L "$LATEST_BACKUP_PATH" ]]; then
-    echo "Latest backup not found. Either never created or not a link or something. ($LATEST_BACKUP_PATH)" >&2
+    warn "Latest backup not found. Either never created or not a link or something. ($LATEST_BACKUP_PATH)"
     exit $EXIT_LATEST_BACKUP_NOT_FOUND
   fi
 
@@ -1029,11 +1016,11 @@ function restore_world {
   # check to make sure a RESTORE_FROM parameter is supplied
   # TODO: fix the output of this usage to show how mcwrapper was called
   [[ -z "$RESTORE_FROM" ]] \
-    && { echo "USAGE: $0 restore <backup_name>" >&2; exit $EXIT_CANNOT_RESTORE_WORLD; }
+    && { warn "USAGE: $0 restore <backup_name>"; exit $EXIT_CANNOT_RESTORE_WORLD; }
 
   # check to make sure world dir exists and is a dir
   [[ -e "$RESTORE_FROM" && -d "$RESTORE_FROM" && -d "${RESTORE_FROM}/world" ]] \
-    || { echo "Path does not appear to be a Minecraft world backup directory or does not exist." >&2; exit $EXIT_CANNOT_RESTORE_WORLD; }
+    || { warn "Path does not appear to be a Minecraft world backup directory or does not exist."; exit $EXIT_CANNOT_RESTORE_WORLD; }
 
   # back-up current world data and temporarily enable infinite retention
   # we don't want to inadvertently clobber any existing backups
@@ -1055,7 +1042,7 @@ function restore_world {
 
   # copy world
   cp -R "$RESTORE_FROM_WORLD" "$WORLD_DIR_PATH" \
-    || { echo "Error restoring world file." >&2 ; exit $EXIT_CANNOT_RESTORE_WORLD; }
+    || { warn "Error restoring world file." ; exit $EXIT_CANNOT_RESTORE_WORLD; }
   echo "$RESTORE_FROM_WORLD" > "$WORLD_DIR_PATH/RESTORED_FROM"
 
   # start server if it was running when we started
@@ -1083,6 +1070,19 @@ ACTION=$1;shift
 default_config
 read_config
 process_config
+
+# absolutely, under no circumstances, let mcwrapper be run as root!!!!
+# well, unless they set ALLOW_ROOT=1, then it's ok.
+# this can be desireable under specific circumstances, so may as well have a workaround.
+if [[ -z "$ALLOW_ROOT" && $(id -u) = 0 ]]; then
+  warn "You have started mcwrapper as root."
+  warn "This is not recommended. Please run as an un-privilaged user."
+  warn "If you *must* run as root, you can execute: ALLOW_ROOT=1 mcwrapper start"
+  warn ""
+  exit $EXIT_RUNNING_AS_ROOT
+elif [[ ! -z "$ALLOW_ROOT" && $(id -u) = 0 ]]; then
+  warn "Warning: Running as root."
+fi
 
 # before most actions are run, sanity_check is called
 # this ensures that things are configured properly before
@@ -1132,11 +1132,11 @@ case $ACTION in
   status )
     sanity_check
     if check_is_running; then
-      echo "Server is running." >&2
+      warn "Server is running."
       exit $EXIT_SUCCESS
     fi
 
-    echo "Server is NOT running." >&2
+    warn "Server is NOT running."
     exit $EXIT_SERVER_NOT_RUNNING
 
     ;;
@@ -1176,9 +1176,9 @@ case $ACTION in
   log )
     sanity_check
     check_server_log_exists
-    echo "Tailing from: ${MINECRAFT_SERVER_DIR_PATH}/server.log" >&2
-    echo "Press ^C to cancel." >&2
-    echo "-------------------------------------------------------------------------------------------" >&2
+    warn "Tailing from: ${MINECRAFT_SERVER_DIR_PATH}/server.log"
+    warn "Press ^C to cancel."
+    warn "-------------------------------------------------------------------------------------------"
 
     tail_server_log
 
@@ -1208,7 +1208,7 @@ case $ACTION in
       pid )
         check_is_running
         if [[ $? != 0 ]]; then
-          echo "Server is NOT running." >&2
+          warn "Server is NOT running."
           exit $EXIT_SERVER_NOT_RUNNING
         fi
 
@@ -1260,8 +1260,8 @@ case $ACTION in
     exit $EXIT_SUCCESS
     ;;
   * )
-    echo "Invalid action: $ACTION" >&2
-    echo "" >&2
+    warn "Invalid action: $ACTION"
+    warn ""
     print_usage
     exit $EXIT_INVALID_ACTION
 esac
