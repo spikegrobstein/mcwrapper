@@ -387,7 +387,7 @@ function create_pid {
 
 function remove_pid {
   # clean up PID file when done.
-  rm $PID_FILE
+  rm "$PID_FILE"
 }
 
 # reads the pidfile and echos it
