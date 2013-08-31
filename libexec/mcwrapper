@@ -519,6 +519,7 @@ function stop_minecraft {
   fi
 
   send_command "stop"
+  wait_for_minecraft_to_stop
 }
 
 function restart_minecraft {
