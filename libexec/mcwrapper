@@ -464,7 +464,7 @@ function set_up_pipe {
 # remove the FIFO
 function remove_pipe {
   if [[ -p "$COMMAND_PIPE" ]]; then
-    rm "$COMMAND_PIPE"
+    rm -f "$COMMAND_PIPE"
   fi
 }
 
