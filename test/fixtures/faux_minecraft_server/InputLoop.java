@@ -22,12 +22,6 @@ public class InputLoop {
 
     System.out.print("Shutting down... ");
 
-    try {
-        Thread.sleep(2000);
-    } catch(InterruptedException ex) {
-        Thread.currentThread().interrupt();
-    }
-
     System.out.println("Done!");
 
     System.exit(0);
