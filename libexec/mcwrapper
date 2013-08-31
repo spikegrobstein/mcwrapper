@@ -390,7 +390,9 @@ function create_pid {
 
 function remove_pid {
   # clean up PID file when done.
-  rm "$PID_FILE"
+  if [[ -e "$PID_FILE" ]]; then
+    rm -f "$PID_FILE"
+  fi
 }
 
 # reads the pidfile and echos it
