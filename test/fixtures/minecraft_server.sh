@@ -12,7 +12,7 @@ done
 
 echo -n Exiting...
 
-sleep 3
+sleep 2
 
 echo "Bye!"
 

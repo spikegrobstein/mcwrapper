@@ -1,5 +1,7 @@
 #! /bin/bash -
 
+set -e
+
 ## MCWrapper
 #  A utility for manging a Minecraft Server installation
 #  Start, stop and safely back up your world data without service interruption.
@@ -364,6 +366,7 @@ function read_command {
 
     # if the user said "stop" then exit after the command completes.
     if [[ "$INPUT" = "stop" ]]; then
+      wait_for_minecraft_to_stop
       clean_up
       exit $EXIT_SUCCESS
     fi
@@ -468,10 +471,8 @@ function remove_pipe {
 # if FOREGROUND is defined, then start in foreground
 # otherwise, ensure that pipe is created and start in background
 function start_minecraft {
-  if check_is_running; then
-    warn "Server is already running. Exiting..."
-    exit $EXIT_SERVER_ALREADY_RUNNING
-  fi
+  check_is_running \
+    && die "Server is already running. Exiting..." $EXIT_SERVER_ALREADY_RUNNING
 
   # now we go to the minecraft_server directory and start the server in a background process
   # need to go to the directory to make sure that the Minecraft server puts the files in the right place (it puts them in the CWD)
@@ -485,10 +486,8 @@ function start_minecraft {
     sleep 1
 
     # verify that minecraft server actually started.
-    if ! check_is_running; then
-      warn "Could not start Minecraft Server."
-      exit $EXIT_SERVER_CANNOT_START
-    fi
+    check_is_running \
+      || die "Could not start Minecraft Server." $EXIT_SERVER_CANNOT_START
   else
     start_minecraft_in_foreground
   fi
