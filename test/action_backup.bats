@@ -92,3 +92,14 @@ teardown() {
     [ $output -eq 6 ]
   }
 }
+
+@test "backup creates backups directory" {
+  rm -rf backups
+
+  [ ! -d "backups" ]
+
+  mcwrapper backup
+
+  [ -d "backups" ]
+}
+
