@@ -2,9 +2,20 @@
 
 load test_helper
 
+setup() {
+  set_tmp
+}
+
+teardown() {
+  rm_tmp
+}
+
 # default config
 
 @test "default_config sets MINECRAFT_SERVER_PATH if it's not set" {
+  set_faux_server "minecraft_server.jar"
+  unset MINECRAFT_SERVER_PATH
+
   [ -z "$MINECRAFT_SERVER_PATH" ]
   init_mcwrapper
   default_config

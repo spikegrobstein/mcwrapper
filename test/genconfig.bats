@@ -2,20 +2,16 @@
 
 # test the genconfig action
 
+load test_helper
+
 setup() {
-  export TMP="$BATS_TEST_DIRNAME/tmp"
-  export PATH="$BATS_TEST_DIRNAME/../libexec:${PATH}"
-  export MINECRAFT_SERVER_PATH="$TMP/faux_minecraft_server.jar"
-
-  mkdir -p "$TMP"
-
-  cp "$BATS_TEST_DIRNAME/fixtures/faux_minecraft_server/faux_minecraft_server.jar" "$TMP/"
-
-  pushd "$TMP" &> /dev/null
+  set_tmp
+  set_path
+  set_faux_server
 }
 
 teardown() {
-  rm -rf "$TMP"
+  rm_tmp
 }
 
 @test "genconfig exits abnormally if config already exists" {
