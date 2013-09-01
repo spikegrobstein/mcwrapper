@@ -2,7 +2,6 @@
 
 # exit immediately after an error
 set -e
-set -x
 
 ## MCWrapper
 #  A utility for manging a Minecraft Server installation
