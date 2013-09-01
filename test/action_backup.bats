@@ -1,5 +1,7 @@
 #! /usr/bin/env bats
 
+# test uncompressed backups
+
 load test_helper
 
 setup() {
@@ -27,12 +29,33 @@ teardown() {
   mcwrapper backup
 }
 
-@test "backup should create a new archive" {
+@test "backup creates a new archive in backups directory" {
   mcwrapper backup
 
   ls backups | {
     run wc -l
+    [ $status -eq 0 ]
     [ $output -eq 2 ]
+  }
+}
+
+@test "backup copies server.properties" {
+  mcwrapper backup
+
+  ls backups/latest/server.properties | {
+    run wc -l
+    [ $status -eq 0 ]
+    [ $output -gt 0 ]
+  }
+}
+
+@test "backup copies .txt files" {
+  mcwrapper backup
+
+  ls backups/latest/*.txt | {
+    run wc -l
+    [ $status -eq 0 ]
+    [ $output -gt 0 ]
   }
 }
 
