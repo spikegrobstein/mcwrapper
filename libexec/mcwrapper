@@ -839,14 +839,13 @@ function do_backup () {
   fi
 
   # copy the current world directory into 'world' directory in current backup
-  
-  if cp -R "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH/world"; then
+  if ! cp -R "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH/world"; then
     # an error occurred
     warn "An error occurred when copying the world data."
     exit $EXIT_CANNOT_BACKUP_WORLD_DATA
   fi
 
-  if cp -R "${MINECRAFT_SERVER_DIR_PATH}/"*.{txt,properties} "$CURRENT_BACKUP_PATH/"; then
+  if ! cp -R "${MINECRAFT_SERVER_DIR_PATH}/"*.{txt,properties} "$CURRENT_BACKUP_PATH/"; then
     # an error occurred
     warn "An error occurred when copying the configuration information"
     exit $EXIT_CANNOT_BACKUP_CONFIGS
@@ -912,7 +911,7 @@ function create_symlink () {
   # then we symlink the current backup to "latest" in backups directory
   if [[ -L "$LATEST_BACKUP_PATH" ]]; then
     # if the symlink already exists, delete it before creating it.
-    if rm "$LATEST_BACKUP_PATH"; then
+    if ! rm "$LATEST_BACKUP_PATH"; then
       # an error occurred
       warn "An error occurred when deleting the old symlink."
       exit $EXIT_FAILED_TO_DELETE_SYMLINK
@@ -924,7 +923,7 @@ function create_symlink () {
   # backup directory without issue.
   local NEW_BACKUP=$(basename "$CURRENT_BACKUP_PATH")
 
-  if ln -s "$NEW_BACKUP" "$LATEST_BACKUP_PATH"; then
+  if ! ln -s "$NEW_BACKUP" "$LATEST_BACKUP_PATH"; then
     # an error occurred
     warn "An error occurred when creating the symlink."
     exit $EXIT_ERORR_CREATING_SYMLINK
@@ -940,7 +939,8 @@ function cleanup_old_backups () {
 
   warn "Cleaning up old backups..."
 
-  OLD_BACKUPS=$(ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail -n +"${BACKUPS_TO_KEEP}")
+  local ADJUSTED_BACKUPS_TO_KEEP=$(( $BACKUPS_TO_KEEP+1 ))
+  OLD_BACKUPS=$(ls -r "$BACKUP_DIRECTORY_PATH" | grep -v "$LATEST_BACKUP_NAME" | tail -n +${ADJUSTED_BACKUPS_TO_KEEP} )
 
   for old_backup in $OLD_BACKUPS; do
     warn "Removing $old_backup"
