@@ -59,7 +59,7 @@ teardown() {
   }
 }
 
-@test "backup should create a symlink to the latest backup" {
+@test "backup creates a symlink to the latest backup" {
   [ ! -e backups/latest ]
 
   mcwrapper backup
@@ -67,7 +67,7 @@ teardown() {
   [ -L backups/latest ]
 }
 
-@test "backup should clean up backups when it hits the BACKUPS_TO_KEEP threshold" {
+@test "backup cleans up backups when it hits the BACKUPS_TO_KEEP threshold" {
   mcwrapper backup
   sleep 1
   mcwrapper backup
