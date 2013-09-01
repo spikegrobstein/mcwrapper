@@ -266,6 +266,7 @@ function default_config {
 # if relative, we want to prepend the MINECRAFT_SERVER_DIR_PATH to it.
 function process_config {
   if [[ -z "$MINECRAFT_SERVER_PATH" ]]; then
+    # TODO: make real error code for this
     return 1
   fi
 
