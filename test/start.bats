@@ -2,20 +2,18 @@
 
 # test starting mcwrapper
 
-# set -x
-
 setup() {
   export TMP="$BATS_TEST_DIRNAME/tmp"
   export MINECRAFT_SERVER_PATH="$TMP/faux_minecraft_server.jar"
   export PID_FILE="$TMP/mcwrapper.pid"
   export COMMAND_PIPE="$TMP/command_input"
 
-  export PATH="$BATS_TEST_DIRNAME/../../libexec:${PATH}"
+  export PATH="$BATS_TEST_DIRNAME/../libexec:${PATH}"
   # export mcwrapper="$BATS_TEST_DIRNAME/../../libexec/mcwrapper"
 
   mkdir -p "$TMP"
 
-  cp "$BATS_TEST_DIRNAME/../fixtures/faux_minecraft_server/faux_minecraft_server.jar" "$TMP/"
+  cp "$BATS_TEST_DIRNAME/fixtures/faux_minecraft_server/faux_minecraft_server.jar" "$TMP/"
 
   pushd "$TMP" &> /dev/null
 }
