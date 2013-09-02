@@ -558,6 +558,7 @@ function check_file_exists {
 # ^C to stop
 function tail_server_log {
   local SERVER_LOG_PATH=$(server_log_path)
+
   check_file_exists "$SERVER_LOG_PATH" "Server log" $EXIT_SERVER_LOG_NOT_FOUND
 
   tail -F "$SERVER_LOG_PATH"

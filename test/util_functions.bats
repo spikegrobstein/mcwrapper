@@ -1,6 +1,6 @@
 #! /usr/bin/env bats
 
-# test uncompressed backups
+# test utility function
 
 load test_helper
 
