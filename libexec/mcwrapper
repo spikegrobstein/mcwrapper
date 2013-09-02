@@ -828,8 +828,8 @@ function do_backup () {
   local WORLD_DATA_DIR=$1
 
   if [[ ! -e "$WORLD_DATA_DIR" ]]; then
-    # check $DOING_RESTORE global variable (set inside restore_world function)
-    if [[ ! -z "$DOING_RESTORE" ]]; then
+    # check if we're doing a restore
+    if is_doing_restore; then
       warn "Skipping backup because world data directory does not exist."
       return 1
     else
@@ -952,23 +952,46 @@ function cleanup_old_backups () {
   done
 }
 
-# call this to go through the whole backup procedure
-# makes sure backup directory exists, makes sure we don't back up a worldfile that's actively being written to, backs it up, symlinks it. everything.
-function backup_world {
-  if [[ "$BACKUPS_TO_KEEP" = "0" ]]; then
-    # set BACKUPS_TO_KEEP to "0" to disable backups entirely.
-    echo ""
-    echo "Backups are disabled. Not backing anything up."
+function start_restore {
+  DOING_RESTORE=1
+}
 
-    # if we're doing a restore, then just return a non-zero,
-    # otherwise exit with an exit code.
-    if [[ -z "$DOING_RESTORE" ]]; then
-      # not doing backup
-      exit $EXIT_BACKUPS_DISABLED
-    else
-      return 1
-    fi
-  fi
+function end_restore {
+  unset DOING_RESTORE
+}
+
+function is_doing_restore {
+  [[ ! -z "$DOING_RESTORE" ]]
+}
+
+# return 0 if backups are enabled
+# backups are disabled if BACKUPS_TO_KEEP is set to 0
+function are_backups_enabled {
+  [[ "$BACKUPS_TO_KEEP" -gt 0 ]]
+}
+
+# if backups are disabled, then spit out a warning
+#   returns 1 if doing a restore
+#   exits with code if not doing a restore
+# returns success if backups are enabled.
+function backup_sanity_check {
+  are_backups_enabled \
+    && return 0
+
+  warn "Backups are disabled. Not backing anything up."
+
+  is_doing_restore \
+    && return 1
+
+  exit $EXIT_BACKUPS_DISABLED
+}
+
+# call this to go through the whole backup procedure
+# this is called by the 'backup' action
+# makes sure backup directory exists,
+# makes sure we don't back up a worldfile that's actively being written to, backs it up, symlinks it. everything.
+function backup_world {
+  backup_sanity_check || return 1
 
   # the path to the to-be-backed-up directory
   CURRENT_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/$CURRENT_BACKUP_NAME"
@@ -1012,7 +1035,7 @@ function path_to_latest_backup {
 # given a path to a world backup, restore the current world with the contents
 # when doing this, back up the current world, if it exists
 function restore_world {
-  DOING_RESTORE=1
+  start_restore
   local RESTORE_FROM=$1
   local RESTORE_FROM_WORLD="${RESTORE_FROM}/world"
 
@@ -1053,7 +1076,7 @@ function restore_world {
     start_minecraft
   fi
 
-  unset DOING_RESTORE
+  end_restore
 }
 
 ## End MCBackup portion.
