@@ -545,16 +545,19 @@ function server_log_path {
   echo "${MINECRAFT_SERVER_DIR_PATH}/server.log"
 }
 
-# check if server log exists. if not, exit hard.
-# TODO: make into generic function for hard exiting if files don't exist. check_file_exist $type (eg: 'Server log'), $path, $callback?
-function check_server_log_exists {
-  local SERVER_LOG_PATH=$(server_log_path)
+# check if a file exists
+# exits abnormally if file does not exist
+# accepts 3 args:
+#  * filename to check
+#  * human-readable name of file for error
+#  * exit code if fails. (default of 1)
+function check_file_exists {
+  local FILE_PATH=$1
+  local FILE_DESC=${2-$FILE_PATH}
+  local EXIT_CODE=${3-1}
 
-  # make sure that the log file exists before trying to tail it.
-  if [[ ! -e "$SERVER_LOG_PATH" ]]; then
-    warn "Server log not found! ($SERVER_LOG_PATH)"
-    warn ""
-    exit $EXIT_SERVER_LOG_NOT_FOUND
+  if [[ ! -e "$FILE_PATH" ]]; then
+    die "${FILE_DESC} not found! ($FILE_PATH)" $EXIT_CODE
   fi
 }
 
@@ -562,7 +565,7 @@ function check_server_log_exists {
 # ^C to stop
 function tail_server_log {
   local SERVER_LOG_PATH=$(server_log_path)
-  check_server_log_exists
+  check_file_exists "$SERVER_LOG_PATH" "Server log" $EXIT_SERVER_LOG_NOT_FOUND
 
   tail -F "$SERVER_LOG_PATH"
 }
@@ -1201,7 +1204,6 @@ if [ "$BASH_SOURCE" == "$0" ]; then
       ;;
     log )
       sanity_check
-      check_server_log_exists
       warn "Tailing from: ${MINECRAFT_SERVER_DIR_PATH}/server.log"
       warn "Press ^C to cancel."
       warn "-------------------------------------------------------------------------------------------"
