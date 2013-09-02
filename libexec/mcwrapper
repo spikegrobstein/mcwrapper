@@ -820,6 +820,36 @@ function world_dir_path () {
   echo $WORLD_DATA_DIR
 }
 
+function copy_world_to_backup_path {
+  local WORLD_DATA_DIR=$1
+  local CURRENT_BACKUP_PATH=$2
+
+  cp -R "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH/" \
+    || die "An error occurred when copying the world data." $EXIT_CANNOT_BACKUP_WORLD_DATA
+}
+
+function copy_support_files_to_backup_path {
+  local MINECRAFT_SERVER_DIR_PATH=$1
+  local CURRENT_BACKUP_PATH=$2
+
+  cp -R "${MINECRAFT_SERVER_DIR_PATH}/"*.{txt,properties} "$CURRENT_BACKUP_PATH" \
+    || die "An error occurred when copying the configuration files." $EXIT_CANNOT_BACKUP_CONFIGS
+}
+
+function should_compress_backup {
+  [[ ! -z "$COMPRESS_BACKUP" ]]
+}
+
+function compress_backup {
+  local COMPRESSION_TYPE=$1
+  local CURRENT_BACKUP_PATH=$2
+
+  type -t "${COMPRESSION_TYPE}_backup" &> /dev/null \
+    || die "Invalid compression type: ${COMPRESSION_TYPE}. \`${COMPRESSION_TYPE}_backup' is not a function" $EXIT_BAD_COMPRESSION_TYPE
+
+  "${COMPRESSION_TYPE}_backup" $CURRENT_BACKUP_PATH
+}
+
 # copy the world data and configuration
 function do_backup () {
   local WORLD_DATA_DIR=$1
@@ -835,20 +865,13 @@ function do_backup () {
     fi
   fi
 
-  # copy the current world directory into 'world' directory in current backup
-  if ! cp -R "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH/world"; then
-    # an error occurred
-    warn "An error occurred when copying the world data."
-    exit $EXIT_CANNOT_BACKUP_WORLD_DATA
-  fi
+  copy_world_to_backup_path "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH"
+  copy_support_files_to_backup_path "$MINECRAFT_SERVER_DIR_PATH" "$CURRENT_BACKUP_PATH"
 
-  if ! cp -R "${MINECRAFT_SERVER_DIR_PATH}/"*.{txt,properties} "$CURRENT_BACKUP_PATH/"; then
-    # an error occurred
-    warn "An error occurred when copying the configuration information"
-    exit $EXIT_CANNOT_BACKUP_CONFIGS
-  fi
+  # should_compress_backup \
+    # && CURRENT_BACKUP_PATH=$( compress_backup "$COMPRESS_BACKUP" "$BACKUP_DIRECTORY_PATH" )
 
-  if [[ ! -z "$COMPRESS_BACKUP" ]]; then
+  if should_compress_backup; then
     # TODO: add support for bz2
     # TODO: make this code a little more readable without the secret, back alley variable updating.
     case "$COMPRESS_BACKUP" in
