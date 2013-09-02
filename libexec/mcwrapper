@@ -813,11 +813,36 @@ function start_writing_world () {
 }
 
 # get the path to the current world directory
+# this is built using the world name from server.properties and the
+# minecraft server dir path
 function world_dir_path () {
   local LEVEL_NAME=$(read_server_property level-name)
   local WORLD_DATA_DIR="${MINECRAFT_SERVER_DIR_PATH}/${LEVEL_NAME}"
 
   echo $WORLD_DATA_DIR
+}
+
+# copy the world data and configuration
+function do_backup () {
+  local WORLD_DATA_DIR=$1
+
+  if [[ ! -e "$WORLD_DATA_DIR" ]]; then
+    # check if we're doing a restore
+    if is_doing_restore; then
+      warn "Skipping backup because world data directory does not exist."
+      return 1
+    else
+      warn "World data directory does not exist. Cannot backup."
+      exit $EXIT_CANNOT_BACKUP_WORLD_DATA
+    fi
+  fi
+
+  copy_world_to_backup_path "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH"
+  copy_support_files_to_backup_path "$MINECRAFT_SERVER_DIR_PATH" "$CURRENT_BACKUP_PATH"
+
+  if should_compress_backup; then
+    CURRENT_BACKUP_PATH=$( compress_backup "$COMPRESS_BACKUP" "$CURRENT_BACKUP_PATH" )
+  fi
 }
 
 function copy_world_to_backup_path {
@@ -847,84 +872,32 @@ function compress_backup {
   type -t "${COMPRESSION_TYPE}_backup" &> /dev/null \
     || die "Invalid compression type: ${COMPRESSION_TYPE}. \`${COMPRESSION_TYPE}_backup' is not a function" $EXIT_BAD_COMPRESSION_TYPE
 
-  "${COMPRESSION_TYPE}_backup" $CURRENT_BACKUP_PATH
-}
+  pushd $( dirname $CURRENT_BACKUP_PATH ) &> /dev/null
 
-# copy the world data and configuration
-function do_backup () {
-  local WORLD_DATA_DIR=$1
-
-  if [[ ! -e "$WORLD_DATA_DIR" ]]; then
-    # check if we're doing a restore
-    if is_doing_restore; then
-      warn "Skipping backup because world data directory does not exist."
-      return 1
-    else
-      warn "World data directory does not exist. Cannot backup."
-      exit $EXIT_CANNOT_BACKUP_WORLD_DATA
-    fi
-  fi
-
-  copy_world_to_backup_path "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH"
-  copy_support_files_to_backup_path "$MINECRAFT_SERVER_DIR_PATH" "$CURRENT_BACKUP_PATH"
-
-  # should_compress_backup \
-    # && CURRENT_BACKUP_PATH=$( compress_backup "$COMPRESS_BACKUP" "$BACKUP_DIRECTORY_PATH" )
-
-  if should_compress_backup; then
-    # TODO: add support for bz2
-    # TODO: make this code a little more readable without the secret, back alley variable updating.
-    case "$COMPRESS_BACKUP" in
-      zip )
-        zip_backup
-        ;;
-      tgz )
-        tgz_backup
-        ;;
-      * )
-        echo "UKNOWN COMPRESSION TYPE: $COMPRESS_BACKUP"
-        exit $EXIT_BAD_COMPRESSION_TYPE
-        ;;
-    esac
-
-    # after the backup is compressed, remove the uncompressed version
-    rm -rf "$CURRENT_BACKUP_PATH"
-
-    # ARCHIVE_FILENAME gets set in the compressor ({tgz,zip}_backup) functions
-    # we set CURRENT_BACKUP_PATH so the symlink gets pointed to the archive rather than the directory we just deleted
-    CURRENT_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${ARCHIVE_FILENAME}"
-  fi
-}
-
-
-#TODO: there's some duplicate code here... should probably fix it.
-# concept:
-# create a compress_backup( $type ) function
-# check for `type ${type}_backup` function, if it exists
-# call it; it should have a signature like: somekind_backup( $current_backup_path )
-# and return the path to the compressed backup
-function tgz_backup {
-  # cd to the backup directory
-  # create new tgz backup
-  pushd "$BACKUP_DIRECTORY_PATH" &> /dev/null
-
-  local FILENAME=$(basename "$CURRENT_BACKUP_PATH")
-  ARCHIVE_FILENAME="${FILENAME}.tgz"
-
-  tar cfz "$ARCHIVE_FILENAME" "$FILENAME"  
+  local ARCHIVE_PATH=$( "${COMPRESSION_TYPE}_backup" $CURRENT_BACKUP_PATH )
+  rm -rf "$CURRENT_BACKUP_PATH"
 
   popd &> /dev/null
+
+  echo "$ARCHIVE_PATH"
+}
+
+function tgz_backup {
+  local CURRENT_BACKUP_PATH=$1
+  local ARCHIVE_PATH="${CURRENT_BACKUP_PATH}.tgz"
+
+  tar cfz "$ARCHIVE_PATH" "$( basename "$CURRENT_BACKUP_PATH" )"
+
+  echo "$ARCHIVE_PATH"
 }
 
 function zip_backup {
-  pushd "$BACKUP_DIRECTORY_PATH" &> /dev/null
+  local CURRENT_BACKUP_PATH=$1
+  local ARCHIVE_PATH="${CURRENT_BACKUP_PATH}.zip"
 
-  local FILENAME=$(basename "$CURRENT_BACKUP_PATH")
-  ARCHIVE_FILENAME="${FILENAME}.zip"
+  zip -q -r "$ARCHIVE_PATH" "$( basename "$CURRENT_BACKUP_PATH" )"
 
-  zip -q -r "$ARCHIVE_FILENAME" "$FILENAME"
-
-  popd &> /dev/null
+  echo "$ARCHIVE_PATH"
 }
 
 function create_symlink () {
