@@ -451,15 +451,8 @@ function set_up_pipe {
       exit "$EXIT_MAKE_FIFO_FAILED"
     fi
 
-    mkfifo "$COMMAND_PIPE"
-
-    local PIPE_STATUS=$?
-
-    if [[ $PIPE_STATUS != 0 ]]; then
-      # if mkfifo failed, print error message, exit non-zero.
-      warn "Error creating the pipe: $COMMAND_PIPE ($PIPE_STATUS)."
-      exit $EXIT_MAKE_FIFO_FAILED
-    fi
+    mkfifo "$COMMAND_PIPE" \
+      || die "Error creating the pipe; $COMMAND_PIPE ($?)" $EXIT_MAKE_FIFO_FAILED
   fi
 }
 
