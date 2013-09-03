@@ -827,19 +827,10 @@ function world_dir_path () {
 #   exits with code if not doing a restore
 # returns success if backups are enabled.
 function backup_sanity_check {
-  # the path to the to-be-backed-up directory
-  CURRENT_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/$CURRENT_BACKUP_NAME"
-
   local WORLD_DIR_PATH=$( world_dir_path )
 
-  create_backup_directory
-
   are_backups_enabled \
-    && [ -d "$WORLD_DIR_PATH" ] \
     && return 0
-
-  [ ! -e "$WORLD_DIR_PATH" ] \
-    && die "World data directory does not exist. Cannot backup." $EXIT_CANNOT_BACKUP_WORLD_DATA
 
   warn "Backups are disabled. Not backing anything up."
 
@@ -854,33 +845,45 @@ function backup_sanity_check {
 # makes sure backup directory exists,
 # makes sure we don't back up a worldfile that's actively being written to, backs it up, symlinks it. everything.
 function backup_world {
+  # the path to the to-be-backed-up directory
+  CURRENT_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/$CURRENT_BACKUP_NAME"
+
   backup_sanity_check || return 1
+
+  create_backup_directory
 
   # the path to the symlink to the above.
   LATEST_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_NAME}"
 
-  local WORLD_DIR_PATH=$( world_dir_path )
-
   check_is_running && stop_writing_world
 
-  do_backup "$WORLD_DIR_PATH"
+  do_backup "$CURRENT_BACKUP_PATH"
 
   check_is_running && start_writing_world
+
+  if should_compress_backup; then
+    CURRENT_BACKUP_PATH=$( compress_backup "$COMPRESS_BACKUP" "$CURRENT_BACKUP_PATH" )
+  fi
 
   create_symlink
   cleanup_old_backups
 }
 
+function sanity_check_world_dir {
+  local WORLD_DIR_PATH=$1
+
+  [ -d "$WORLD_DIR_PATH" ] \
+    || die "World data directory does not exist. Cannot backup." $EXIT_CANNOT_BACKUP_WORLD_DATA
+}
+
 # copy the world data and configuration
 function do_backup () {
-  local WORLD_DATA_DIR=$1
+  local CURRENT_BACKUP_PATH=$1
+  local WORLD_DIR_PATH=$( world_dir_path )
 
-  copy_world_to_backup_path "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH"
+  sanity_check_world_dir "$WORLD_DIR_PATH"
+  copy_world_to_backup_path "$WORLD_DIR_PATH" "$CURRENT_BACKUP_PATH"
   copy_support_files_to_backup_path "$MINECRAFT_SERVER_DIR_PATH" "$CURRENT_BACKUP_PATH"
-
-  if should_compress_backup; then
-    CURRENT_BACKUP_PATH=$( compress_backup "$COMPRESS_BACKUP" "$CURRENT_BACKUP_PATH" )
-  fi
 }
 
 function copy_world_to_backup_path {
