@@ -822,20 +822,58 @@ function world_dir_path () {
   echo $WORLD_DATA_DIR
 }
 
+# if backups are disabled, then spit out a warning
+#   returns 1 if doing a restore
+#   exits with code if not doing a restore
+# returns success if backups are enabled.
+function backup_sanity_check {
+  # the path to the to-be-backed-up directory
+  CURRENT_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/$CURRENT_BACKUP_NAME"
+
+  local WORLD_DIR_PATH=$( world_dir_path )
+
+  create_backup_directory
+
+  are_backups_enabled \
+    && [ -d "$WORLD_DIR_PATH" ] \
+    && return 0
+
+  [ ! -e "$WORLD_DIR_PATH" ] \
+    && die "World data directory does not exist. Cannot backup." $EXIT_CANNOT_BACKUP_WORLD_DATA
+
+  warn "Backups are disabled. Not backing anything up."
+
+  is_doing_restore \
+    && return 1
+
+  exit $EXIT_BACKUPS_DISABLED
+}
+
+# call this to go through the whole backup procedure
+# this is called by the 'backup' action
+# makes sure backup directory exists,
+# makes sure we don't back up a worldfile that's actively being written to, backs it up, symlinks it. everything.
+function backup_world {
+  backup_sanity_check || return 1
+
+  # the path to the symlink to the above.
+  LATEST_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_NAME}"
+
+  local WORLD_DIR_PATH=$( world_dir_path )
+
+  check_is_running && stop_writing_world
+
+  do_backup "$WORLD_DIR_PATH"
+
+  check_is_running && start_writing_world
+
+  create_symlink
+  cleanup_old_backups
+}
+
 # copy the world data and configuration
 function do_backup () {
   local WORLD_DATA_DIR=$1
-
-  if [[ ! -e "$WORLD_DATA_DIR" ]]; then
-    # check if we're doing a restore
-    if is_doing_restore; then
-      warn "Skipping backup because world data directory does not exist."
-      return 1
-    else
-      warn "World data directory does not exist. Cannot backup."
-      exit $EXIT_CANNOT_BACKUP_WORLD_DATA
-    fi
-  fi
 
   copy_world_to_backup_path "$WORLD_DATA_DIR" "$CURRENT_BACKUP_PATH"
   copy_support_files_to_backup_path "$MINECRAFT_SERVER_DIR_PATH" "$CURRENT_BACKUP_PATH"
@@ -961,47 +999,6 @@ function is_doing_restore {
 # backups are disabled if BACKUPS_TO_KEEP is set to 0
 function are_backups_enabled {
   [[ "$BACKUPS_TO_KEEP" -gt 0 ]]
-}
-
-# if backups are disabled, then spit out a warning
-#   returns 1 if doing a restore
-#   exits with code if not doing a restore
-# returns success if backups are enabled.
-function backup_sanity_check {
-  are_backups_enabled \
-    && return 0
-
-  warn "Backups are disabled. Not backing anything up."
-
-  is_doing_restore \
-    && return 1
-
-  exit $EXIT_BACKUPS_DISABLED
-}
-
-# call this to go through the whole backup procedure
-# this is called by the 'backup' action
-# makes sure backup directory exists,
-# makes sure we don't back up a worldfile that's actively being written to, backs it up, symlinks it. everything.
-function backup_world {
-  backup_sanity_check || return 1
-
-  # the path to the to-be-backed-up directory
-  CURRENT_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/$CURRENT_BACKUP_NAME"
-
-  # the path to the symlink to the above.
-  LATEST_BACKUP_PATH="${BACKUP_DIRECTORY_PATH}/${LATEST_BACKUP_NAME}"
-
-  create_backup_directory
-
-  check_is_running && stop_writing_world
-
-  do_backup $(world_dir_path)
-
-  check_is_running && start_writing_world
-
-  create_symlink
-  cleanup_old_backups
 }
 
 function path_to_latest_backup {
