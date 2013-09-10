@@ -1088,7 +1088,7 @@ if [ "$BASH_SOURCE" == "$0" ]; then
   # selfconfigure
   default_config
   read_config
-  process_config
+  process_config || true
 
   # absolutely, under no circumstances, let mcwrapper be run as root!!!!
   # well, unless they set ALLOW_ROOT=1, then it's ok.
