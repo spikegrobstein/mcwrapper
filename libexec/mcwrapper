@@ -595,6 +595,34 @@ function sanity_check {
   fi
 }
 
+# return a truthy value if we're running as root
+function check_if_running_as_root {
+  [[ $( id -u ) = 0 ]] \
+    && return 0
+
+  return 1
+}
+
+# absolutely, under no circumstances, let mcwrapper be run as root!!!!
+# well, unless they set ALLOW_ROOT=1, then it's ok.
+# this can be desireable under specific circumstances, so may as well have a workaround.
+function exit_if_running_as_root {
+  if [[ -z "$ALLOW_ROOT" && check_if_running_as_root ]]; then
+    warn "You have started mcwrapper as root."
+    warn "This is not recommended. Please run as an un-privilaged user."
+    warn "If you *must* run as root, you can execute: ALLOW_ROOT=1 mcwrapper start"
+    warn ""
+    exit $EXIT_RUNNING_AS_ROOT
+  elif [[ ! -z "$ALLOW_ROOT" && check_if_running_as_root ]]; then
+
+    # spit out a warning unless SUPPORESS_ROOT_WARNING is set
+    if [[ -z "$SUPPRESS_ROOT_WARNING" ]]; then
+      warn "Warning: Running as root."
+    fi
+
+  fi
+}
+
 # performs cleanup after stopping mcwrapper
 # removes pid and pipe
 function clean_up {
@@ -1093,20 +1121,7 @@ if [ "$BASH_SOURCE" == "$0" ]; then
   read_config
   process_config || true
 
-  # absolutely, under no circumstances, let mcwrapper be run as root!!!!
-  # well, unless they set ALLOW_ROOT=1, then it's ok.
-  # this can be desireable under specific circumstances, so may as well have a workaround.
-  if [[ -z "$ALLOW_ROOT" && $(id -u) = 0 ]]; then
-    warn "You have started mcwrapper as root."
-    warn "This is not recommended. Please run as an un-privilaged user."
-    warn "If you *must* run as root, you can execute: ALLOW_ROOT=1 mcwrapper start"
-    warn ""
-    exit $EXIT_RUNNING_AS_ROOT
-  elif [[ ! -z "$ALLOW_ROOT" && $(id -u) = 0 ]]; then
-    # spit out a warning unless SUPPORESS_ROOT_WARNING is set
-    [[ -z "$SUPPRESS_ROOT_WARNING" ]] \
-      && warn "Warning: Running as root."
-  fi
+  exit_if_running_as_root
 
   # before most actions are run, sanity_check is called
   # this ensures that things are configured properly before
