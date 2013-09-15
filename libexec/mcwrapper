@@ -1103,7 +1103,7 @@ if [ "$BASH_SOURCE" == "$0" ]; then
     warn ""
     exit $EXIT_RUNNING_AS_ROOT
   elif [[ ! -z "$ALLOW_ROOT" && $(id -u) = 0 ]]; then
-    warn "Warning: Running as root."
+    [[ -z "$SUPPRESS_ROOT_WARNING" ]] && warn "Warning: Running as root."
   fi
 
   # before most actions are run, sanity_check is called
