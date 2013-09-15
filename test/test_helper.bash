@@ -1,5 +1,5 @@
 set_path() {
-  export PATH="$BATS_TEST_DIRNAME/../libexec:${PATH}"
+  export PATH="$BATS_TEST_DIRNAME/../bin:${PATH}"
 }
 
 set_faux_server() {
