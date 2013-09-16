@@ -163,7 +163,7 @@ function print_about {
 function get_config_path {
 
   # if it's defined in an ENV var, then let's use that
-  if [[ ! -z "$MCWRAPPER_CONFIG_PATH" ]]; then
+  if [[ -n "$MCWRAPPER_CONFIG_PATH" ]]; then
     echo $MCWRAPPER_CONFIG_PATH
     return
   fi
@@ -508,7 +508,7 @@ function start_minecraft_in_foreground {
 # stops the minecraft server by sending it the 'stop' command via the FIFO
 function stop_minecraft {
   # if $BACKUP_ON_EXIT is non-zero length, then backup the world before exiting.
-  if [[ ! -z "$BACKUP_ON_EXIT" ]]; then
+  if [[ -n "$BACKUP_ON_EXIT" ]]; then
     warn ""
     warn -n "Backing up world data before exiting..."
     ( backup_world )
@@ -617,7 +617,7 @@ function exit_if_running_as_root {
     warn "If you *must* run as root, you can execute: ALLOW_ROOT=1 mcwrapper start"
     warn ""
     exit $EXIT_RUNNING_AS_ROOT
-  elif [[ ! -z "$ALLOW_ROOT" ]]; then
+  elif [[ -n "$ALLOW_ROOT" ]]; then
 
     # spit out a warning unless SUPPORESS_ROOT_WARNING is set
     if [[ -z "$SUPPRESS_ROOT_WARNING" ]]; then
@@ -683,7 +683,7 @@ function run_installer () {
 
   echo -n "Is this where you wish to install the Minecraft Server? [Y/n]: "
   read INSTALL_PATH_CORRECT
-  if [[ "$INSTALL_PATH_CORRECT" != 'y' && ! -z "$INSTALL_PATH_CORRECT" ]]; then
+  if [[ "$INSTALL_PATH_CORRECT" != 'y' && -n "$INSTALL_PATH_CORRECT" ]]; then
     echo ""
     echo "Please update your mcwrapper.conf and re-run this installer."
     echo ""
@@ -938,7 +938,7 @@ function copy_support_files_to_backup_path {
 }
 
 function should_compress_backup {
-  [[ ! -z "$COMPRESS_BACKUP" ]]
+  [[ -n "$COMPRESS_BACKUP" ]]
 }
 
 function compress_backup {
@@ -1030,7 +1030,7 @@ function end_restore {
 }
 
 function is_doing_restore {
-  [[ ! -z "$DOING_RESTORE" ]]
+  [[ -n "$DOING_RESTORE" ]]
 }
 
 # return 0 if backups are enabled
