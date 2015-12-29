@@ -483,7 +483,12 @@ function start_minecraft {
   pushd $MINECRAFT_SERVER_DIR_PATH &> /dev/null
 
   set_up_pipe
-  create_pid $(start_minecraft_in_background)
+
+  if [ $FOREGROUND -eq 1 ]; then
+    create_pid $(start_minecraft_in_foreground)
+  else
+    create_pid $(start_minecraft_in_background)
+  fi
 
   # sleep for one second to make sure that the process actually started properly.
   sleep 1
